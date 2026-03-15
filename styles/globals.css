@@ -1,0 +1,21 @@
+@import "tailwindcss";
+
+
+body{
+    font-size: 16px;
+}
+
+.container {
+    display: grid;
+    grid-template-columns: 2fr min(1440px,94%) 2fr;
+    grid-template-rows: 80px 1fr auto; /* Header 80px, Footer içindekiler kadar (auto), Orta kısım kalan tüm alan (1fr) */
+    min-height: 100vh; /* Kapsayıcının en az ekran boyu kadar olmasını sağlar */
+}   
+
+.container > * {
+  grid-column: 2;
+}
+
+.container > .fluid {
+  grid-column: 1 / -1;
+}
