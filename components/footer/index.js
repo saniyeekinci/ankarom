@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 export default function Footer() {
-const scrollToTop = (e) => {
+  const scrollToTop = (e) => {
     e.preventDefault(); // Sayfa yenilenmesini veya beklenmedik kaymaları önler
     if (typeof window !== "undefined") {
       window.scrollTo({
@@ -15,11 +15,10 @@ const scrollToTop = (e) => {
   };
 
   return (
-    <footer className="w-full bg-[#f8fafc] py-6 px-0">
+    <footer className="w-full  py-6 px-0">
       <div className="mx-auto max-w-none px-4 md:px-10">
-        <div className="bg-[#0a3631] text-white rounded-[40px] overflow-hidden shadow-2xl">
+        <div className="border border-gray-600 text-white rounded-[40px] overflow-hidden shadow-2xl">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-12 px-8 py-16 md:px-20 lg:px-24">
-            {/* Sol Bölüm: Logo, Slogan ve Yeni Eklenen Sosyal İkonlar + Buton */}
             <div className="md:col-span-5 flex flex-col justify-between h-full">
               {" "}
               {/* h-full ve justify-between önemli */}
@@ -103,26 +102,26 @@ const scrollToTop = (e) => {
 
                 {/* BACK TO TOP BUTONU */}
                 <div>
-                 <button
-  type="button" // Form içinde kalırsa sayfayı yenilememesi için
-  onClick={scrollToTop}
-  className="relative z-10 flex items-center gap-3 border border-gray-500 rounded-lg px-5 py-2.5 text-[11px] font-bold uppercase tracking-widest hover:bg-white hover:text-[#0a3631] transition-all duration-300 cursor-pointer"
->
-  <svg
-    className="w-4 h-4 pointer-events-none" // SVG'nin tıklamayı emmesini engeller
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth="2"
-      d="M5 11l7-7 7 7"
-    />
-  </svg>
-  BACK TO TOP
-</button>
+                  <button
+                    type="button" // Form içinde kalırsa sayfayı yenilememesi için
+                    onClick={scrollToTop}
+                    className="relative z-10 flex items-center gap-3 border border-gray-500 rounded-lg px-5 py-2.5 text-[11px] font-bold uppercase tracking-widest hover:bg-white hover:text-[#0a3631] transition-all duration-300 cursor-pointer"
+                  >
+                    <svg
+                      className="w-4 h-4 pointer-events-none" // SVG'nin tıklamayı emmesini engeller
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M5 11l7-7 7 7"
+                      />
+                    </svg>
+                    BACK TO TOP
+                  </button>
                 </div>
               </div>
             </div>

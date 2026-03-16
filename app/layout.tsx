@@ -20,9 +20,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className="container">
+        className="container" suppressHydrationWarning={true}>
         <Header/>
-        <main className="bg-yellow-200">{children}</main>
+        <main className="bg-white/5 backdrop-blur-md border border-white/10 rounded-[40px] p-12 text-gray-200 shadow-2xl">{children}</main>
         <Footer />
       </body>
     </html>
