@@ -25,3 +25,16 @@ body {
 .container > .fluid {
     grid-column: 1 / -1;
 }
+
+.marquee-track {
+    animation: logo-marquee 24s linear infinite;
+}
+
+@keyframes logo-marquee {
+    0% {
+        transform: translate3d(0, 0, 0);
+    }
+    100% {
+        transform: translate3d(-50%, 0, 0);
+    }
+}
