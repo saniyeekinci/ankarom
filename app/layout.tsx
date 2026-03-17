@@ -22,7 +22,7 @@ export default function RootLayout({
       <body
         className="container" suppressHydrationWarning={true}>
         <Header/>
-        <main className="bg-white/5 backdrop-blur-md border border-white/10 rounded-[40px] p-12 text-gray-200 shadow-2xl">{children}</main>
+        <main className="text-gray-200">{children}</main>
         <Footer />
       </body>
     </html>
