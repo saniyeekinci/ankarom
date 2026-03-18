@@ -12,7 +12,7 @@ const pulseAnimation = keyframes`0% { box-shadow: 0 0 0 0 rgba(180, 83, 9, 0.7);
 
 // Mega Menu
 const megaMenuLinksCol1 = [
-{ name: "Online Stores", href: "#" },
+{ name: "Super Sport Trailer", href: "/urunler" },
 { name: "Segmentation", href: "#" },
 { name: "Marketing CRM", href: "#" },
 { name: "Sales Operations", href: "#" },
@@ -49,7 +49,7 @@ export default function Header() {
 
 				<nav className="absolute left-1/2 z-10 hidden h-full -translate-x-1/2 items-center gap-8 lg:flex">
 					<div className="group relative h-full flex items-center">
-						<button className="flex h-full items-center gap-2 text-[13px] font-bold uppercase tracking-[0.2em] text-white/80 transition-colors duration-300 hover:text-amber-400 outline-none">
+						<Link href="/urunler" className="flex h-full items-center gap-2 text-[13px] font-bold uppercase tracking-[0.2em] text-white/80 transition-colors duration-300 hover:text-amber-400 outline-none">
 							Ürünlerimiz
 							<svg
 								className="h-3 w-3 transition-transform duration-300 group-hover:rotate-180"
@@ -59,7 +59,7 @@ export default function Header() {
 							>
 								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
 							</svg>
-						</button>
+						</Link>
 
 						<div className="pointer-events-none absolute left-1/2 top-full z-50 w-240 -translate-x-1/2 pt-5 opacity-0 invisible translate-y-4 transition-all duration-500 ease-out group-hover:pointer-events-auto group-hover:opacity-100 group-hover:visible group-hover:translate-y-0">
 							<div className="rounded-4xl border border-white/10 bg-slate-900/85 p-10 text-slate-300 shadow-[0_30px_80px_rgba(2,6,23,0.7)] backdrop-blur-2xl">

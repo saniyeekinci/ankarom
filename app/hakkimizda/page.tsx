@@ -91,16 +91,16 @@ export default function HakkimizdaPage() {
           </aside>
         </div>
 
-        <section className="rounded-3xl border border-white/10 bg-slate-900/55 p-6 shadow-[0_24px_70px_rgba(2,6,23,0.45)] sm:p-8 lg:p-10">
-          <div className="flex flex-wrap items-end justify-between gap-3">
+        <section className="mb-10 rounded-3xl border border-white/10 bg-slate-900/55 p-6 shadow-[0_24px_70px_rgba(2,6,23,0.45)] sm:mb-12 sm:p-8 lg:mb-14 lg:p-10">
+          <div className="mb-10 flex flex-wrap items-end justify-between gap-5 sm:mb-12">
             <h2 className="text-3xl font-black sm:text-4xl">Yolculuk</h2>
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-400">2018 — 2026</p>
           </div>
 
-          <div className="mt-12 border-l-2 border-white/15 pl-5 sm:pl-7">
-            <div className="space-y-8">
+          <div className="border-l-2 border-white/15 pl-5 sm:pl-7">
+            <div className="grid gap-6 sm:gap-7">
               {milestones.map((item) => (
-                <article key={item.year} className="relative rounded-2xl border border-white/10 bg-white/5 p-5">
+                <article key={item.year} className="relative rounded-2xl border border-white/15 bg-white/5 p-5 shadow-[0_8px_24px_rgba(2,6,23,0.2)]">
                   <span className="absolute -left-9.5 top-6 h-4 w-4 rounded-full border-2 border-slate-950 bg-amber-300" />
                   <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">{item.year}</p>
                   <h3 className="mt-2 text-xl font-bold">{item.label}</h3>
