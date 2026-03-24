@@ -3,6 +3,8 @@ import "@/styles/globals.css";
 import "@/styles/reset.css";
 import Header from "@/components/header"
 import Footer from "@/components/footer"
+import { CartProvider } from "@/components/cart/CartProvider";
+import { AuthProvider } from "@/components/auth/AuthProvider";
 
 export const metadata: Metadata = {
   title: "ANKAROM",
@@ -21,9 +23,13 @@ export default function RootLayout({
     <html lang="en">
       <body
         className="container" suppressHydrationWarning={true}>
-        <Header/>
-        <main className="text-gray-200">{children}</main>
-        <Footer />
+        <AuthProvider>
+          <CartProvider>
+            <Header/>
+            <main className="text-gray-200">{children}</main>
+            <Footer />
+          </CartProvider>
+        </AuthProvider>
       </body>
     </html>
   );
