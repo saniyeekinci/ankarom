@@ -42,6 +42,10 @@ const productSchema = new mongoose.Schema(
       default: "Stokta Var",
       trim: true,
     },
+    features: {
+      type: [String],
+      default: [],
+    },
   },
   { timestamps: true }
 );

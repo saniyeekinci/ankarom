@@ -130,12 +130,12 @@ export default function CartPage() {
                 <p className="mt-1 text-2xl font-black text-yellow-300">{formatCurrency(subtotal)}</p>
               </div>
 
-              <button
-                type="button"
-                className="mt-6 w-full rounded-2xl bg-linear-to-r from-emerald-500 to-green-500 px-4 py-3.5 text-sm font-bold text-white shadow-[0_12px_30px_rgba(16,185,129,0.35)] transition-all hover:-translate-y-0.5"
+              <Link
+                href="/odeme"
+                className="mt-6 w-full rounded-2xl bg-linear-to-r from-emerald-500 to-green-500 px-4 py-3.5 text-center text-sm font-bold text-white shadow-[0_12px_30px_rgba(16,185,129,0.35)] transition-all hover:-translate-y-0.5"
               >
                 Siparişi Tamamla
-              </button>
+              </Link>
             </aside>
           </div>
         )}

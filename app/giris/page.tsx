@@ -10,6 +10,7 @@ import { EyeSlashIcon } from "@heroicons/react/24/outline";
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
   const { login, isAuthenticated } = useAuth();
   const router = useRouter();
 
@@ -23,10 +24,22 @@ export default function LoginPage() {
     return null;
   }
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    login(email, password);
-    router.push("/hesabim");
+    setErrorMessage("");
+
+    try {
+      const loggedInUser = await login(email, password);
+      if (loggedInUser.role === "admin") {
+        router.push("/admin/urun-ekle");
+        return;
+      }
+
+      router.push("/hesabim");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Giriş sırasında bir hata oluştu.";
+      setErrorMessage(message);
+    }
   };
 
   return (
@@ -68,6 +81,8 @@ export default function LoginPage() {
           </div>
 
           <div className="pt-1 text-right text-sm font-medium text-slate-400">Forget password?</div>
+
+          {errorMessage && <p className="text-sm text-rose-300">{errorMessage}</p>}
 
           <button
             type="submit"

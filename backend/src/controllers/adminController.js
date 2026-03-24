@@ -24,6 +24,27 @@ const parseDate = (value) => {
   return Number.isNaN(parsed.getTime()) ? null : parsed;
 };
 
+const normalizeFeatures = (value) => {
+  if (value === undefined || value === null) {
+    return [];
+  }
+
+  if (Array.isArray(value)) {
+    return value
+      .map((item) => String(item ?? "").trim())
+      .filter(Boolean);
+  }
+
+  if (typeof value === "string") {
+    return value
+      .split(/\r?\n/)
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+
+  return [];
+};
+
 export const getDashboardStats = async (req, res, next) => {
   try {
     const [totalRevenueAgg, totalSalesAgg, totalUsers, lowStockProducts, monthlySalesAgg, recentProducts] = await Promise.all([
@@ -73,7 +94,7 @@ export const getDashboardStats = async (req, res, next) => {
 
 export const createProduct = async (req, res, next) => {
   try {
-    const { name, price, discountPrice, stock, category, imageUrl, description, deliveryInfo } = req.body;
+    const { name, price, discountPrice, stock, category, imageUrl, description, deliveryInfo, features } = req.body;
 
     if (!name || price === undefined) {
       res.status(400);
@@ -108,6 +129,7 @@ export const createProduct = async (req, res, next) => {
       category: String(category || "Genel").trim(),
       imageUrl: String(imageUrl || "").trim(),
       deliveryInfo: String(deliveryInfo || "Stokta Var").trim(),
+      features: normalizeFeatures(features),
     });
 
     return res.status(201).json({
@@ -134,7 +156,7 @@ export const updateProduct = async (req, res, next) => {
       throw new Error("Ürün bulunamadı.");
     }
 
-    const { name, price, discountPrice, stock, category, imageUrl, description, deliveryInfo } = req.body;
+    const { name, price, discountPrice, stock, category, imageUrl, description, deliveryInfo, features } = req.body;
 
     if (name !== undefined) {
       existingProduct.name = String(name).trim();
@@ -197,6 +219,10 @@ export const updateProduct = async (req, res, next) => {
 
     if (deliveryInfo !== undefined) {
       existingProduct.deliveryInfo = String(deliveryInfo || "Stokta Var").trim();
+    }
+
+    if (features !== undefined) {
+      existingProduct.features = normalizeFeatures(features);
     }
 
     const updatedProduct = await existingProduct.save();

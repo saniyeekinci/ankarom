@@ -3,21 +3,25 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 export type AuthUser = {
+  id: string;
   name: string;
   email: string;
+  role: "admin" | "user";
 };
 
 type AuthContextValue = {
   user: AuthUser | null;
+  token: string | null;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => void;
-  register: (name: string, email: string, password: string) => void;
+  login: (email: string, password: string) => Promise<AuthUser>;
+  register: (name: string, email: string, password: string) => Promise<AuthUser>;
   loginWithGoogle: (redirectTo?: string) => void;
   logout: () => void;
 };
 
-const STORAGE_KEY = "ankarom-auth-user";
+const STORAGE_KEY = "ankarom-auth-session";
 const GOOGLE_SCOPE = "openid email profile";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
@@ -32,7 +36,45 @@ const getNameFromEmail = (email: string) => {
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
+  const [token, setToken] = useState<string | null>(null);
   const [isHydrated, setIsHydrated] = useState(false);
+
+  const setSession = (sessionUser: AuthUser, sessionToken: string) => {
+    setUser(sessionUser);
+    setToken(sessionToken);
+  };
+
+  const authenticateWithBackend = async (
+    endpoint: "login" | "register" | "google",
+    payload: Record<string, unknown>,
+  ): Promise<AuthUser> => {
+    let response: Response;
+
+    try {
+      response = await fetch(`${API_BASE_URL}/api/auth/${endpoint}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+    } catch {
+      throw new Error(
+        `Backend'e bağlanılamadı. API adresi: ${API_BASE_URL}. Backend sunucusunun çalıştığını ve CORS ayarlarını kontrol edin.`,
+      );
+    }
+
+    const data = (await response.json()) as {
+      message?: string;
+      token?: string;
+      user?: AuthUser;
+    };
+
+    if (!response.ok || !data.token || !data.user?.id) {
+      throw new Error(data.message || "Kimlik doğrulama işlemi başarısız oldu.");
+    }
+
+    setSession(data.user, data.token);
+    return data.user;
+  };
 
   useEffect(() => {
     const parseGoogleAuthHash = async () => {
@@ -70,11 +112,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           throw new Error("Google user info request failed");
         }
 
-        const profile = (await response.json()) as { name?: string; email?: string };
+        const profile = (await response.json()) as { name?: string; email?: string; sub?: string };
         if (profile.email) {
-          setUser({
-            name: profile.name?.trim() || getNameFromEmail(profile.email),
+          await authenticateWithBackend("google", {
             email: profile.email,
+            name: profile.name?.trim() || getNameFromEmail(profile.email),
+            googleId: profile.sub || null,
           });
         }
       } catch {
@@ -92,9 +135,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {
-        const parsed = JSON.parse(raw) as AuthUser;
-        if (parsed?.email) {
-          setUser(parsed);
+        const parsed = JSON.parse(raw) as { user?: AuthUser; token?: string };
+        if (parsed?.user?.id && parsed?.token) {
+          setUser(parsed.user);
+          setToken(parsed.token);
         }
       }
     } finally {
@@ -107,21 +151,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    if (user) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+    if (user && token) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ user, token }));
       return;
     }
 
     localStorage.removeItem(STORAGE_KEY);
-  }, [user, isHydrated]);
+  }, [user, token, isHydrated]);
 
-  const login = (email: string) => {
-    setUser({ name: getNameFromEmail(email), email });
+  const login = async (email: string, password: string) => {
+    return authenticateWithBackend("login", { email, password });
   };
 
-  const register = (name: string, email: string) => {
-    const normalizedName = name.trim() || getNameFromEmail(email);
-    setUser({ name: normalizedName, email });
+  const register = async (name: string, email: string, password: string) => {
+    return authenticateWithBackend("register", { name, email, password });
   };
 
   const loginWithGoogle = (redirectTo = "/hesabim") => {
@@ -151,18 +194,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = () => {
     setUser(null);
+    setToken(null);
   };
 
   const value = useMemo(
     () => ({
       user,
+      token,
       isAuthenticated: Boolean(user),
       login,
       register,
       loginWithGoogle,
       logout,
     }),
-    [user],
+    [user, token],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

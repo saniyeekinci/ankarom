@@ -11,6 +11,7 @@ export default function RegisterPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
   const { register, isAuthenticated } = useAuth();
   const router = useRouter();
 
@@ -24,10 +25,17 @@ export default function RegisterPage() {
     return null;
   }
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    register(name, email, password);
-    router.push("/hesabim");
+    setErrorMessage("");
+
+    try {
+      await register(name, email, password);
+      router.push("/hesabim");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Kayıt sırasında bir hata oluştu.";
+      setErrorMessage(message);
+    }
   };
 
   return (
@@ -78,6 +86,8 @@ export default function RegisterPage() {
             />
             <EyeSlashIcon className="h-5 w-5 text-slate-400" />
           </div>
+
+          {errorMessage && <p className="text-sm text-rose-300">{errorMessage}</p>}
 
           <button
             type="submit"

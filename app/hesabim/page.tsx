@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { ClipboardDocumentListIcon, ShoppingCartIcon, Cog6ToothIcon, ArrowRightOnRectangleIcon } from "@heroicons/react/24/outline";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { useCart } from "@/components/cart/CartProvider";
@@ -19,8 +21,15 @@ const formatCurrency = (value: number) =>
   }).format(value);
 
 export default function AccountPage() {
+  const router = useRouter();
   const { user, isAuthenticated, logout } = useAuth();
   const { items, itemCount, subtotal } = useCart();
+
+  useEffect(() => {
+    if (isAuthenticated && user?.role === "admin") {
+      router.replace("/admin/urun-ekle");
+    }
+  }, [isAuthenticated, user, router]);
 
   if (!isAuthenticated || !user) {
     return (
@@ -63,6 +72,12 @@ export default function AccountPage() {
                 <ShoppingCartIcon className="h-5 w-5 text-cyan-300" />
                 Sepetim
               </Link>
+              {user.role === "admin" && (
+                <Link href="/admin/urun-ekle" className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-semibold text-cyan-200 transition-colors hover:bg-cyan-500/15 hover:text-cyan-100">
+                  <Cog6ToothIcon className="h-5 w-5 text-cyan-300" />
+                  Admin Paneli
+                </Link>
+              )}
               <button type="button" className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm font-semibold text-white/85 transition-colors hover:bg-white/10 hover:text-white">
                 <Cog6ToothIcon className="h-5 w-5 text-cyan-300" />
                 Hesap Ayarları

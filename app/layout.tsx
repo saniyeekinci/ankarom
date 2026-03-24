@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import "@/styles/globals.css";
 import "@/styles/reset.css";
-import Header from "@/components/header"
-import Footer from "@/components/footer"
 import { CartProvider } from "@/components/cart/CartProvider";
 import { AuthProvider } from "@/components/auth/AuthProvider";
+import AppFrame from "@/components/layout/AppFrame";
 
 export const metadata: Metadata = {
   title: "ANKAROM",
@@ -25,9 +24,7 @@ export default function RootLayout({
         className="container" suppressHydrationWarning={true}>
         <AuthProvider>
           <CartProvider>
-            <Header/>
-            <main className="text-gray-200">{children}</main>
-            <Footer />
+            <AppFrame>{children}</AppFrame>
           </CartProvider>
         </AuthProvider>
       </body>

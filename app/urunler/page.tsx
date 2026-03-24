@@ -2,8 +2,38 @@ import Image from "next/image";
 import Link from "next/link";
 import { HeartIcon, TruckIcon, StarIcon } from "@heroicons/react/24/outline";
 import { trailerProducts } from "@/lib/trailerProducts";
+import { mapBackendProductToTrailerProduct, type BackendProduct } from "@/lib/productMapper";
 
-export default function ProductsPage() {
+const getLiveProducts = async () => {
+  try {
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+    // Ürün eklediğin an sayfada görebilmen için cache'i kapatıyoruz
+    const response = await fetch(`${backendUrl}/api/products`, {
+      cache: "no-store", 
+    });
+
+    if (!response.ok) {
+      return trailerProducts;
+    }
+
+    const data = (await response.json()) as BackendProduct[] | { products?: BackendProduct[] };
+    
+    // Backend'den gelen veri direkt dizi (array) mi yoksa { products: [...] } formatında mı kontrol ediyoruz
+    const productsList: BackendProduct[] | undefined = Array.isArray(data) ? data : data.products;
+
+    if (!productsList || productsList.length === 0) {
+      return trailerProducts;
+    }
+
+    return productsList.map(mapBackendProductToTrailerProduct);
+  } catch {
+    return trailerProducts;
+  }
+};
+
+export default async function ProductsPage() {
+  const products = await getLiveProducts();
+
   return (
     <section className="relative overflow-hidden px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
       <div className="pointer-events-none absolute -left-20 top-10 h-72 w-72 rounded-full bg-indigo-500/15 blur-3xl" />
@@ -20,7 +50,7 @@ export default function ProductsPage() {
         </div>
 
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {trailerProducts.map((product) => (
+          {products.map((product) => (
             <article
               key={product.id}
               className="group relative overflow-hidden rounded-3xl border border-white/10 bg-linear-to-b from-slate-900/75 to-slate-950/80 p-3 shadow-[0_18px_50px_rgba(2,6,23,0.5)] backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:border-white/20"
