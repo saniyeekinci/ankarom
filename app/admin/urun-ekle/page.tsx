@@ -113,15 +113,15 @@ export default function AdminUrunEklePage() {
       <div className="pointer-events-none absolute -left-16 top-10 h-80 w-80 rounded-full bg-indigo-500/15 blur-3xl" />
       <div className="pointer-events-none absolute right-0 top-0 h-80 w-80 rounded-full bg-cyan-500/10 blur-3xl" />
 
-      <div className="relative mx-auto w-full max-w-360 min-w-0">
+      <div className="flex flex-col gap-4 relative mx-auto w-full max-w-360 min-w-0">
         <header className="mb-6 min-w-0 rounded-3xl border border-white/10 bg-slate-900/70 p-5 shadow-[0_24px_70px_rgba(2,6,23,0.6)] backdrop-blur-2xl sm:p-7">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-300">Ankarom Yönetim</p>
           <h1 className="mt-3 wrap-break-word text-2xl leading-tight font-black text-white sm:text-4xl">Ürün Yönetim Paneli</h1>
           <p className="mt-2 text-sm text-slate-300">Sisteme yeni ürün ekleme ve temel stok bilgilerini yönetme alanı.</p>
         </header>
 
-        <div className="grid gap-6 lg:grid-cols-12">
-          <aside className="rounded-3xl border border-white/10 bg-slate-900/75 p-4 shadow-[0_20px_60px_rgba(2,6,23,0.55)] backdrop-blur-2xl lg:col-span-3">
+        <div className="grid gap-6 lg:grid-cols-12 ">
+          <aside className="flex flex-col gap-4 rounded-3xl border border-white/10 bg-slate-900/75 p-4 shadow-[0_20px_60px_rgba(2,6,23,0.55)] backdrop-blur-2xl lg:col-span-3">
             <p className="px-2 text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Panel Bölümleri</p>
             <div className="mt-3 space-y-2">
               <div className="rounded-xl border border-cyan-300/25 bg-cyan-500/10 px-3 py-2.5 text-sm font-semibold text-cyan-100">Ürün Ekle</div>
@@ -132,20 +132,9 @@ export default function AdminUrunEklePage() {
                 Sipariş Yönetimi
               </Link>
             </div>
-
-            <div className="mt-6 space-y-3">
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
-                <p className="text-xs uppercase tracking-[0.14em] text-slate-400">Aktif Kullanıcı</p>
-                <p className="mt-1 text-sm font-semibold text-white">{user?.name || "-"}</p>
-              </div>
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
-                <p className="text-xs uppercase tracking-[0.14em] text-slate-400">Yetki</p>
-                <p className="mt-1 text-sm font-semibold text-cyan-200">{user?.role || "-"}</p>
-              </div>
-            </div>
           </aside>
 
-          <div className="space-y-6 lg:col-span-9">
+          <div className="space-y-6 lg:col-span-9 flex flex-col gap-4">
             <div className="grid gap-4 sm:grid-cols-3">
               <article className="rounded-2xl border border-white/10 bg-slate-900/75 p-4 shadow-[0_16px_40px_rgba(2,6,23,0.45)] backdrop-blur-xl">
                 <p className="text-xs uppercase tracking-[0.14em] text-slate-400">İşlem Türü</p>
@@ -161,7 +150,7 @@ export default function AdminUrunEklePage() {
               </article>
             </div>
 
-            <article className="rounded-3xl border border-white/10 bg-slate-900/75 p-5 shadow-[0_24px_70px_rgba(2,6,23,0.6)] backdrop-blur-2xl sm:p-6">
+            <article className="flex flex-col gap-4 rounded-3xl border border-white/10 bg-slate-900/75 p-5 shadow-[0_24px_70px_rgba(2,6,23,0.6)] backdrop-blur-2xl sm:p-6">
               <h2 className="text-2xl font-black text-white">Yeni Ürün Bilgileri</h2>
               <p className="mt-2 text-sm text-slate-400">Aşağıdaki alanları doldurup ürünü sisteme kaydedin.</p>
 

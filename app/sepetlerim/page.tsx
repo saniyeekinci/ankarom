@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { MinusIcon, PlusIcon, TrashIcon, ShoppingBagIcon } from "@heroicons/react/24/outline";
+import { useRouter } from "next/navigation";
+import { MinusIcon, PlusIcon, TrashIcon, ShoppingBagIcon, ArrowLeftIcon } from "@heroicons/react/24/outline";
 import { useCart } from "@/components/cart/CartProvider";
 
 const formatCurrency = (value: number) =>
@@ -13,6 +14,7 @@ const formatCurrency = (value: number) =>
   }).format(value);
 
 export default function CartPage() {
+  const router = useRouter();
   const { items, itemCount, subtotal, updateQuantity, removeFromCart, clearCart } = useCart();
 
   return (
@@ -27,15 +29,25 @@ export default function CartPage() {
             <h1 className="mt-2 text-3xl font-black text-white sm:text-4xl">Sepetlerim</h1>
             <p className="mt-2 text-sm text-slate-300">Toplam {itemCount} ürün seçildi.</p>
           </div>
-          {items.length > 0 && (
+          <div className="flex items-center gap-2">
             <button
               type="button"
-              onClick={clearCart}
-              className="rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-white/10"
+              onClick={() => router.back()}
+              className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-white/10"
             >
-              Sepeti Temizle
+              <ArrowLeftIcon className="h-4 w-4" />
+              Geri
             </button>
-          )}
+            {items.length > 0 && (
+              <button
+                type="button"
+                onClick={clearCart}
+                className="rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-white/10"
+              >
+                Sepeti Temizle
+              </button>
+            )}
+          </div>
         </div>
 
         {items.length === 0 ? (

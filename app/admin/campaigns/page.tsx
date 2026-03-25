@@ -268,7 +268,7 @@ export default function AdminCampaignsPage() {
   };
 
   return (
-    <section className="space-y-6">
+    <section className="space-y-6 flex flex-col gap-4">
       <div className="rounded-3xl border border-white/10 bg-slate-900/75 p-5 shadow-[0_24px_70px_rgba(2,6,23,0.6)] backdrop-blur-2xl sm:p-6">
         <h2 className="text-2xl font-black text-white">Kampanya Yönetimi</h2>
         <p className="mt-1 text-sm text-slate-400">Kupon ve indirim kampanyalarını yönetin.</p>

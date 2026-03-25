@@ -14,19 +14,61 @@ import {
   MegaphoneIcon,
   Cog6ToothIcon,
   ClipboardDocumentListIcon,
+  TagIcon,
+  BellIcon,
+  StarIcon,
+  ChatBubbleLeftRightIcon,
+  BuildingStorefrontIcon,
 } from "@heroicons/react/24/outline";
 import { useAuth } from "@/components/auth/AuthProvider";
 
-const navItems = [
-  { href: "/admin", label: "Dashboard", icon: ChartBarIcon, enabled: true },
-  { href: "/admin/products", label: "Ürün Yönetimi", icon: CubeIcon, enabled: true },
-  { href: "/admin/urun-ekle", label: "Yeni Ürün", icon: PlusCircleIcon, enabled: true },
-  { href: "/admin/orders", label: "Siparişler", icon: ShoppingBagIcon, enabled: true },
-  { href: "/admin/stock", label: "Stok Durumu", icon: ArchiveBoxIcon, enabled: true },
-  { href: "/admin/customers", label: "Müşteri Yönetimi", icon: UsersIcon, enabled: true },
-  { href: "/admin/campaigns", label: "Kampanya Yönetimi", icon: MegaphoneIcon, enabled: true },
-  { href: "/admin/reports", label: "Raporlar", icon: ClipboardDocumentListIcon, enabled: true },
-  { href: "/admin/settings", label: "Ayarlar", icon: Cog6ToothIcon, enabled: true },
+const navSections = [
+  {
+    title: "Genel Bakış",
+    items: [{ href: "/admin", label: "Dashboard", icon: ChartBarIcon, enabled: true }],
+  },
+  {
+    title: "Ürün Operasyonları",
+    items: [
+      { href: "/admin/products", label: "Ürün Yönetimi", icon: CubeIcon, enabled: true },
+      { href: "/admin/urun-ekle", label: "Yeni Ürün", icon: PlusCircleIcon, enabled: true },
+      { href: "/admin/stock", label: "Stok Durumu", icon: ArchiveBoxIcon, enabled: true },
+    ],
+  },
+  {
+    title: "Sipariş ve Müşteri",
+    items: [
+      { href: "/admin/orders", label: "Siparişler", icon: ShoppingBagIcon, enabled: true },
+      { href: "/admin/customers", label: "Müşteri Yönetimi", icon: UsersIcon, enabled: true },
+    ],
+  },
+  {
+    title: "Pazarlama",
+    items: [
+      { href: "/admin/campaigns", label: "Kampanya Yönetimi", icon: MegaphoneIcon, enabled: true },
+      { href: "/admin/discounts", label: "İndirim Kuponları", icon: TagIcon, enabled: true },
+    ],
+  },
+  {
+    title: "Analiz ve Raporlama",
+    items: [{ href: "/admin/reports", label: "Raporlar", icon: ClipboardDocumentListIcon, enabled: true }],
+  },
+  {
+    title: "İçerik ve Destek",
+    items: [
+      { href: "/admin/reviews", label: "Yorum Moderasyonu", icon: StarIcon, enabled: true },
+      { href: "/admin/support", label: "Destek Talepleri", icon: ChatBubbleLeftRightIcon, enabled: true },
+      { href: "/admin/notifications", label: "Bildirim Yönetimi", icon: BellIcon, enabled: true },
+    ],
+  },
+  {
+    title: "Bayi ve Satış Ağı",
+    items: [{ href: "/admin/dealers", label: "Bayi Başvuruları", icon: BuildingStorefrontIcon, enabled: true }],
+  },
+  {
+    title: "Sistem",
+    items: [{ href: "/admin/settings", label: "Ayarlar", icon: Cog6ToothIcon, enabled: true }],
+  },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -57,38 +99,45 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <p className="mt-1 text-sm text-slate-400">Admin kontrol paneli</p>
           </div>
 
-          <nav className="mt-8 space-y-2">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = pathname === item.href;
+          <nav className="mt-8 space-y-5">
+            {navSections.map((section) => (
+              <div key={section.title}>
+                <p className="mb-2 px-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{section.title}</p>
+                <div className="space-y-2">
+                  {section.items.map((item) => {
+                    const Icon = item.icon;
+                    const isActive = pathname === item.href;
 
-              if (!item.enabled) {
-                return (
-                  <div
-                    key={item.label}
-                    className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-500"
-                  >
-                    <Icon className="h-5 w-5" />
-                    {item.label}
-                  </div>
-                );
-              }
+                    if (!item.enabled) {
+                      return (
+                        <div
+                          key={item.label}
+                          className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-500"
+                        >
+                          <Icon className="h-5 w-5" />
+                          {item.label}
+                        </div>
+                      );
+                    }
 
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-all ${
-                    isActive
-                      ? "border border-cyan-300/25 bg-cyan-500/10 text-cyan-100"
-                      : "text-slate-300 hover:bg-white/5 hover:text-white"
-                  }`}
-                >
-                  <Icon className="h-5 w-5" />
-                  {item.label}
-                </Link>
-              );
-            })}
+                    return (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-all ${
+                          isActive
+                            ? "border border-cyan-300/25 bg-cyan-500/10 text-cyan-100"
+                            : "text-slate-300 hover:bg-white/5 hover:text-white"
+                        }`}
+                      >
+                        <Icon className="h-5 w-5" />
+                        {item.label}
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
           </nav>
 
           <button

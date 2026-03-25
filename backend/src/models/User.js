@@ -29,6 +29,11 @@ const userSchema = new mongoose.Schema(
       lowercase: true,
       trim: true,
     },
+    phone: {
+      type: String,
+      default: "",
+      trim: true,
+    },
     // Normal kayıtlı kullanıcılar için şifre alanı zorunlu.
     // Google ile girişte şifre otomatik üretilip hashlenebilir.
     password: {

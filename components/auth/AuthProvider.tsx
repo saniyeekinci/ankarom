@@ -6,7 +6,16 @@ export type AuthUser = {
   id: string;
   name: string;
   email: string;
+  phone?: string;
   role: "admin" | "user";
+};
+
+export type ProfileUpdatePayload = {
+  name?: string;
+  email?: string;
+  phone?: string;
+  currentPassword?: string;
+  newPassword?: string;
 };
 
 type AuthContextValue = {
@@ -15,6 +24,7 @@ type AuthContextValue = {
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<AuthUser>;
   register: (name: string, email: string, password: string) => Promise<AuthUser>;
+  updateProfile: (payload: ProfileUpdatePayload) => Promise<AuthUser>;
   loginWithGoogle: (redirectTo?: string) => void;
   logout: () => void;
 };
@@ -167,6 +177,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return authenticateWithBackend("register", { name, email, password });
   };
 
+  const updateProfile = async (payload: ProfileUpdatePayload): Promise<AuthUser> => {
+    if (!token) {
+      throw new Error("Profil güncellemek için oturum açmalısınız.");
+    }
+
+    let response: Response;
+
+    try {
+      response = await fetch(`${API_BASE_URL}/api/auth/me`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
+    } catch {
+      throw new Error("Backend'e bağlanılamadı. Profil güncellenemedi.");
+    }
+
+    const data = (await response.json()) as {
+      message?: string;
+      user?: AuthUser;
+    };
+
+    if (!response.ok || !data.user?.id) {
+      throw new Error(data.message || "Profil güncellenemedi.");
+    }
+
+    setUser(data.user);
+    return data.user;
+  };
+
   const loginWithGoogle = (redirectTo = "/hesabim") => {
     if (typeof window === "undefined") {
       return;
@@ -195,6 +238,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = () => {
     setUser(null);
     setToken(null);
+
+    if (typeof window !== "undefined") {
+      window.location.replace("/");
+    }
   };
 
   const value = useMemo(
@@ -204,6 +251,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       isAuthenticated: Boolean(user),
       login,
       register,
+      updateProfile,
       loginWithGoogle,
       logout,
     }),

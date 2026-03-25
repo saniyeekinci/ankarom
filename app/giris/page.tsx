@@ -11,14 +11,14 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const { login, isAuthenticated } = useAuth();
+  const { login, isAuthenticated, user } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
     if (isAuthenticated) {
-      router.replace("/hesabim");
+      router.replace(user?.role === "admin" ? "/admin" : "/hesabim");
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, router, user]);
 
   if (isAuthenticated) {
     return null;
@@ -31,7 +31,7 @@ export default function LoginPage() {
     try {
       const loggedInUser = await login(email, password);
       if (loggedInUser.role === "admin") {
-        router.push("/admin/urun-ekle");
+        router.push("/admin");
         return;
       }
 

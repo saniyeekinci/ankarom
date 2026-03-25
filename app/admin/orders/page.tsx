@@ -40,6 +40,9 @@ export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<AdminOrder[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"all" | AdminOrder["status"]>("all");
+  const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest");
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -71,9 +74,31 @@ export default function AdminOrdersPage() {
   }, [token]);
 
   const totalOrderAmount = useMemo(() => orders.reduce((sum, order) => sum + (order.totalAmount || 0), 0), [orders]);
+  const filteredOrders = useMemo(() => {
+    const query = searchQuery.trim().toLocaleLowerCase("tr-TR");
+
+    return orders
+      .filter((order) => {
+        if (statusFilter !== "all" && order.status !== statusFilter) {
+          return false;
+        }
+
+        if (!query) {
+          return true;
+        }
+
+        const orderCode = order._id.slice(-6).toUpperCase();
+        return `${orderCode} ${order.user?.name || ""} ${order.user?.email || ""}`.toLocaleLowerCase("tr-TR").includes(query);
+      })
+      .sort((a, b) => {
+        const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return sortOrder === "newest" ? bTime - aTime : aTime - bTime;
+      });
+  }, [orders, searchQuery, statusFilter, sortOrder]);
 
   return (
-    <section className="space-y-6">
+    <section className="space-y-6 flex flex-col gap-4">
       <div className="rounded-3xl border border-white/10 bg-slate-900/75 p-5 shadow-[0_24px_70px_rgba(2,6,23,0.6)] backdrop-blur-2xl sm:p-6">
         <h2 className="text-2xl font-black text-white">Sipariş Yönetimi</h2>
         <p className="mt-1 text-sm text-slate-400">Tüm kullanıcı siparişlerini tek panelden yönetin.</p>
@@ -93,6 +118,35 @@ export default function AdminOrdersPage() {
       <div className="overflow-x-auto rounded-3xl border border-white/10 bg-slate-900/75 p-4 shadow-[0_24px_70px_rgba(2,6,23,0.6)] backdrop-blur-2xl sm:p-6">
         {errorMessage && <p className="mb-4 text-sm text-rose-300">{errorMessage}</p>}
 
+        <div className="mb-4 grid gap-3 rounded-2xl border border-white/10 bg-white/5 p-4 md:grid-cols-3">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(event) => setSearchQuery(event.target.value)}
+            placeholder="Sipariş no, müşteri adı veya e-posta ara"
+            className="rounded-xl border border-white/10 bg-slate-950/60 px-3 py-2.5 text-sm text-white placeholder:text-slate-400 outline-none focus:border-cyan-400/70"
+          />
+          <select
+            value={statusFilter}
+            onChange={(event) => setStatusFilter(event.target.value as "all" | AdminOrder["status"])}
+            className="rounded-xl border border-white/10 bg-slate-950/60 px-3 py-2.5 text-sm text-white outline-none focus:border-cyan-400/70"
+          >
+            <option value="all" className="bg-slate-900">Tüm Durumlar</option>
+            <option value="Hazırlanıyor" className="bg-slate-900">Hazırlanıyor</option>
+            <option value="Kargolandı" className="bg-slate-900">Kargolandı</option>
+            <option value="Teslim Edildi" className="bg-slate-900">Teslim Edildi</option>
+            <option value="İptal Edildi" className="bg-slate-900">İptal Edildi</option>
+          </select>
+          <select
+            value={sortOrder}
+            onChange={(event) => setSortOrder(event.target.value as "newest" | "oldest")}
+            className="rounded-xl border border-white/10 bg-slate-950/60 px-3 py-2.5 text-sm text-white outline-none focus:border-cyan-400/70"
+          >
+            <option value="newest" className="bg-slate-900">En Yeni</option>
+            <option value="oldest" className="bg-slate-900">En Eski</option>
+          </select>
+        </div>
+
         <table className="min-w-full border-separate border-spacing-y-2">
           <thead>
             <tr>
@@ -108,12 +162,12 @@ export default function AdminOrdersPage() {
               <tr>
                 <td colSpan={5} className="px-3 py-4 text-sm text-slate-300">Siparişler yükleniyor...</td>
               </tr>
-            ) : orders.length === 0 ? (
+            ) : filteredOrders.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-3 py-4 text-sm text-slate-300">Kayıtlı sipariş bulunamadı.</td>
+                <td colSpan={5} className="px-3 py-4 text-sm text-slate-300">Filtreye uygun sipariş bulunamadı.</td>
               </tr>
             ) : (
-              orders.map((order) => (
+              filteredOrders.map((order) => (
                 <tr key={order._id} className="rounded-xl border border-white/10 bg-white/5">
                   <td className="rounded-l-xl px-3 py-3 text-sm text-white">
                     <p className="font-semibold">#{order._id.slice(-6).toUpperCase()}</p>

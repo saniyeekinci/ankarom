@@ -4,6 +4,13 @@ import User from "../models/User.js";
 import Product from "../models/Product.js";
 import Campaign from "../models/Campaign.js";
 import AdminSetting from "../models/AdminSetting.js";
+import Discount from "../models/Discount.js";
+import Review from "../models/Review.js";
+import SupportTicket from "../models/SupportTicket.js";
+import AdminNotification from "../models/AdminNotification.js";
+import DealerApplication from "../models/DealerApplication.js";
+
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const parsePrice = (value) => {
   const normalized = String(value ?? "")
@@ -45,8 +52,40 @@ const normalizeFeatures = (value) => {
   return [];
 };
 
+const getMainSettings = async () => {
+  let settings = await AdminSetting.findOne({ key: "main" });
+
+  if (!settings) {
+    settings = await AdminSetting.create({ key: "main" });
+  }
+
+  return settings;
+};
+
+const parseBooleanInput = (value, fieldLabel) => {
+  if (typeof value === "boolean") {
+    return value;
+  }
+
+  if (typeof value === "string") {
+    if (value.toLowerCase() === "true") {
+      return true;
+    }
+    if (value.toLowerCase() === "false") {
+      return false;
+    }
+  }
+
+  throw new Error(`${fieldLabel} için geçerli bir boolean değer giriniz.`);
+};
+
+const generateRef = (prefix) => `${prefix}-${Math.floor(1000 + Math.random() * 9000)}`;
+
 export const getDashboardStats = async (req, res, next) => {
   try {
+    const settings = await getMainSettings();
+    const lowStockThreshold = Number(settings.lowStockThreshold ?? 10);
+
     const [totalRevenueAgg, totalSalesAgg, totalUsers, lowStockProducts, monthlySalesAgg, recentProducts] = await Promise.all([
       Order.aggregate([{ $group: { _id: null, totalRevenue: { $sum: "$totalAmount" } } }]),
       Order.aggregate([
@@ -54,7 +93,7 @@ export const getDashboardStats = async (req, res, next) => {
         { $group: { _id: null, totalSales: { $sum: "$items.quantity" } } },
       ]),
       User.countDocuments(),
-      Product.countDocuments({ stock: { $lt: 10 } }),
+      Product.countDocuments({ stock: { $lt: lowStockThreshold } }),
       Order.aggregate([
         {
           $group: {
@@ -84,6 +123,7 @@ export const getDashboardStats = async (req, res, next) => {
       totalSales: totalSalesAgg[0]?.totalSales || 0,
       totalUsers,
       lowStockProducts,
+      lowStockThreshold,
       monthlySales,
       recentProducts,
     });
@@ -295,7 +335,10 @@ export const getAdminUsers = async (req, res, next) => {
 
 export const getLowStockProducts = async (req, res, next) => {
   try {
-    const threshold = Number(req.query.threshold ?? 10);
+    const settings = await getMainSettings();
+    const defaultThreshold = Number(settings.lowStockThreshold ?? 10);
+    const parsedThreshold = Number(req.query.threshold ?? defaultThreshold);
+    const threshold = Number.isNaN(parsedThreshold) || parsedThreshold < 0 ? defaultThreshold : parsedThreshold;
 
     const products = await Product.find({ stock: { $lt: threshold } })
       .sort({ stock: 1, createdAt: -1 })
@@ -303,6 +346,7 @@ export const getLowStockProducts = async (req, res, next) => {
 
     return res.status(200).json({
       threshold,
+      defaultThreshold,
       count: products.length,
       products,
     });
@@ -598,11 +642,7 @@ export const getAdminReports = async (req, res, next) => {
 
 export const getAdminSettings = async (req, res, next) => {
   try {
-    let settings = await AdminSetting.findOne({ key: "main" });
-
-    if (!settings) {
-      settings = await AdminSetting.create({ key: "main" });
-    }
+    const settings = await getMainSettings();
 
     return res.status(200).json(settings);
   } catch (error) {
@@ -612,11 +652,7 @@ export const getAdminSettings = async (req, res, next) => {
 
 export const updateAdminSettings = async (req, res, next) => {
   try {
-    let settings = await AdminSetting.findOne({ key: "main" });
-
-    if (!settings) {
-      settings = await AdminSetting.create({ key: "main" });
-    }
+    const settings = await getMainSettings();
 
     const {
       siteName,
@@ -630,15 +666,30 @@ export const updateAdminSettings = async (req, res, next) => {
     } = req.body;
 
     if (siteName !== undefined) {
-      settings.siteName = String(siteName).trim();
+      const normalized = String(siteName).trim();
+      if (!normalized) {
+        res.status(400);
+        throw new Error("Site adı boş olamaz.");
+      }
+      settings.siteName = normalized;
     }
 
     if (supportEmail !== undefined) {
-      settings.supportEmail = String(supportEmail).trim().toLowerCase();
+      const normalized = String(supportEmail).trim().toLowerCase();
+      if (normalized && !emailRegex.test(normalized)) {
+        res.status(400);
+        throw new Error("Geçerli bir destek e-posta adresi giriniz.");
+      }
+      settings.supportEmail = normalized;
     }
 
     if (supportPhone !== undefined) {
-      settings.supportPhone = String(supportPhone).trim();
+      const normalized = String(supportPhone).trim();
+      if (normalized.length > 30) {
+        res.status(400);
+        throw new Error("Destek telefon alanı en fazla 30 karakter olabilir.");
+      }
+      settings.supportPhone = normalized;
     }
 
     if (freeShippingThreshold !== undefined) {
@@ -660,15 +711,30 @@ export const updateAdminSettings = async (req, res, next) => {
     }
 
     if (maintenanceMode !== undefined) {
-      settings.maintenanceMode = Boolean(maintenanceMode);
+      try {
+        settings.maintenanceMode = parseBooleanInput(maintenanceMode, "Bakım modu");
+      } catch (parseError) {
+        res.status(400);
+        throw parseError;
+      }
     }
 
     if (allowGuestCheckout !== undefined) {
-      settings.allowGuestCheckout = Boolean(allowGuestCheckout);
+      try {
+        settings.allowGuestCheckout = parseBooleanInput(allowGuestCheckout, "Misafir ödeme");
+      } catch (parseError) {
+        res.status(400);
+        throw parseError;
+      }
     }
 
     if (homepageAnnouncement !== undefined) {
-      settings.homepageAnnouncement = String(homepageAnnouncement).trim();
+      const normalized = String(homepageAnnouncement).trim();
+      if (normalized.length > 200) {
+        res.status(400);
+        throw new Error("Ana sayfa duyurusu en fazla 200 karakter olabilir.");
+      }
+      settings.homepageAnnouncement = normalized;
     }
 
     const updated = await settings.save();
@@ -676,6 +742,374 @@ export const updateAdminSettings = async (req, res, next) => {
     return res.status(200).json({
       message: "Ayarlar güncellendi.",
       settings: updated,
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+export const getAdminDiscounts = async (req, res, next) => {
+  try {
+    let discounts = await Discount.find().sort({ createdAt: -1 });
+
+    if (discounts.length === 0) {
+      await Discount.create([
+        { code: "YAZ2026", type: "percent", value: 10, usageLimit: 200, active: true },
+        { code: "HOSGELDIN", type: "fixed", value: 2500, usageLimit: 100, active: true },
+      ]);
+      discounts = await Discount.find().sort({ createdAt: -1 });
+    }
+
+    return res.status(200).json(discounts);
+  } catch (error) {
+    return next(error);
+  }
+};
+
+export const createAdminDiscount = async (req, res, next) => {
+  try {
+    const { code, type, value, usageLimit, active } = req.body;
+
+    if (!code || value === undefined) {
+      res.status(400);
+      throw new Error("Kupon kodu ve indirim değeri zorunludur.");
+    }
+
+    const normalizedCode = String(code).trim().toUpperCase();
+    if (!normalizedCode) {
+      res.status(400);
+      throw new Error("Kupon kodu boş olamaz.");
+    }
+
+    if (!["percent", "fixed"].includes(type || "percent")) {
+      res.status(400);
+      throw new Error("Geçerli bir indirim tipi giriniz.");
+    }
+
+    const parsedValue = Number(value);
+    if (Number.isNaN(parsedValue) || parsedValue < 0) {
+      res.status(400);
+      throw new Error("Geçerli bir indirim değeri giriniz.");
+    }
+
+    if ((type || "percent") === "percent" && parsedValue > 100) {
+      res.status(400);
+      throw new Error("Yüzdesel indirim 100'den büyük olamaz.");
+    }
+
+    const parsedUsageLimit = Number(usageLimit ?? 50);
+    if (Number.isNaN(parsedUsageLimit) || parsedUsageLimit < 1) {
+      res.status(400);
+      throw new Error("Kullanım limiti en az 1 olmalıdır.");
+    }
+
+    const exists = await Discount.findOne({ code: normalizedCode });
+    if (exists) {
+      res.status(400);
+      throw new Error("Bu kupon kodu zaten mevcut.");
+    }
+
+    const discount = await Discount.create({
+      code: normalizedCode,
+      type: type || "percent",
+      value: parsedValue,
+      usageLimit: parsedUsageLimit,
+      active: typeof active === "boolean" ? active : true,
+    });
+
+    return res.status(201).json({
+      message: "Kupon eklendi.",
+      discount,
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+export const toggleAdminDiscount = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      res.status(400);
+      throw new Error("Geçersiz kupon ID.");
+    }
+
+    const discount = await Discount.findById(id);
+    if (!discount) {
+      res.status(404);
+      throw new Error("Kupon bulunamadı.");
+    }
+
+    discount.active = !discount.active;
+    const updated = await discount.save();
+
+    return res.status(200).json({
+      message: "Kupon durumu güncellendi.",
+      discount: updated,
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+export const getAdminReviews = async (req, res, next) => {
+  try {
+    let reviews = await Review.find().sort({ createdAt: -1 });
+
+    if (reviews.length === 0) {
+      await Review.create([
+        {
+          customerName: "Mehmet K.",
+          productName: "Tekne Römorku TR-220",
+          comment: "Çok sağlam, teslimat hızlıydı.",
+          rating: 5,
+          approved: true,
+        },
+        {
+          customerName: "Ayşe T.",
+          productName: "ATV Römorku A-90",
+          comment: "Fiyat iyi, kurulum rehberi daha detaylı olabilir.",
+          rating: 4,
+          approved: false,
+        },
+      ]);
+      reviews = await Review.find().sort({ createdAt: -1 });
+    }
+
+    return res.status(200).json(reviews);
+  } catch (error) {
+    return next(error);
+  }
+};
+
+export const toggleAdminReviewApproval = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      res.status(400);
+      throw new Error("Geçersiz yorum ID.");
+    }
+
+    const review = await Review.findById(id);
+    if (!review) {
+      res.status(404);
+      throw new Error("Yorum bulunamadı.");
+    }
+
+    review.approved = !review.approved;
+    const updated = await review.save();
+
+    return res.status(200).json({
+      message: "Yorum onay durumu güncellendi.",
+      review: updated,
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+export const getAdminSupportTickets = async (req, res, next) => {
+  try {
+    let tickets = await SupportTicket.find().sort({ createdAt: -1 });
+
+    if (tickets.length === 0) {
+      await SupportTicket.create([
+        { ticketNo: "T-1001", subject: "Sipariş takibi", customer: "Murat S.", priority: "Orta", status: "Açık" },
+        { ticketNo: "T-1002", subject: "İade talebi", customer: "Zehra Y.", priority: "Yüksek", status: "Açık" },
+        { ticketNo: "T-1003", subject: "Ürün bilgisi", customer: "Oğuz B.", priority: "Düşük", status: "Yanıtlandı" },
+      ]);
+      tickets = await SupportTicket.find().sort({ createdAt: -1 });
+    }
+
+    return res.status(200).json(tickets);
+  } catch (error) {
+    return next(error);
+  }
+};
+
+export const createAdminSupportTicket = async (req, res, next) => {
+  try {
+    const { subject, customer, priority } = req.body;
+
+    if (!subject || !customer) {
+      res.status(400);
+      throw new Error("Konu ve müşteri bilgisi zorunludur.");
+    }
+
+    const parsedPriority = ["Düşük", "Orta", "Yüksek"].includes(priority) ? priority : "Orta";
+    const ticket = await SupportTicket.create({
+      ticketNo: generateRef("T"),
+      subject: String(subject).trim(),
+      customer: String(customer).trim(),
+      priority: parsedPriority,
+      status: "Açık",
+    });
+
+    return res.status(201).json({
+      message: "Destek talebi eklendi.",
+      ticket,
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+export const updateAdminSupportTicketStatus = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      res.status(400);
+      throw new Error("Geçersiz talep ID.");
+    }
+
+    if (status !== "Açık" && status !== "Yanıtlandı") {
+      res.status(400);
+      throw new Error("Geçerli bir durum giriniz.");
+    }
+
+    const ticket = await SupportTicket.findById(id);
+    if (!ticket) {
+      res.status(404);
+      throw new Error("Destek talebi bulunamadı.");
+    }
+
+    ticket.status = status;
+    const updated = await ticket.save();
+
+    return res.status(200).json({
+      message: "Destek talebi durumu güncellendi.",
+      ticket: updated,
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+export const getAdminNotifications = async (req, res, next) => {
+  try {
+    const notifications = await AdminNotification.find().sort({ createdAt: -1 });
+    return res.status(200).json(notifications);
+  } catch (error) {
+    return next(error);
+  }
+};
+
+export const createAdminNotification = async (req, res, next) => {
+  try {
+    const { title, message, channel } = req.body;
+
+    if (!title || !message) {
+      res.status(400);
+      throw new Error("Bildirim başlığı ve metni zorunludur.");
+    }
+
+    if (channel && !["site", "email", "sms"].includes(channel)) {
+      res.status(400);
+      throw new Error("Geçerli bir bildirim kanalı seçiniz.");
+    }
+
+    const notification = await AdminNotification.create({
+      title: String(title).trim(),
+      message: String(message).trim(),
+      channel: channel || "site",
+    });
+
+    return res.status(201).json({
+      message: "Bildirim gönderimi kaydedildi.",
+      notification,
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+export const getAdminDealerApplications = async (req, res, next) => {
+  try {
+    let applications = await DealerApplication.find().sort({ createdAt: -1 });
+
+    if (applications.length === 0) {
+      await DealerApplication.create([
+        {
+          applicationNo: "B-101",
+          companyName: "Ankara Çekici Market",
+          city: "Ankara",
+          contactName: "Ali Demir",
+          status: "Beklemede",
+        },
+        {
+          applicationNo: "B-102",
+          companyName: "Ege Römork",
+          city: "İzmir",
+          contactName: "Esra Kılıç",
+          status: "Beklemede",
+        },
+      ]);
+      applications = await DealerApplication.find().sort({ createdAt: -1 });
+    }
+
+    return res.status(200).json(applications);
+  } catch (error) {
+    return next(error);
+  }
+};
+
+export const createAdminDealerApplication = async (req, res, next) => {
+  try {
+    const { companyName, city, contactName } = req.body;
+
+    if (!companyName || !city || !contactName) {
+      res.status(400);
+      throw new Error("Firma, şehir ve yetkili alanları zorunludur.");
+    }
+
+    const application = await DealerApplication.create({
+      applicationNo: generateRef("B"),
+      companyName: String(companyName).trim(),
+      city: String(city).trim(),
+      contactName: String(contactName).trim(),
+      status: "Beklemede",
+    });
+
+    return res.status(201).json({
+      message: "Bayi başvurusu eklendi.",
+      application,
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+export const updateAdminDealerStatus = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      res.status(400);
+      throw new Error("Geçersiz başvuru ID.");
+    }
+
+    if (!["Beklemede", "Onaylandı", "Reddedildi"].includes(status)) {
+      res.status(400);
+      throw new Error("Geçerli bir başvuru durumu giriniz.");
+    }
+
+    const application = await DealerApplication.findById(id);
+    if (!application) {
+      res.status(404);
+      throw new Error("Bayi başvurusu bulunamadı.");
+    }
+
+    application.status = status;
+    const updated = await application.save();
+
+    return res.status(200).json({
+      message: "Başvuru durumu güncellendi.",
+      application: updated,
     });
   } catch (error) {
     return next(error);

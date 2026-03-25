@@ -2,6 +2,8 @@
 
 import { useMemo, useState } from "react";
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+
 const cities = [
   "Adana",
   "Adıyaman",
@@ -89,6 +91,19 @@ const cities = [
 export default function IletisimPage() {
   const [cityQuery, setCityQuery] = useState("");
   const [isCityListOpen, setIsCityListOpen] = useState(false);
+  const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [interestedProduct, setInterestedProduct] = useState("");
+  const [message, setMessage] = useState("");
+  const [isSubmittingSupport, setIsSubmittingSupport] = useState(false);
+  const [supportFeedback, setSupportFeedback] = useState("");
+
+  const [dealerCompanyName, setDealerCompanyName] = useState("");
+  const [dealerContactName, setDealerContactName] = useState("");
+  const [dealerCity, setDealerCity] = useState("");
+  const [isSubmittingDealer, setIsSubmittingDealer] = useState(false);
+  const [dealerFeedback, setDealerFeedback] = useState("");
 
   const filteredCities = useMemo(() => {
     const query = cityQuery.trim().toLocaleLowerCase("tr-TR");
@@ -101,6 +116,88 @@ export default function IletisimPage() {
       .filter((city) => city.toLocaleLowerCase("tr-TR").includes(query))
       .slice(0, 12);
   }, [cityQuery]);
+
+  const handleSupportSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setSupportFeedback("");
+
+    if (!fullName.trim() || !message.trim()) {
+      setSupportFeedback("Lütfen ad soyad ve mesaj alanlarını doldurun.");
+      return;
+    }
+
+    setIsSubmittingSupport(true);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/public/support-tickets`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customer: fullName,
+          subject: interestedProduct?.trim() ? `İletişim Talebi - ${interestedProduct}` : "İletişim Talebi",
+          priority: "Orta",
+          message: `${message} | Telefon: ${phone || "-"} | E-posta: ${email || "-"} | İl: ${cityQuery || "-"}`,
+        }),
+      });
+
+      const data = (await response.json()) as { message?: string };
+      if (!response.ok) {
+        throw new Error(data.message || "Talep gönderilemedi.");
+      }
+
+      setSupportFeedback(data.message || "Talebiniz alındı.");
+      setFullName("");
+      setPhone("");
+      setEmail("");
+      setInterestedProduct("");
+      setMessage("");
+      setCityQuery("");
+    } catch (error) {
+      const text = error instanceof Error ? error.message : "Talep gönderilirken hata oluştu.";
+      setSupportFeedback(text);
+    } finally {
+      setIsSubmittingSupport(false);
+    }
+  };
+
+  const handleDealerSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setDealerFeedback("");
+
+    if (!dealerCompanyName.trim() || !dealerContactName.trim() || !dealerCity.trim()) {
+      setDealerFeedback("Lütfen bayi başvuru alanlarını eksiksiz doldurun.");
+      return;
+    }
+
+    setIsSubmittingDealer(true);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/public/dealer-applications`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          companyName: dealerCompanyName,
+          city: dealerCity,
+          contactName: dealerContactName,
+        }),
+      });
+
+      const data = (await response.json()) as { message?: string };
+      if (!response.ok) {
+        throw new Error(data.message || "Bayi başvurusu gönderilemedi.");
+      }
+
+      setDealerFeedback(data.message || "Bayi başvurunuz alındı.");
+      setDealerCompanyName("");
+      setDealerContactName("");
+      setDealerCity("");
+    } catch (error) {
+      const text = error instanceof Error ? error.message : "Bayi başvurusu gönderilirken hata oluştu.";
+      setDealerFeedback(text);
+    } finally {
+      setIsSubmittingDealer(false);
+    }
+  };
 
   return (
     <section className="flex min-h-[calc(100vh-220px)] w-full items-center justify-center py-10 sm:py-14">
@@ -147,17 +244,22 @@ export default function IletisimPage() {
               </div>
             </div>
 
-            <form className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:col-span-3">
+            <div className="space-y-4 lg:col-span-3">
+            <form onSubmit={handleSupportSubmit} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <input
                 type="text"
                 name="adSoyad"
                 placeholder="Ad Soyad"
+                value={fullName}
+                onChange={(event) => setFullName(event.target.value)}
                 className="h-12 rounded-xl border border-white/15 bg-slate-950/70 px-4 text-sm text-white outline-none transition-colors focus:border-amber-500"
               />
               <input
                 type="tel"
                 name="telefon"
                 placeholder="Telefon"
+                value={phone}
+                onChange={(event) => setPhone(event.target.value)}
                 className="h-12 rounded-xl border border-white/15 bg-slate-950/70 px-4 text-sm text-white outline-none transition-colors focus:border-amber-500"
               />
               <div className="relative sm:col-span-2">
@@ -201,31 +303,74 @@ export default function IletisimPage() {
                 type="email"
                 name="email"
                 placeholder="E-posta"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
                 className="h-12 rounded-xl border border-white/15 bg-slate-950/70 px-4 text-sm text-white outline-none transition-colors focus:border-amber-500 sm:col-span-2"
               />
               <input
                 type="text"
                 name="ilgilendigiUrun"
                 placeholder="Hangi ürün ile ilgileniyorsunuz?"
+                value={interestedProduct}
+                onChange={(event) => setInterestedProduct(event.target.value)}
                 className="h-12 rounded-xl border border-white/15 bg-slate-950/70 px-4 text-sm text-white outline-none transition-colors focus:border-amber-500 sm:col-span-2"
               />
               <textarea
                 name="mesaj"
                 placeholder="Mesajınız"
                 rows={5}
+                value={message}
+                onChange={(event) => setMessage(event.target.value)}
                 className="rounded-xl border border-white/15 bg-slate-950/70 px-4 py-3 text-sm text-white outline-none transition-colors focus:border-amber-500 sm:col-span-2"
               />
               <button
                 type="submit"
+                disabled={isSubmittingSupport}
                 className="h-12 rounded-xl border border-amber-500/70 bg-amber-600 px-6 text-sm font-bold uppercase tracking-[0.14em] text-white transition-all hover:bg-amber-500 sm:col-span-2"
               >
-                Gönder
+                {isSubmittingSupport ? "Gönderiliyor..." : "Gönder"}
               </button>
+
+              {supportFeedback && <p className="text-sm text-slate-200 sm:col-span-2">{supportFeedback}</p>}
 
               <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-300 sm:col-span-2">
                 Çalışma Saatleri: Pzt - Cmt / 09:00 - 18:00
               </div>
             </form>
+
+            <form onSubmit={handleDealerSubmit} className="grid grid-cols-1 gap-4 rounded-2xl border border-white/10 bg-white/5 p-4 sm:grid-cols-3">
+              <p className="sm:col-span-3 text-sm font-semibold text-white">Bayi Başvuru Formu</p>
+              <input
+                type="text"
+                placeholder="Firma Adı"
+                value={dealerCompanyName}
+                onChange={(event) => setDealerCompanyName(event.target.value)}
+                className="h-11 rounded-xl border border-white/15 bg-slate-950/70 px-4 text-sm text-white outline-none transition-colors focus:border-amber-500"
+              />
+              <input
+                type="text"
+                placeholder="Yetkili Ad Soyad"
+                value={dealerContactName}
+                onChange={(event) => setDealerContactName(event.target.value)}
+                className="h-11 rounded-xl border border-white/15 bg-slate-950/70 px-4 text-sm text-white outline-none transition-colors focus:border-amber-500"
+              />
+              <input
+                type="text"
+                placeholder="Şehir"
+                value={dealerCity}
+                onChange={(event) => setDealerCity(event.target.value)}
+                className="h-11 rounded-xl border border-white/15 bg-slate-950/70 px-4 text-sm text-white outline-none transition-colors focus:border-amber-500"
+              />
+              <button
+                type="submit"
+                disabled={isSubmittingDealer}
+                className="sm:col-span-3 h-11 rounded-xl border border-cyan-300/40 bg-cyan-500/15 px-4 text-sm font-semibold text-cyan-100 hover:bg-cyan-500/20 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isSubmittingDealer ? "Gönderiliyor..." : "Bayi Başvurusu Gönder"}
+              </button>
+              {dealerFeedback && <p className="sm:col-span-3 text-sm text-slate-200">{dealerFeedback}</p>}
+            </form>
+            </div>
           </div>
         </div>
       </div>

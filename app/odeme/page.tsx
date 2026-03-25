@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 import { useCart } from "@/components/cart/CartProvider";
 
 const formatCurrency = (value: number) =>
@@ -33,11 +34,23 @@ export default function PaymentPage() {
 
       <div className="flex flex-col gap-4 relative mx-auto w-full max-w-360">
         <div className="mb-8 sm:mb-10">
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">Secure Checkout</p>
-          <h1 className="mt-3 text-3xl font-black text-white sm:text-4xl">Ödeme</h1>
-          <p className="mt-3 max-w-3xl text-sm text-slate-300 sm:text-base">
-            Siparişinizi tamamlamak için fatura ve ödeme bilgilerinizi girin.
-          </p>
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">Secure Checkout</p>
+              <h1 className="mt-3 text-3xl font-black text-white sm:text-4xl">Ödeme</h1>
+              <p className="mt-3 max-w-3xl text-sm text-slate-300 sm:text-base">
+                Siparişinizi tamamlamak için fatura ve ödeme bilgilerinizi girin.
+              </p>
+            </div>
+
+            <Link
+              href="/sepetlerim"
+              className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-white/10"
+            >
+              <ArrowLeftIcon className="h-4 w-4" />
+              Geri
+            </Link>
+          </div>
         </div>
 
         <div className="grid items-start gap-6 lg:grid-cols-12">

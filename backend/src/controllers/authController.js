@@ -1,6 +1,8 @@
 import User from "../models/User.js";
 import generateToken from "../utils/generateToken.js";
 
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 // POST /api/auth/register
 export const register = async (req, res, next) => {
   try {
@@ -38,6 +40,7 @@ export const register = async (req, res, next) => {
         id: user._id,
         name: user.name,
         email: user.email,
+        phone: user.phone || "",
         role: user.role,
       },
     });
@@ -82,6 +85,7 @@ export const login = async (req, res, next) => {
         id: user._id,
         name: user.name,
         email: user.email,
+        phone: user.phone || "",
         role: user.role,
       },
     });
@@ -131,6 +135,116 @@ export const googleAuth = async (req, res, next) => {
         id: user._id,
         name: user.name,
         email: user.email,
+        phone: user.phone || "",
+        role: user.role,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// GET /api/auth/me
+export const getMyProfile = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user._id).select("-password");
+
+    if (!user) {
+      res.status(404);
+      throw new Error("Kullanıcı bulunamadı.");
+    }
+
+    res.status(200).json({
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone || "",
+        role: user.role,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// PUT /api/auth/me
+export const updateMyProfile = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      res.status(404);
+      throw new Error("Kullanıcı bulunamadı.");
+    }
+
+    const { name, email, phone, currentPassword, newPassword } = req.body;
+
+    if (name !== undefined) {
+      const normalizedName = String(name).trim();
+      if (!normalizedName) {
+        res.status(400);
+        throw new Error("Ad soyad boş olamaz.");
+      }
+      user.name = normalizedName;
+    }
+
+    if (email !== undefined) {
+      const normalizedEmail = String(email).trim().toLowerCase();
+      if (!normalizedEmail || !emailRegex.test(normalizedEmail)) {
+        res.status(400);
+        throw new Error("Geçerli bir e-posta adresi giriniz.");
+      }
+
+      const emailOwner = await User.findOne({ email: normalizedEmail });
+      if (emailOwner && String(emailOwner._id) !== String(user._id)) {
+        res.status(409);
+        throw new Error("Bu e-posta başka bir hesapta kullanılıyor.");
+      }
+
+      user.email = normalizedEmail;
+    }
+
+    if (phone !== undefined) {
+      const normalizedPhone = String(phone).trim();
+      if (normalizedPhone.length > 30) {
+        res.status(400);
+        throw new Error("Telefon alanı en fazla 30 karakter olabilir.");
+      }
+      user.phone = normalizedPhone;
+    }
+
+    if (newPassword !== undefined && String(newPassword).trim() !== "") {
+      const parsedNewPassword = String(newPassword);
+
+      if (!currentPassword) {
+        res.status(400);
+        throw new Error("Şifre değiştirmek için mevcut şifrenizi girmelisiniz.");
+      }
+
+      if (parsedNewPassword.length < 6) {
+        res.status(400);
+        throw new Error("Yeni şifre en az 6 karakter olmalıdır.");
+      }
+
+      const isPasswordCorrect = await user.comparePassword(String(currentPassword));
+      if (!isPasswordCorrect) {
+        res.status(401);
+        throw new Error("Mevcut şifre hatalı.");
+      }
+
+      user.password = parsedNewPassword;
+    }
+
+    await user.save();
+
+    res.status(200).json({
+      message: "Hesap ayarları güncellendi.",
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone || "",
         role: user.role,
       },
     });

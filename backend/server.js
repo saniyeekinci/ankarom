@@ -10,6 +10,7 @@ import productRoutes from "./src/routes/productRoutes.js";
 import orderRoutes from "./src/routes/orderRoutes.js";
 import cartRoutes from "./src/routes/cartRoutes.js";
 import adminRoutes from "./src/routes/adminRoutes.js";
+import publicRoutes from "./src/routes/publicRoutes.js";
 import { notFound, errorHandler } from "./src/middleware/errorMiddleware.js";
 
 dotenv.config();
@@ -72,6 +73,7 @@ app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/public", publicRoutes);
 
 // Hata middleware'leri
 app.use(notFound);

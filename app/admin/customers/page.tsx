@@ -72,7 +72,7 @@ export default function AdminCustomersPage() {
   }, [fetchUsers]);
 
   return (
-    <section className="rounded-3xl border border-white/10 bg-slate-900/75 p-5 shadow-[0_24px_70px_rgba(2,6,23,0.6)] backdrop-blur-2xl sm:p-6">
+    <section className="flex flex-col gap-4 rounded-3xl border border-white/10 bg-slate-900/75 p-5 shadow-[0_24px_70px_rgba(2,6,23,0.6)] backdrop-blur-2xl sm:p-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="text-2xl font-black text-white">Müşteri Yönetimi</h2>

@@ -1,12 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { ArrowDownLeftIcon, AdjustmentsVerticalIcon, ShieldCheckIcon, BuildingOffice2Icon, ShoppingCartIcon, QuestionMarkCircleIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 import type { TrailerProduct } from "@/lib/trailerProducts";
 import { useCart } from "@/components/cart/CartProvider";
 
 const featureIcons = [ArrowDownLeftIcon, AdjustmentsVerticalIcon, ShieldCheckIcon, BuildingOffice2Icon];
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+
+type ReviewItem = {
+  _id: string;
+  customerName: string;
+  comment: string;
+  rating: number;
+  createdAt: string;
+};
 
 type ProductDetailExperienceProps = {
   product: TrailerProduct;
@@ -14,9 +23,47 @@ type ProductDetailExperienceProps = {
 
 export default function ProductDetailExperience({ product }: ProductDetailExperienceProps) {
   const [isAddedToastVisible, setIsAddedToastVisible] = useState(false);
+  const [reviews, setReviews] = useState<ReviewItem[]>([]);
+  const [isLoadingReviews, setIsLoadingReviews] = useState(true);
+  const [reviewName, setReviewName] = useState("");
+  const [reviewComment, setReviewComment] = useState("");
+  const [isSendingReview, setIsSendingReview] = useState(false);
+  const [reviewError, setReviewError] = useState("");
+  const [reviewSuccess, setReviewSuccess] = useState("");
   const { addToCart } = useCart();
   const whatsappMessage = `Merhaba, ${product.name} hakkında bir sorum var. Ürün ID: ${product.id}`;
   const whatsappHref = `https://wa.me/905XXXXXXXXX?text=${encodeURIComponent(whatsappMessage)}`;
+  const isBackendProduct = useMemo(() => /^[a-f0-9]{24}$/i.test(product.id), [product.id]);
+
+  useEffect(() => {
+    const fetchReviews = async () => {
+      if (!isBackendProduct) {
+        setIsLoadingReviews(false);
+        return;
+      }
+
+      setIsLoadingReviews(true);
+      setReviewError("");
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/products/${product.id}/reviews`, { cache: "no-store" });
+        const data = (await response.json()) as ReviewItem[] & { message?: string };
+
+        if (!response.ok) {
+          throw new Error((data as { message?: string }).message || "Yorumlar yüklenemedi.");
+        }
+
+        setReviews(Array.isArray(data) ? data : []);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "Yorumlar yüklenirken hata oluştu.";
+        setReviewError(message);
+      } finally {
+        setIsLoadingReviews(false);
+      }
+    };
+
+    fetchReviews();
+  }, [isBackendProduct, product.id]);
 
   const handleAddToCart = () => {
     addToCart(product);
@@ -24,6 +71,49 @@ export default function ProductDetailExperience({ product }: ProductDetailExperi
     setTimeout(() => {
       setIsAddedToastVisible(false);
     }, 2600);
+  };
+
+  const handleReviewSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!isBackendProduct) {
+      setReviewError("Bu ürün için yorum gönderimi şu an kapalı.");
+      return;
+    }
+
+    setReviewError("");
+    setReviewSuccess("");
+
+    if (!reviewName.trim() || !reviewComment.trim()) {
+      setReviewError("Ad soyad ve yorum alanları zorunludur.");
+      return;
+    }
+
+    setIsSendingReview(true);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/products/${product.id}/reviews`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customerName: reviewName,
+          comment: reviewComment,
+        }),
+      });
+
+      const data = (await response.json()) as { message?: string };
+      if (!response.ok) {
+        throw new Error(data.message || "Yorum gönderilemedi.");
+      }
+
+      setReviewName("");
+      setReviewComment("");
+      setReviewSuccess(data.message || "Yorumunuz alındı.");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Yorum gönderilirken hata oluştu.";
+      setReviewError(message);
+    } finally {
+      setIsSendingReview(false);
+    }
   };
   return (
     <section className="relative px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
@@ -157,6 +247,53 @@ export default function ProductDetailExperience({ product }: ProductDetailExperi
               {product.detailDescription}
             </p>
           </div>
+        </section>
+
+        <section className="rounded-4xl border border-white/10 bg-slate-900/75 p-6 shadow-[0_30px_100px_rgba(2,6,23,0.8)] backdrop-blur-2xl sm:p-8">
+          <h3 className="text-2xl font-black text-white">Ürün Yorumları</h3>
+          <p className="mt-2 text-sm text-slate-400">Onaylanmış yorumlar aşağıda listelenir. Siz de yorum gönderebilirsiniz.</p>
+
+          {reviewError && <p className="mt-4 text-sm text-rose-300">{reviewError}</p>}
+          {reviewSuccess && <p className="mt-4 text-sm text-emerald-300">{reviewSuccess}</p>}
+
+          <div className="mt-4 space-y-3">
+            {isLoadingReviews ? (
+              <p className="text-sm text-slate-300">Yorumlar yükleniyor...</p>
+            ) : reviews.length === 0 ? (
+              <p className="text-sm text-slate-300">Henüz onaylı yorum bulunmuyor.</p>
+            ) : (
+              reviews.map((review) => (
+                <article key={review._id} className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                  <p className="text-sm font-semibold text-white">{review.customerName}</p>
+                  <p className="mt-2 text-sm text-slate-300">{review.comment}</p>
+                </article>
+              ))
+            )}
+          </div>
+
+          <form onSubmit={handleReviewSubmit} className="mt-6 grid gap-3 sm:grid-cols-2">
+            <input
+              type="text"
+              value={reviewName}
+              onChange={(event) => setReviewName(event.target.value)}
+              placeholder="Ad Soyad"
+              className="h-11 rounded-xl border border-white/15 bg-slate-950/70 px-4 text-sm text-white outline-none transition-colors focus:border-amber-500"
+            />
+            <textarea
+              value={reviewComment}
+              onChange={(event) => setReviewComment(event.target.value)}
+              placeholder="Yorumunuz"
+              rows={4}
+              className="sm:col-span-2 rounded-xl border border-white/15 bg-slate-950/70 px-4 py-3 text-sm text-white outline-none transition-colors focus:border-amber-500"
+            />
+            <button
+              type="submit"
+              disabled={isSendingReview}
+              className="sm:col-span-2 h-11 rounded-xl border border-amber-500/70 bg-amber-600 px-6 text-sm font-bold uppercase tracking-[0.14em] text-white transition-all hover:bg-amber-500 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {isSendingReview ? "Gönderiliyor..." : "Yorum Gönder"}
+            </button>
+          </form>
         </section>
 
       </div>
