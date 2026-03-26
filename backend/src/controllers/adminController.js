@@ -9,6 +9,7 @@ import Review from "../models/Review.js";
 import SupportTicket from "../models/SupportTicket.js";
 import AdminNotification from "../models/AdminNotification.js";
 import DealerApplication from "../models/DealerApplication.js";
+import { sendSupportReplyEmail } from "../utils/sendSupportTicketEmail.js";
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -912,16 +913,7 @@ export const toggleAdminReviewApproval = async (req, res, next) => {
 
 export const getAdminSupportTickets = async (req, res, next) => {
   try {
-    let tickets = await SupportTicket.find().sort({ createdAt: -1 });
-
-    if (tickets.length === 0) {
-      await SupportTicket.create([
-        { ticketNo: "T-1001", subject: "Sipariş takibi", customer: "Murat S.", priority: "Orta", status: "Açık" },
-        { ticketNo: "T-1002", subject: "İade talebi", customer: "Zehra Y.", priority: "Yüksek", status: "Açık" },
-        { ticketNo: "T-1003", subject: "Ürün bilgisi", customer: "Oğuz B.", priority: "Düşük", status: "Yanıtlandı" },
-      ]);
-      tickets = await SupportTicket.find().sort({ createdAt: -1 });
-    }
+    const tickets = await SupportTicket.find().sort({ createdAt: -1 });
 
     return res.status(200).json(tickets);
   } catch (error) {
@@ -931,7 +923,7 @@ export const getAdminSupportTickets = async (req, res, next) => {
 
 export const createAdminSupportTicket = async (req, res, next) => {
   try {
-    const { subject, customer, priority } = req.body;
+    const { subject, customer, customerEmail, message, priority } = req.body;
 
     if (!subject || !customer) {
       res.status(400);
@@ -943,6 +935,8 @@ export const createAdminSupportTicket = async (req, res, next) => {
       ticketNo: generateRef("T"),
       subject: String(subject).trim(),
       customer: String(customer).trim(),
+      customerEmail: String(customerEmail || "").trim(),
+      message: String(message || "").trim(),
       priority: parsedPriority,
       status: "Açık",
     });
@@ -959,7 +953,8 @@ export const createAdminSupportTicket = async (req, res, next) => {
 export const updateAdminSupportTicketStatus = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { status } = req.body;
+    const { status, replyMessage } = req.body;
+    let emailSent = false;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       res.status(400);
@@ -977,12 +972,56 @@ export const updateAdminSupportTicketStatus = async (req, res, next) => {
       throw new Error("Destek talebi bulunamadı.");
     }
 
+    if (status === "Yanıtlandı") {
+      const normalizedReply = String(replyMessage || "").trim();
+
+      if (normalizedReply) {
+        if (!ticket.customerEmail) {
+          res.status(400);
+          throw new Error("Müşteri e-posta adresi olmadığı için yanıt gönderilemez.");
+        }
+
+        const settings = await getMainSettings();
+        const replyEmailResult = await sendSupportReplyEmail({
+          to: ticket.customerEmail,
+          siteName: settings.siteName || "Ankarom",
+          ticketNo: ticket.ticketNo,
+          subject: ticket.subject,
+          replyMessage: normalizedReply,
+        });
+
+        if (!replyEmailResult?.sent) {
+          res.status(500);
+          const reason = replyEmailResult?.reason ? ` (${replyEmailResult.reason})` : "";
+          throw new Error(`Yanıt e-postası gönderilemedi. SMTP ayarlarını kontrol edin${reason}.`);
+        }
+
+        emailSent = true;
+        ticket.adminReply = normalizedReply;
+      }
+
+      if (ticket.customerEmail) {
+        await AdminNotification.create({
+          title: "Destek talebiniz yanıtlandı",
+          message: normalizedReply
+            ? `${ticket.ticketNo} numaralı destek talebinize yanıt verildi.`
+            : `${ticket.ticketNo} numaralı destek talebiniz e-posta üzerinden yanıtlandı.`,
+          channel: "site",
+          type: "support_reply",
+          recipientEmail: String(ticket.customerEmail || "").trim().toLowerCase(),
+        });
+      }
+
+      ticket.answeredAt = new Date();
+    }
+
     ticket.status = status;
     const updated = await ticket.save();
 
     return res.status(200).json({
       message: "Destek talebi durumu güncellendi.",
       ticket: updated,
+      emailSent,
     });
   } catch (error) {
     return next(error);
@@ -1000,7 +1039,7 @@ export const getAdminNotifications = async (req, res, next) => {
 
 export const createAdminNotification = async (req, res, next) => {
   try {
-    const { title, message, channel } = req.body;
+    const { title, message, channel, type, recipientEmail } = req.body;
 
     if (!title || !message) {
       res.status(400);
@@ -1012,10 +1051,17 @@ export const createAdminNotification = async (req, res, next) => {
       throw new Error("Geçerli bir bildirim kanalı seçiniz.");
     }
 
+    if (type && !["general", "support_reply"].includes(type)) {
+      res.status(400);
+      throw new Error("Geçerli bir bildirim tipi seçiniz.");
+    }
+
     const notification = await AdminNotification.create({
       title: String(title).trim(),
       message: String(message).trim(),
       channel: channel || "site",
+      type: type || "general",
+      recipientEmail: String(recipientEmail || "").trim().toLowerCase(),
     });
 
     return res.status(201).json({

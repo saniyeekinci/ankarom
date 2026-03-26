@@ -18,6 +18,26 @@ const supportTicketSchema = new mongoose.Schema(
       required: [true, "Müşteri adı zorunludur"],
       trim: true,
     },
+    customerEmail: {
+      type: String,
+      trim: true,
+      lowercase: true,
+      default: "",
+    },
+    message: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    adminReply: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    answeredAt: {
+      type: Date,
+      default: null,
+    },
     priority: {
       type: String,
       enum: ["Düşük", "Orta", "Yüksek"],

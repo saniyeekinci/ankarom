@@ -1,5 +1,7 @@
 import User from "../models/User.js";
 import generateToken from "../utils/generateToken.js";
+import SupportTicket from "../models/SupportTicket.js";
+import AdminNotification from "../models/AdminNotification.js";
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -247,6 +249,93 @@ export const updateMyProfile = async (req, res, next) => {
         phone: user.phone || "",
         role: user.role,
       },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// GET /api/auth/my-support-tickets
+export const getMySupportTickets = async (req, res, next) => {
+  try {
+    const userEmail = String(req.user?.email || "").trim().toLowerCase();
+    const userName = String(req.user?.name || "").trim();
+
+    const query = userEmail
+      ? { $or: [{ customerEmail: userEmail }, { customer: userName }] }
+      : { customer: userName };
+
+    const tickets = await SupportTicket.find(query)
+      .sort({ createdAt: -1 })
+      .select("ticketNo subject message adminReply status createdAt answeredAt");
+
+    res.status(200).json(tickets);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// GET /api/auth/notifications
+export const getMyNotifications = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user._id).select("notificationReadAt email");
+
+    if (!user) {
+      res.status(404);
+      throw new Error("Kullanıcı bulunamadı.");
+    }
+
+    const userEmail = String(user.email || "").trim().toLowerCase();
+    const recipientFilters = [{ recipientEmail: "" }, { recipientEmail: { $exists: false } }];
+
+    if (userEmail) {
+      recipientFilters.push({ recipientEmail: userEmail });
+    }
+
+    const notifications = await AdminNotification.find({ channel: "site", $or: recipientFilters })
+      .sort({ createdAt: -1 })
+      .limit(25)
+      .select("title message createdAt channel type recipientEmail");
+
+    const readAt = user.notificationReadAt ? new Date(user.notificationReadAt) : null;
+    const payload = notifications.map((notification) => {
+      const createdAt = notification.createdAt ? new Date(notification.createdAt) : null;
+      const isRead = readAt && createdAt ? createdAt <= readAt : false;
+
+      return {
+        ...notification.toObject(),
+        isRead,
+      };
+    });
+
+    const unreadCount = payload.reduce((count, item) => count + (item.isRead ? 0 : 1), 0);
+
+    res.status(200).json({
+      notifications: payload,
+      unreadCount,
+      notificationReadAt: user.notificationReadAt,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// PUT /api/auth/notifications/read-all
+export const markAllNotificationsAsRead = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      res.status(404);
+      throw new Error("Kullanıcı bulunamadı.");
+    }
+
+    user.notificationReadAt = new Date();
+    await user.save();
+
+    res.status(200).json({
+      message: "Bildirimler okundu olarak işaretlendi.",
+      notificationReadAt: user.notificationReadAt,
     });
   } catch (error) {
     next(error);

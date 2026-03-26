@@ -11,6 +11,7 @@ import orderRoutes from "./src/routes/orderRoutes.js";
 import cartRoutes from "./src/routes/cartRoutes.js";
 import adminRoutes from "./src/routes/adminRoutes.js";
 import publicRoutes from "./src/routes/publicRoutes.js";
+import { startImapListener } from "./src/utils/imapListener.js";
 import { notFound, errorHandler } from "./src/middleware/errorMiddleware.js";
 
 dotenv.config();
@@ -82,6 +83,8 @@ app.use(errorHandler);
 const PORT = process.env.PORT || 5000;
 
 connectDB().then(() => {
+  startImapListener();
+
   app.listen(PORT, () => {
     console.log(`Server çalışıyor: http://localhost:${PORT}`);
   });

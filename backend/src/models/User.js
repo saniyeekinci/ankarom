@@ -56,6 +56,10 @@ const userSchema = new mongoose.Schema(
       enum: ["admin", "user"],
       default: "user",
     },
+    notificationReadAt: {
+      type: Date,
+      default: null,
+    },
   },
   { timestamps: true }
 );

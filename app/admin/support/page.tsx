@@ -9,6 +9,10 @@ type SupportTicket = {
   ticketNo: string;
   subject: string;
   customer: string;
+  customerEmail?: string;
+  message?: string;
+  adminReply?: string;
+  answeredAt?: string;
   priority: "Düşük" | "Orta" | "Yüksek";
   status: "Açık" | "Yanıtlandı";
   createdAt?: string;
@@ -42,7 +46,7 @@ export default function AdminSupportPage() {
           return true;
         }
 
-        return `${ticket.ticketNo} ${ticket.customer} ${ticket.subject}`
+        return `${ticket.ticketNo} ${ticket.customer} ${ticket.customerEmail || ""} ${ticket.subject} ${ticket.message || ""}`
           .toLocaleLowerCase("tr-TR")
           .includes(query);
       })
@@ -53,13 +57,15 @@ export default function AdminSupportPage() {
       });
   }, [tickets, searchQuery, statusFilter, sortOrder]);
 
-  const fetchTickets = useCallback(async () => {
+  const fetchTickets = useCallback(async (silent = false) => {
     if (!token) {
       return;
     }
 
-    setIsLoading(true);
-    setErrorMessage("");
+    if (!silent) {
+      setIsLoading(true);
+      setErrorMessage("");
+    }
 
     try {
       const response = await fetch(`${API_BASE_URL}/api/admin/support-tickets`, {
@@ -76,7 +82,9 @@ export default function AdminSupportPage() {
       const message = error instanceof Error ? error.message : "Destek talepleri yüklenirken hata oluştu.";
       setErrorMessage(message);
     } finally {
-      setIsLoading(false);
+      if (!silent) {
+        setIsLoading(false);
+      }
     }
   }, [token]);
 
@@ -84,8 +92,25 @@ export default function AdminSupportPage() {
     fetchTickets();
   }, [fetchTickets]);
 
+  useEffect(() => {
+    if (!token) {
+      return;
+    }
+
+    const intervalId = setInterval(() => {
+      fetchTickets(true);
+    }, 5000);
+
+    return () => clearInterval(intervalId);
+  }, [token, fetchTickets]);
+
   const markAnswered = async (id: string) => {
     if (!token) {
+      return;
+    }
+
+    const replyMessage = window.prompt("Yanıt metnini yazın (mailden cevapladıysan boş bırakıp TAMAM deyin):", "");
+    if (replyMessage === null) {
       return;
     }
 
@@ -98,7 +123,10 @@ export default function AdminSupportPage() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ status: "Yanıtlandı" }),
+        body: JSON.stringify({
+          status: "Yanıtlandı",
+          ...(replyMessage.trim() ? { replyMessage: replyMessage.trim() } : {}),
+        }),
       });
 
       const data = (await response.json()) as { message?: string; ticket?: SupportTicket };
@@ -156,6 +184,7 @@ export default function AdminSupportPage() {
               <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Talep No</th>
               <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Konu</th>
               <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Müşteri</th>
+              <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Mesaj</th>
               <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Öncelik</th>
               <th className="px-3 py-2 text-right text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Durum</th>
             </tr>
@@ -163,17 +192,21 @@ export default function AdminSupportPage() {
           <tbody>
             {isLoading ? (
               <tr>
-                <td colSpan={5} className="px-3 py-4 text-sm text-slate-300">Destek talepleri yükleniyor...</td>
+                <td colSpan={6} className="px-3 py-4 text-sm text-slate-300">Destek talepleri yükleniyor...</td>
               </tr>
             ) : filteredTickets.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-3 py-4 text-sm text-slate-300">Filtreye uygun destek talebi yok.</td>
+                <td colSpan={6} className="px-3 py-4 text-sm text-slate-300">Filtreye uygun destek talebi yok.</td>
               </tr>
             ) : filteredTickets.map((ticket) => (
               <tr key={ticket._id} className="rounded-xl border border-white/10 bg-white/5">
                 <td className="rounded-l-xl px-3 py-3 text-sm font-semibold text-white">{ticket.ticketNo}</td>
                 <td className="px-3 py-3 text-sm text-slate-200">{ticket.subject}</td>
-                <td className="px-3 py-3 text-sm text-slate-200">{ticket.customer}</td>
+                <td className="px-3 py-3 text-sm text-slate-200">
+                  <p>{ticket.customer}</p>
+                  {ticket.customerEmail && <p className="text-xs text-slate-400">{ticket.customerEmail}</p>}
+                </td>
+                <td className="px-3 py-3 text-sm text-slate-200 max-w-80 truncate" title={ticket.message || ""}>{ticket.message || "-"}</td>
                 <td className="px-3 py-3 text-sm text-amber-200">{ticket.priority}</td>
                 <td className="rounded-r-xl px-3 py-3 text-right">
                   <button

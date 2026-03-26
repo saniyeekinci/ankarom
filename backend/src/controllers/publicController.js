@@ -1,6 +1,7 @@
 import DealerApplication from "../models/DealerApplication.js";
 import SupportTicket from "../models/SupportTicket.js";
 import AdminSetting from "../models/AdminSetting.js";
+import { sendSupportTicketEmail } from "../utils/sendSupportTicketEmail.js";
 
 const generateRef = (prefix) => `${prefix}-${Math.floor(1000 + Math.random() * 9000)}`;
 
@@ -35,27 +36,50 @@ export const getPublicSettings = async (req, res, next) => {
 
 export const createPublicSupportTicket = async (req, res, next) => {
   try {
-    const { customer, subject, priority, message } = req.body;
+    const { customer, customerEmail, subject, priority, message } = req.body;
 
-    if (!customer || !subject) {
+    if (!customer || !message) {
       res.status(400);
-      throw new Error("Ad soyad ve konu zorunludur.");
+      throw new Error("Ad soyad ve mesaj zorunludur.");
     }
 
     const parsedPriority = ["Düşük", "Orta", "Yüksek"].includes(priority) ? priority : "Orta";
-    const normalizedSubject = message ? `${String(subject).trim()} - ${String(message).trim().slice(0, 100)}` : String(subject).trim();
+    const normalizedSubject = String(subject || "Hesabım destek talebi").trim();
+    const normalizedMessage = String(message).trim();
 
     const ticket = await SupportTicket.create({
       ticketNo: generateRef("T"),
       subject: normalizedSubject,
       customer: String(customer).trim(),
+      customerEmail: String(customerEmail || "").trim(),
+      message: normalizedMessage,
       priority: parsedPriority,
       status: "Açık",
     });
 
+    const settings = await getMainSettings();
+    const recipientEmail = process.env.ADMIN_SUPPORT_EMAIL || settings.supportEmail;
+
+    let emailSent = false;
+    try {
+      const emailResult = await sendSupportTicketEmail({
+        to: recipientEmail,
+        siteName: settings.siteName || "Ankarom",
+        ticketNo: ticket.ticketNo,
+        customer: ticket.customer,
+        customerEmail: ticket.customerEmail,
+        subject: ticket.subject,
+        message: ticket.message,
+      });
+      emailSent = Boolean(emailResult?.sent);
+    } catch (emailError) {
+      console.error("Destek talebi e-postası gönderilemedi:", emailError);
+    }
+
     return res.status(201).json({
       message: "Talebiniz alındı, en kısa sürede dönüş yapacağız.",
       ticket,
+      emailSent,
     });
   } catch (error) {
     return next(error);

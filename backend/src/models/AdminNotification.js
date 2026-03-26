@@ -17,6 +17,17 @@ const adminNotificationSchema = new mongoose.Schema(
       enum: ["site", "email", "sms"],
       default: "site",
     },
+    type: {
+      type: String,
+      enum: ["general", "support_reply"],
+      default: "general",
+    },
+    recipientEmail: {
+      type: String,
+      trim: true,
+      lowercase: true,
+      default: "",
+    },
   },
   { timestamps: true }
 );
