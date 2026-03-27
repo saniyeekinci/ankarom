@@ -5,6 +5,43 @@ import AdminNotification from "../models/AdminNotification.js";
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+const escapeRegex = (value) => String(value || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+const normalizeTicketMessages = (ticket) => {
+  const existing = Array.isArray(ticket.messages)
+    ? ticket.messages
+        .filter((entry) => entry && String(entry.text || "").trim())
+        .map((entry) => ({
+          sender: entry.sender,
+          text: String(entry.text || "").trim(),
+          createdAt: entry.createdAt || ticket.createdAt || new Date(),
+        }))
+    : [];
+
+  if (existing.length > 0) {
+    return existing.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+  }
+
+  const fallback = [];
+  if (String(ticket.message || "").trim()) {
+    fallback.push({
+      sender: "customer",
+      text: String(ticket.message || "").trim(),
+      createdAt: ticket.createdAt || new Date(),
+    });
+  }
+
+  if (String(ticket.adminReply || "").trim()) {
+    fallback.push({
+      sender: "admin",
+      text: String(ticket.adminReply || "").trim(),
+      createdAt: ticket.answeredAt || ticket.updatedAt || new Date(),
+    });
+  }
+
+  return fallback;
+};
+
 // POST /api/auth/register
 export const register = async (req, res, next) => {
   try {
@@ -261,15 +298,33 @@ export const getMySupportTickets = async (req, res, next) => {
     const userEmail = String(req.user?.email || "").trim().toLowerCase();
     const userName = String(req.user?.name || "").trim();
 
-    const query = userEmail
-      ? { $or: [{ customerEmail: userEmail }, { customer: userName }] }
-      : { customer: userName };
+    const nameFilter = userName
+      ? { customer: { $regex: `^${escapeRegex(userName)}$`, $options: "i" } }
+      : null;
+
+    const orFilters = [];
+    if (userEmail) {
+      orFilters.push({ customerEmail: userEmail });
+    }
+    if (nameFilter) {
+      orFilters.push(nameFilter);
+    }
+
+    const query = orFilters.length > 0 ? { $or: orFilters } : { _id: null };
 
     const tickets = await SupportTicket.find(query)
       .sort({ createdAt: -1 })
-      .select("ticketNo subject message adminReply status createdAt answeredAt");
+      .select("ticketNo subject message adminReply messages status createdAt answeredAt updatedAt");
 
-    res.status(200).json(tickets);
+    const payload = tickets.map((ticket) => {
+      const item = ticket.toObject();
+      return {
+        ...item,
+        messages: normalizeTicketMessages(item),
+      };
+    });
+
+    res.status(200).json(payload);
   } catch (error) {
     next(error);
   }

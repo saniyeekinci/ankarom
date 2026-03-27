@@ -22,15 +22,25 @@ const formatCurrency = (value: number) =>
     maximumFractionDigits: 0,
   }).format(value);
 
+// YENİ: Mesajların yapısını tanımlıyoruz
+type SupportMessage = {
+  _id?: string;
+  sender: "customer" | "admin" | "system";
+  text: string;
+  createdAt: string;
+};
+
 type UserSupportTicket = {
   _id: string;
   ticketNo: string;
   subject: string;
-  message?: string;
-  adminReply?: string;
+  message?: string; // Eski yapı desteği
+  adminReply?: string; // Eski yapı desteği
+  messages?: SupportMessage[]; // YENİ: Mesaj geçmişi dizisi
   status: "Açık" | "Yanıtlandı";
   createdAt?: string;
   answeredAt?: string;
+  updatedAt?: string;
 };
 
 type UserNotification = {
@@ -53,41 +63,6 @@ const formatNotificationDate = (value?: string) => {
     hour: "2-digit",
     minute: "2-digit",
   }).format(new Date(value));
-};
-
-const sanitizeReplyPreview = (value?: string) => {
-  if (!value) {
-    return "";
-  }
-
-  let normalized = String(value).replace(/\r\n/g, "\n").replace(/\r/g, "\n");
-  const inlineCutPatterns = [/\bOn\b.+\bwrote:\s*/i, /\btarihinde\b.+\byazd[ıi1]:\s*/i, /Ankarom\s+Destek\s*<[^>]+>/i];
-
-  let cutIndex = normalized.length;
-  for (const pattern of inlineCutPatterns) {
-    const match = pattern.exec(normalized);
-    if (match && typeof match.index === "number" && match.index < cutIndex) {
-      cutIndex = match.index;
-    }
-  }
-
-  if (cutIndex < normalized.length) {
-    normalized = normalized.slice(0, cutIndex);
-  }
-
-  const lines = normalized.split("\n");
-  const stopPatterns = [/^On\s.+wrote:\s*$/i, /^.+tarihinde\s+şunu\s+yazdı:\s*$/i, /^>+\s*/];
-  const cleanLines = [];
-
-  for (const line of lines) {
-    const trimmed = line.trim();
-    if (stopPatterns.some((pattern) => pattern.test(trimmed))) {
-      break;
-    }
-    cleanLines.push(line);
-  }
-
-  return cleanLines.join("\n").trim();
 };
 
 const getNotificationMeta = (notification: UserNotification) => {
@@ -126,6 +101,12 @@ export default function AccountPage() {
   const [notificationFeedback, setNotificationFeedback] = useState("");
   const { user, token, isAuthenticated, logout } = useAuth();
   const { items, itemCount, subtotal } = useCart();
+
+  const orderedSupportTickets = [...supportTickets].sort((a, b) => {
+    const dateA = new Date(a.updatedAt || a.createdAt || 0).getTime();
+    const dateB = new Date(b.updatedAt || b.createdAt || 0).getTime();
+    return dateA - dateB;
+  });
 
   const fetchSupportTickets = useCallback(async (silent = false) => {
     if (!token) {
@@ -189,10 +170,23 @@ export default function AccountPage() {
         }),
       });
 
-      const data = (await response.json()) as { message?: string };
+      const data = (await response.json()) as { message?: string; ticket?: UserSupportTicket };
 
       if (!response.ok) {
         throw new Error(data.message || "Destek talebi gönderilemedi.");
+      }
+
+      if (data.ticket?._id) {
+        setSupportTickets((prev) => {
+          const existingIndex = prev.findIndex((ticket) => ticket._id === data.ticket?._id);
+          if (existingIndex === -1) {
+            return [...prev, data.ticket as UserSupportTicket];
+          }
+
+          const next = [...prev];
+          next[existingIndex] = data.ticket as UserSupportTicket;
+          return next;
+        });
       }
 
       setSupportMessage("");
@@ -268,15 +262,18 @@ export default function AccountPage() {
     }
   }, [token]);
 
-  // Yeni kayıt eklendiğinde sadece destek kutusunun kendi içinde en alta kaydır
+  // Yeni mesaj geldiğinde sadece destek kutusunu en alta kaydır
   useEffect(() => {
     if (isSupportOpen) {
       const container = messagesContainerRef.current;
       if (container) {
-        container.scrollTo({ top: container.scrollHeight, behavior: "smooth" });
+        // Küçük bir gecikme ekleyerek DOM'un render olmasını garantiliyoruz
+        setTimeout(() => {
+          container.scrollTo({ top: container.scrollHeight, behavior: "smooth" });
+        }, 100);
       }
     }
-  }, [supportTickets.length, isSupportOpen]);
+  }, [supportTickets, isSupportOpen]);
 
   useEffect(() => {
     if (isAuthenticated && user?.role === "admin") {
@@ -531,55 +528,64 @@ export default function AccountPage() {
                         <p className="text-sm text-slate-400">Destek ekibine ilk mesajını gönder.<br />Konuşma akışı burada görünecek.</p>
                       </div>
                     ) : (
-                      <div className="flex flex-col gap-5">
-                        {/* reverse() fonksiyonu eklenerek dizi tersine çevrildi, en yeni mesaj en altta çıkacak */}
-                        {[...supportTickets].reverse().map((ticket) => {
-                          const cleanedAdminReply = sanitizeReplyPreview(ticket.adminReply);
-
-                          return (
-                          <div key={ticket._id} className="flex flex-col gap-2">
-                            {/* Kullanıcı Mesajı */}
-                            <div className="flex flex-col items-end w-full">
-                              <span className="mb-1 text-[10px] font-medium tracking-wider text-slate-500 uppercase">
-                                {ticket.ticketNo} - Sen
+                      <div className="flex flex-col gap-6">
+                        {/* Tüm ticket'ları ters çevirip yazdırıyoruz, her birinin içindeki mesaj dizisini döngüye sokuyoruz */}
+                        {orderedSupportTickets.map((ticket) => (
+                          <div key={ticket._id} className="flex flex-col gap-3 relative">
+                            {/* Talep Numarası Etiketi */}
+                            <div className="flex justify-center mb-1">
+                              <span className="bg-white/5 border border-white/10 px-3 py-1 rounded-full text-[10px] font-semibold text-slate-400 uppercase tracking-widest">
+                                Destek Talebi: {ticket.ticketNo}
                               </span>
-                              <div className="max-w-[85%] rounded-2xl rounded-br-sm border border-cyan-500/20 bg-cyan-500/10 px-4 py-2.5 text-sm text-white shadow-sm">
-                                {ticket.message || "-"}
-                              </div>
                             </div>
 
-                            {/* Destek Ekibi Yanıtı */}
-                            {cleanedAdminReply ? (
-                              <div className="flex flex-col items-start w-full mt-1">
-                                <span className="mb-1 text-[10px] font-medium tracking-wider text-slate-500 uppercase">
-                                  Destek Ekibi
-                                </span>
-                                <div className="max-w-[85%] rounded-2xl rounded-bl-sm border border-emerald-500/20 bg-emerald-500/10 px-4 py-2.5 text-sm text-white shadow-sm">
-                                  {cleanedAdminReply}
+                            {/* EĞER YENİ MESAJ DİZİSİ (MESSAGES) VARSA ONU KULLAN */}
+                            {ticket.messages && ticket.messages.length > 0 ? (
+                              ticket.messages.map((msg, idx) => (
+                                <div key={idx} className={`flex flex-col w-full ${msg.sender === "customer" ? "items-end" : "items-start"}`}>
+                                  <span className="mb-1 text-[10px] font-medium tracking-wider text-slate-500 uppercase">
+                                    {msg.sender === "customer" ? "Sen" : "Destek Ekibi"}
+                                  </span>
+                                  <div className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm shadow-sm ${
+                                    msg.sender === "customer"
+                                      ? "rounded-br-sm border border-cyan-500/20 bg-cyan-500/10 text-white"
+                                      : "rounded-bl-sm border border-emerald-500/20 bg-emerald-500/10 text-emerald-50"
+                                  }`}>
+                                    {msg.text}
+                                  </div>
                                 </div>
-                              </div>
-                            ) : ticket.status === "Yanıtlandı" ? (
-                              <div className="flex flex-col items-start w-full mt-1">
-                                <span className="mb-1 text-[10px] font-medium tracking-wider text-slate-500 uppercase">
-                                  Destek Ekibi
-                                </span>
-                                <div className="max-w-[85%] rounded-2xl rounded-bl-sm border border-emerald-500/20 bg-emerald-500/10 px-4 py-2 text-xs text-emerald-100">
-                                  Bu talep e-posta üzerinden yanıtlandı. Gelen kutunu kontrol edebilirsin.
-                                </div>
-                              </div>
+                              ))
                             ) : (
-                              <div className="flex flex-col items-start w-full mt-1">
-                                <span className="mb-1 text-[10px] font-medium tracking-wider text-slate-500 uppercase">
-                                  Sistem
-                                </span>
+                              /* EĞER ESKİ SİSTEMDE KALMIŞ MESAJLAR VARSA BOZULMADAN GÖSTERİLSİN */
+                              <div className="flex flex-col gap-3">
+                                <div className="flex flex-col items-end w-full">
+                                  <span className="mb-1 text-[10px] font-medium tracking-wider text-slate-500 uppercase">Sen</span>
+                                  <div className="max-w-[85%] rounded-2xl rounded-br-sm border border-cyan-500/20 bg-cyan-500/10 px-4 py-2.5 text-sm text-white shadow-sm">
+                                    {ticket.message || "-"}
+                                  </div>
+                                </div>
+                                {ticket.adminReply && (
+                                  <div className="flex flex-col items-start w-full mt-1">
+                                    <span className="mb-1 text-[10px] font-medium tracking-wider text-slate-500 uppercase">Destek Ekibi</span>
+                                    <div className="max-w-[85%] rounded-2xl rounded-bl-sm border border-emerald-500/20 bg-emerald-500/10 px-4 py-2.5 text-sm text-white shadow-sm">
+                                      {ticket.adminReply}
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            )}
+
+                            {/* Sistem Bekleme Durumu */}
+                            {ticket.status === "Açık" && (
+                              <div className="flex flex-col items-start w-full mt-2">
+                                <span className="mb-1 text-[10px] font-medium tracking-wider text-slate-500 uppercase">Sistem</span>
                                 <div className="max-w-[85%] rounded-2xl rounded-bl-sm border border-white/5 bg-white/5 px-4 py-2 text-xs text-slate-400 italic">
-                                  Yanıt bekleniyor...
+                                  Destek talebiniz inceleniyor, yanıt bekleniyor...
                                 </div>
                               </div>
                             )}
                           </div>
-                          );
-                        })}
+                        ))}
                       </div>
                     )}
                   </div>

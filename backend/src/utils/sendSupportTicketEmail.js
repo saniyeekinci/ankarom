@@ -21,18 +21,40 @@ const createTransporter = () => {
   });
 };
 
-export const sendSupportTicketEmail = async ({ to, siteName, ticketNo, customer, customerEmail, subject, message }) => {
+const getThreadHeaders = (threadMessageId) => {
+  const normalized = String(threadMessageId || "").trim();
+  if (!normalized) {
+    return {};
+  }
+
+  return {
+    inReplyTo: normalized,
+    references: normalized,
+  };
+};
+
+export const sendSupportTicketEmail = async ({
+  to,
+  siteName,
+  ticketNo,
+  customer,
+  customerEmail,
+  subject,
+  message,
+  threadMessageId,
+}) => {
   const transporter = createTransporter();
 
   if (!transporter || !to) {
     return { sent: false, reason: "missing_smtp_or_recipient" };
   }
 
-  await transporter.sendMail({
+  const info = await transporter.sendMail({
     from: process.env.SMTP_FROM || process.env.SMTP_USER,
     to,
     replyTo: process.env.SMTP_USER,
     subject: `[${siteName}] Yeni destek talebi: ${ticketNo}`,
+    ...getThreadHeaders(threadMessageId),
     text: [
       `Talep No: ${ticketNo}`,
       `Müşteri: ${customer}`,
@@ -44,20 +66,21 @@ export const sendSupportTicketEmail = async ({ to, siteName, ticketNo, customer,
     ].join("\n"),
   });
 
-  return { sent: true };
+  return { sent: true, messageId: String(info?.messageId || "").trim() };
 };
 
-export const sendSupportReplyEmail = async ({ to, siteName, ticketNo, subject, replyMessage }) => {
+export const sendSupportReplyEmail = async ({ to, siteName, ticketNo, subject, replyMessage, threadMessageId }) => {
   const transporter = createTransporter();
 
   if (!transporter || !to) {
     return { sent: false, reason: "missing_smtp_or_recipient" };
   }
 
-  await transporter.sendMail({
+  const info = await transporter.sendMail({
     from: process.env.SMTP_FROM || process.env.SMTP_USER,
     to,
     subject: `[${siteName}] Destek yanıtı: ${ticketNo}`,
+    ...getThreadHeaders(threadMessageId),
     text: [
       `Talep No: ${ticketNo}`,
       `Konu: ${subject}`,
@@ -67,5 +90,5 @@ export const sendSupportReplyEmail = async ({ to, siteName, ticketNo, subject, r
     ].join("\n"),
   });
 
-  return { sent: true };
+  return { sent: true, messageId: String(info?.messageId || "").trim() };
 };

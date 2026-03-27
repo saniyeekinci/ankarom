@@ -92,6 +92,11 @@ const parseTicketNoFromSubject = (subject) => {
   return match ? match[0].toUpperCase() : null;
 };
 
+const isSystemSupportNotificationSubject = (subject) => {
+  const normalized = String(subject || "").trim();
+  return /^\[[^\]]+\]\s*(Yeni destek talebi|Destek yanıtı)\s*:\s*T-\d{4,}/i.test(normalized);
+};
+
 let listenerStarted = false;
 const processedMessageKeys = new Set();
 
@@ -112,6 +117,61 @@ const buildMessageKey = (parsedMail, fallbackKey) => {
   const subject = String(parsedMail?.subject || "").trim();
   const date = parsedMail?.date ? new Date(parsedMail.date).toISOString() : "";
   return `${subject}|${date}|${fallbackKey}`;
+};
+
+const listMailboxes = (connection) =>
+  new Promise((resolve, reject) => {
+    connection.imap.getBoxes((error, boxes) => {
+      if (error) {
+        reject(error);
+        return;
+      }
+      resolve(boxes || {});
+    });
+  });
+
+const flattenMailboxNames = (boxes, prefix = "") => {
+  const names = [];
+
+  for (const [name, box] of Object.entries(boxes || {})) {
+    const delimiter = box?.delimiter || "/";
+    const fullName = prefix ? `${prefix}${delimiter}${name}` : name;
+    names.push(fullName);
+
+    if (box?.children) {
+      names.push(...flattenMailboxNames(box.children, fullName));
+    }
+  }
+
+  return names;
+};
+
+const resolveTargetMailboxes = async (connection) => {
+  const configured = String(
+    process.env.IMAP_MAILBOXES || "INBOX,[Gmail]/Sent Mail,[Gmail]/Gönderilmiş Postalar"
+  )
+    .split(",")
+    .map((value) => value.trim())
+    .filter(Boolean);
+
+  try {
+    const boxes = await listMailboxes(connection);
+    const available = new Set(flattenMailboxNames(boxes));
+    const existing = configured.filter((mailbox) => available.has(mailbox));
+
+    if (existing.length > 0) {
+      return existing;
+    }
+
+    if (available.has("INBOX")) {
+      return ["INBOX"];
+    }
+
+    return configured;
+  } catch (error) {
+    console.warn("IMAP mailbox discovery failed, using configured list.", error?.message || error);
+    return configured;
+  }
 };
 
 export const startImapListener = async () => {
@@ -171,6 +231,11 @@ export const startImapListener = async () => {
           const subject = parsed.subject || "";
           const ticketNo = parseTicketNoFromSubject(subject);
 
+          // Ignore app-generated notification mails so they are not mistaken as human replies.
+          if (isSystemSupportNotificationSubject(subject)) {
+            continue;
+          }
+
           const messageKey = buildMessageKey(parsed, `${mailbox}-${item.attributes?.uid || "no-uid"}`);
           if (processedMessageKeys.has(messageKey)) {
             continue;
@@ -205,7 +270,29 @@ export const startImapListener = async () => {
             continue;
           }
 
+          const previousAdminReply = String(ticket.adminReply || "").trim();
           ticket.adminReply = cleanReply;
+          const messages = Array.isArray(ticket.messages) ? [...ticket.messages] : [];
+          if (messages.length === 0 && String(ticket.message || "").trim()) {
+            messages.push({
+              sender: "customer",
+              text: String(ticket.message || "").trim(),
+              createdAt: ticket.createdAt || new Date(),
+            });
+          }
+          if (messages.length <= 1 && previousAdminReply) {
+            messages.push({
+              sender: "admin",
+              text: previousAdminReply,
+              createdAt: ticket.answeredAt || new Date(),
+            });
+          }
+          messages.push({
+            sender: "admin",
+            text: cleanReply,
+            createdAt: new Date(),
+          });
+          ticket.messages = messages;
           ticket.status = "Yanıtlandı";
           ticket.answeredAt = new Date();
           await ticket.save();
@@ -237,7 +324,7 @@ export const startImapListener = async () => {
     };
 
     const pollInbox = async () => {
-      const mailboxes = ["INBOX", "[Gmail]/Sent Mail", "[Gmail]/Gönderilmiş Postalar"];
+      const mailboxes = await resolveTargetMailboxes(connection);
       for (const mailbox of mailboxes) {
         await processMailbox(mailbox);
       }

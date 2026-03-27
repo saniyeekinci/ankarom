@@ -12,6 +12,11 @@ type SupportTicket = {
   customerEmail?: string;
   message?: string;
   adminReply?: string;
+  messages?: Array<{
+    sender: "customer" | "admin" | "system";
+    text: string;
+    createdAt?: string;
+  }>;
   answeredAt?: string;
   priority: "Düşük" | "Orta" | "Yüksek";
   status: "Açık" | "Yanıtlandı";
@@ -28,6 +33,21 @@ export default function AdminSupportPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "open" | "answered">("all");
   const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest");
+
+  const getLatestMessageText = (ticket: SupportTicket) => {
+    if (Array.isArray(ticket.messages) && ticket.messages.length > 0) {
+      const latest = [...ticket.messages]
+        .filter((entry) => entry && String(entry.text || "").trim())
+        .sort((a, b) => new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime())
+        .at(-1);
+
+      if (latest?.text) {
+        return latest.text;
+      }
+    }
+
+    return ticket.adminReply || ticket.message || "";
+  };
 
   const filteredTickets = useMemo(() => {
     const query = searchQuery.trim().toLocaleLowerCase("tr-TR");
@@ -46,7 +66,7 @@ export default function AdminSupportPage() {
           return true;
         }
 
-        return `${ticket.ticketNo} ${ticket.customer} ${ticket.customerEmail || ""} ${ticket.subject} ${ticket.message || ""}`
+        return `${ticket.ticketNo} ${ticket.customer} ${ticket.customerEmail || ""} ${ticket.subject} ${getLatestMessageText(ticket)}`
           .toLocaleLowerCase("tr-TR")
           .includes(query);
       })
@@ -206,7 +226,7 @@ export default function AdminSupportPage() {
                   <p>{ticket.customer}</p>
                   {ticket.customerEmail && <p className="text-xs text-slate-400">{ticket.customerEmail}</p>}
                 </td>
-                <td className="px-3 py-3 text-sm text-slate-200 max-w-80 truncate" title={ticket.message || ""}>{ticket.message || "-"}</td>
+                <td className="px-3 py-3 text-sm text-slate-200 max-w-80 truncate" title={getLatestMessageText(ticket) || ""}>{getLatestMessageText(ticket) || "-"}</td>
                 <td className="px-3 py-3 text-sm text-amber-200">{ticket.priority}</td>
                 <td className="rounded-r-xl px-3 py-3 text-right">
                   <button

@@ -936,6 +936,15 @@ export const createAdminSupportTicket = async (req, res, next) => {
       subject: String(subject).trim(),
       customer: String(customer).trim(),
       customerEmail: String(customerEmail || "").trim(),
+      messages: String(message || "").trim()
+        ? [
+            {
+              sender: "customer",
+              text: String(message || "").trim(),
+              createdAt: new Date(),
+            },
+          ]
+        : [],
       message: String(message || "").trim(),
       priority: parsedPriority,
       status: "Açık",
@@ -988,6 +997,7 @@ export const updateAdminSupportTicketStatus = async (req, res, next) => {
           ticketNo: ticket.ticketNo,
           subject: ticket.subject,
           replyMessage: normalizedReply,
+          threadMessageId: ticket.supportThreadMessageId || ticket.supportLastMessageId,
         });
 
         if (!replyEmailResult?.sent) {
@@ -997,7 +1007,36 @@ export const updateAdminSupportTicketStatus = async (req, res, next) => {
         }
 
         emailSent = true;
+        const previousAdminReply = String(ticket.adminReply || "").trim();
         ticket.adminReply = normalizedReply;
+        const messages = Array.isArray(ticket.messages) ? [...ticket.messages] : [];
+        if (messages.length === 0 && String(ticket.message || "").trim()) {
+          messages.push({
+            sender: "customer",
+            text: String(ticket.message || "").trim(),
+            createdAt: ticket.createdAt || new Date(),
+          });
+        }
+        if (messages.length <= 1 && previousAdminReply) {
+          messages.push({
+            sender: "admin",
+            text: previousAdminReply,
+            createdAt: ticket.answeredAt || new Date(),
+          });
+        }
+        messages.push({
+          sender: "admin",
+          text: normalizedReply,
+          createdAt: new Date(),
+        });
+        ticket.messages = messages;
+        const latestMessageId = String(replyEmailResult?.messageId || "").trim();
+        if (latestMessageId) {
+          if (!ticket.supportThreadMessageId) {
+            ticket.supportThreadMessageId = latestMessageId;
+          }
+          ticket.supportLastMessageId = latestMessageId;
+        }
       }
 
       if (ticket.customerEmail) {

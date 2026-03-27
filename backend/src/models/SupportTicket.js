@@ -24,12 +24,40 @@ const supportTicketSchema = new mongoose.Schema(
       lowercase: true,
       default: "",
     },
+    messages: [
+      {
+        sender: {
+          type: String,
+          enum: ["customer", "admin", "system"],
+          required: true,
+        },
+        text: {
+          type: String,
+          required: true,
+          trim: true,
+        },
+        createdAt: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
     message: {
       type: String,
       trim: true,
       default: "",
     },
     adminReply: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    supportThreadMessageId: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    supportLastMessageId: {
       type: String,
       trim: true,
       default: "",
