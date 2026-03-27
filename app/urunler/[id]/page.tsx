@@ -7,6 +7,16 @@ type ProductDetailPageProps = {
   params: Promise<{ id: string }>;
 };
 
+const extractBackendProduct = (
+  payload: BackendProduct | { product?: BackendProduct },
+): BackendProduct | undefined => {
+  if ("_id" in payload) {
+    return payload;
+  }
+
+  return payload.product;
+};
+
 export default async function ProductDetailPage({ params }: ProductDetailPageProps) {
   const { id } = await params;
 
@@ -21,9 +31,9 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
 
       if (response.ok) {
         const data = (await response.json()) as BackendProduct | { product?: BackendProduct };
-        const backendProduct = "product" in data ? data.product : data;
+        const backendProduct = extractBackendProduct(data);
 
-        if (backendProduct?._id) {
+        if (backendProduct) {
           product = mapBackendProductToTrailerProduct(backendProduct);
         }
       }
