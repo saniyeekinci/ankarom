@@ -80,12 +80,14 @@ app.use("/api/public", publicRoutes);
 app.use(notFound);
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 5000;
+// Mevcut halini şununla değiştir:
+const PORT = process.env.PORT || 10000;
 
 connectDB().then(() => {
   startImapListener();
 
-  app.listen(PORT, () => {
-    console.log(`Server çalışıyor: http://localhost:${PORT}`);
+  // '0.0.0.0' eklemek Render'ın dış dünyadan gelen istekleri yakalamasını sağlar
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server ${PORT} portunda yayında...`);
   });
 });
