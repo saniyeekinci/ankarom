@@ -2,11 +2,24 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import { ArrowDownLeftIcon, AdjustmentsVerticalIcon, ShieldCheckIcon, BuildingOffice2Icon, ShoppingCartIcon, QuestionMarkCircleIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
+import {
+  ArrowDownLeftIcon,
+  AdjustmentsVerticalIcon,
+  ShieldCheckIcon,
+  BuildingOffice2Icon,
+  ShoppingCartIcon,
+  QuestionMarkCircleIcon,
+  CheckCircleIcon,
+} from "@heroicons/react/24/outline";
 import type { TrailerProduct } from "@/lib/trailerProducts";
 import { useCart } from "@/components/cart/CartProvider";
 
-const featureIcons = [ArrowDownLeftIcon, AdjustmentsVerticalIcon, ShieldCheckIcon, BuildingOffice2Icon];
+const featureIcons = [
+  ArrowDownLeftIcon,
+  AdjustmentsVerticalIcon,
+  ShieldCheckIcon,
+  BuildingOffice2Icon,
+];
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
 type ReviewItem = {
@@ -21,7 +34,9 @@ type ProductDetailExperienceProps = {
   product: TrailerProduct;
 };
 
-export default function ProductDetailExperience({ product }: ProductDetailExperienceProps) {
+export default function ProductDetailExperience({
+  product,
+}: ProductDetailExperienceProps) {
   const [isAddedToastVisible, setIsAddedToastVisible] = useState(false);
   const [reviews, setReviews] = useState<ReviewItem[]>([]);
   const [isLoadingReviews, setIsLoadingReviews] = useState(true);
@@ -31,9 +46,14 @@ export default function ProductDetailExperience({ product }: ProductDetailExperi
   const [reviewError, setReviewError] = useState("");
   const [reviewSuccess, setReviewSuccess] = useState("");
   const { addToCart } = useCart();
-  const whatsappMessage = `Merhaba, ${product.name} hakkında bir sorum var. Ürün ID: ${product.id}`;
-  const whatsappHref = `https://wa.me/905XXXXXXXXX?text=${encodeURIComponent(whatsappMessage)}`;
-  const isBackendProduct = useMemo(() => /^[a-f0-9]{24}$/i.test(product.id), [product.id]);
+const whatsappMessage = `Merhaba, ${product.name} hakkında bir sorum var. Ürün ID: ${product.id}`;
+
+// ✅ EN İYİ ve EN GÜVENİLİR YÖNTEM (2026 itibarıyla önerilen)
+const whatsappHref = `https://wa.me/905065440466?text=${encodeURIComponent(whatsappMessage)}`;
+  const isBackendProduct = useMemo(
+    () => /^[a-f0-9]{24}$/i.test(product.id),
+    [product.id],
+  );
 
   useEffect(() => {
     const fetchReviews = async () => {
@@ -46,16 +66,26 @@ export default function ProductDetailExperience({ product }: ProductDetailExperi
       setReviewError("");
 
       try {
-        const response = await fetch(`${API_BASE_URL}/api/products/${product.id}/reviews`, { cache: "no-store" });
-        const data = (await response.json()) as ReviewItem[] & { message?: string };
+        const response = await fetch(
+          `${API_BASE_URL}/api/products/${product.id}/reviews`,
+          { cache: "no-store" },
+        );
+        const data = (await response.json()) as ReviewItem[] & {
+          message?: string;
+        };
 
         if (!response.ok) {
-          throw new Error((data as { message?: string }).message || "Yorumlar yüklenemedi.");
+          throw new Error(
+            (data as { message?: string }).message || "Yorumlar yüklenemedi.",
+          );
         }
 
         setReviews(Array.isArray(data) ? data : []);
       } catch (error) {
-        const message = error instanceof Error ? error.message : "Yorumlar yüklenirken hata oluştu.";
+        const message =
+          error instanceof Error
+            ? error.message
+            : "Yorumlar yüklenirken hata oluştu.";
         setReviewError(message);
       } finally {
         setIsLoadingReviews(false);
@@ -91,14 +121,17 @@ export default function ProductDetailExperience({ product }: ProductDetailExperi
     setIsSendingReview(true);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/products/${product.id}/reviews`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          customerName: reviewName,
-          comment: reviewComment,
-        }),
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/api/products/${product.id}/reviews`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            customerName: reviewName,
+            comment: reviewComment,
+          }),
+        },
+      );
 
       const data = (await response.json()) as { message?: string };
       if (!response.ok) {
@@ -109,7 +142,10 @@ export default function ProductDetailExperience({ product }: ProductDetailExperi
       setReviewComment("");
       setReviewSuccess(data.message || "Yorumunuz alındı.");
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Yorum gönderilirken hata oluştu.";
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Yorum gönderilirken hata oluştu.";
       setReviewError(message);
     } finally {
       setIsSendingReview(false);
@@ -135,14 +171,24 @@ export default function ProductDetailExperience({ product }: ProductDetailExperi
             <aside className="rounded-3xl border border-slate-200 bg-slate-50 p-5 lg:col-span-5 lg:p-6">
               <div className="flex h-full flex-col gap-6">
                 <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-slate-500">Kurumsal Ürün Serisi</p>
-                  <h2 className="mt-3 text-3xl font-black leading-tight text-slate-900 sm:text-4xl">{product.name}</h2>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-slate-500">
+                    Kurumsal Ürün Serisi
+                  </p>
+                  <h2 className="mt-3 text-3xl font-black leading-tight text-slate-900 sm:text-4xl">
+                    {product.name}
+                  </h2>
                 </div>
 
                 <div className="rounded-2xl border border-blue-200 bg-blue-50 px-4 py-4">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-blue-700">Fiyat</p>
-                  <p className="mt-1 text-2xl font-extrabold text-slate-900">{product.currentPrice} + KDV</p>
-                  <p className="mt-2 text-xs font-medium text-slate-600">Teslim Süresi: 4-6 Hafta (Siparişe Özel Üretim)</p>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-blue-700">
+                    Fiyat
+                  </p>
+                  <p className="mt-1 text-2xl font-extrabold text-slate-900">
+                    {product.currentPrice} + KDV
+                  </p>
+                  <p className="mt-2 text-xs font-medium text-slate-600">
+                    Teslim Süresi: 4-6 Hafta (Siparişe Özel Üretim)
+                  </p>
                 </div>
 
                 <div>
@@ -175,9 +221,9 @@ export default function ProductDetailExperience({ product }: ProductDetailExperi
                     href={whatsappHref}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3.5 text-sm font-bold text-slate-700 transition-all duration-300 hover:-translate-y-0.5 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+                    className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#25D366] px-4 py-3.5 text-sm font-bold text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#1ebe5d]"
                   >
-                    <QuestionMarkCircleIcon className="h-5 w-5 text-blue-600" />
+                    <QuestionMarkCircleIcon className="h-5 w-5 text-white" />
                     Soru Sor
                   </a>
                 </div>
@@ -186,15 +232,21 @@ export default function ProductDetailExperience({ product }: ProductDetailExperi
           </div>
         </article>
 
-        <section id="urun-detayli-bilgi" className="overflow-hidden rounded-[32px] border border-slate-200 bg-white p-8 shadow-[0_24px_70px_rgba(15,23,42,0.08)] sm:p-10 lg:p-12">
+        <section
+          id="urun-detayli-bilgi"
+          className="overflow-hidden rounded-[32px] border border-slate-200 bg-white p-8 shadow-[0_24px_70px_rgba(15,23,42,0.08)] sm:p-10 lg:p-12"
+        >
           <div className="relative z-10">
             <div className="flex items-center gap-4">
               <span className="h-0.5 w-8 rounded-full bg-blue-600/60" />
-              <p className="text-xs font-bold uppercase tracking-[0.25em] text-blue-700">Detaylı Bilgi</p>
+              <p className="text-xs font-bold uppercase tracking-[0.25em] text-blue-700">
+                Detaylı Bilgi
+              </p>
             </div>
 
             <h3 className="mt-5 text-2xl font-black tracking-tight text-slate-900 sm:text-3xl lg:text-4xl">
-              {product.name} <span className="font-medium text-slate-500">Teknik Detayı</span>
+              {product.name}{" "}
+              <span className="font-medium text-slate-500">Teknik Detayı</span>
             </h3>
 
             <p className="mt-6 max-w-4xl text-base leading-relaxed text-slate-600 sm:text-lg sm:leading-loose">
@@ -205,27 +257,46 @@ export default function ProductDetailExperience({ product }: ProductDetailExperi
 
         <section className="rounded-[32px] border border-slate-200 bg-white p-6 shadow-[0_24px_70px_rgba(15,23,42,0.08)] sm:p-8">
           <h3 className="text-2xl font-black text-slate-900">Ürün Yorumları</h3>
-          <p className="mt-2 text-sm text-slate-500">Onaylanmış yorumlar aşağıda listelenir. Siz de yorum gönderebilirsiniz.</p>
+          <p className="mt-2 text-sm text-slate-500">
+            Onaylanmış yorumlar aşağıda listelenir. Siz de yorum
+            gönderebilirsiniz.
+          </p>
 
-          {reviewError && <p className="mt-4 text-sm text-rose-300">{reviewError}</p>}
-          {reviewSuccess && <p className="mt-4 text-sm text-emerald-600">{reviewSuccess}</p>}
+          {reviewError && (
+            <p className="mt-4 text-sm text-rose-300">{reviewError}</p>
+          )}
+          {reviewSuccess && (
+            <p className="mt-4 text-sm text-emerald-600">{reviewSuccess}</p>
+          )}
 
           <div className="mt-4 space-y-3">
             {isLoadingReviews ? (
               <p className="text-sm text-slate-500">Yorumlar yükleniyor...</p>
             ) : reviews.length === 0 ? (
-              <p className="text-sm text-slate-500">Henüz onaylı yorum bulunmuyor.</p>
+              <p className="text-sm text-slate-500">
+                Henüz onaylı yorum bulunmuyor.
+              </p>
             ) : (
               reviews.map((review) => (
-                <article key={review._id} className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                  <p className="text-sm font-semibold text-slate-900">{review.customerName}</p>
-                  <p className="mt-2 text-sm text-slate-600">{review.comment}</p>
+                <article
+                  key={review._id}
+                  className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
+                >
+                  <p className="text-sm font-semibold text-slate-900">
+                    {review.customerName}
+                  </p>
+                  <p className="mt-2 text-sm text-slate-600">
+                    {review.comment}
+                  </p>
                 </article>
               ))
             )}
           </div>
 
-          <form onSubmit={handleReviewSubmit} className="mt-6 grid gap-3 sm:grid-cols-2">
+          <form
+            onSubmit={handleReviewSubmit}
+            className="mt-6 grid gap-3 sm:grid-cols-2"
+          >
             <input
               type="text"
               value={reviewName}
@@ -249,7 +320,6 @@ export default function ProductDetailExperience({ product }: ProductDetailExperi
             </button>
           </form>
         </section>
-
       </div>
 
       {isAddedToastVisible && (
@@ -259,8 +329,12 @@ export default function ProductDetailExperience({ product }: ProductDetailExperi
               <CheckCircleIcon className="h-6 w-6 text-emerald-600" />
             </span>
             <div>
-              <p className="text-sm font-extrabold uppercase tracking-[0.08em] text-emerald-700">Başarılı</p>
-              <p className="text-sm font-semibold text-slate-900">Ürün sepete eklendi.</p>
+              <p className="text-sm font-extrabold uppercase tracking-[0.08em] text-emerald-700">
+                Başarılı
+              </p>
+              <p className="text-sm font-semibold text-slate-900">
+                Ürün sepete eklendi.
+              </p>
             </div>
           </div>
         </div>
