@@ -117,155 +117,109 @@ export default function ProductDetailExperience({ product }: ProductDetailExperi
   };
   return (
     <section className="relative px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
-      {/* Flex ve gap kullanarak iki ana kartın arasını kesin olarak açıyoruz */}
-      <div className="mx-auto w-full max-w-360 flex flex-col gap-12 lg:gap-20">
-        
-        {/* 1. Kısım: Ürün Kartı */}
-        <article className="relative overflow-hidden rounded-[34px] border border-white/10 bg-linear-to-br from-[#060b1f] via-[#0a1230] to-[#1a0c2d] p-4 shadow-[0_28px_90px_rgba(2,6,23,0.6)] sm:p-5 lg:p-6">
-          <div className="pointer-events-none absolute -left-10 -top-10 h-56 w-56 rounded-full bg-indigo-500/20 blur-3xl" />
-          <div className="pointer-events-none absolute -right-12 top-16 h-56 w-56 rounded-full bg-fuchsia-500/15 blur-3xl" />
-          <div className="pointer-events-none absolute bottom-0 right-20 h-48 w-48 rounded-full bg-cyan-400/10 blur-3xl" />
+      <div className="mx-auto flex w-full max-w-360 flex-col gap-10 lg:gap-14">
+        <article className="overflow-hidden rounded-[32px] border border-slate-200 bg-white p-4 shadow-[0_24px_70px_rgba(15,23,42,0.08)] sm:p-5 lg:p-6">
+          <div className="grid gap-6 lg:grid-cols-12 lg:items-stretch">
+            <div className="relative min-h-90 overflow-hidden rounded-3xl border border-slate-200 bg-slate-50 lg:col-span-7 lg:min-h-[560px]">
+              <Image
+                src={product.image}
+                alt={product.name}
+                fill
+                priority
+                sizes="(max-width: 1024px) 100vw, 62vw"
+                className="object-cover"
+              />
+              <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-slate-900/25 via-transparent to-transparent" />
+            </div>
 
-          <div className="relative overflow-hidden rounded-[28px] border border-white/10 bg-slate-950/35 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] lg:p-5">
-            <div className="grid h-full gap-4 lg:grid-cols-12 lg:gap-5">
-              
-              {/* Sol Taraf: Görsel */}
-              <div className="relative min-h-90 overflow-hidden rounded-3xl border border-white/10 bg-slate-900/35 shadow-[0_24px_70px_rgba(2,6,23,0.55)] lg:col-span-7 lg:min-h-0">
-                <Image
-                  src={product.image}
-                  alt={product.name}
-                  fill
-                  priority
-                  sizes="(max-width: 1024px) 100vw, 62vw"
-                  className="object-cover saturate-110"
-                />
-                <div className="pointer-events-none absolute inset-0 bg-linear-to-tr from-slate-950/80 via-slate-950/20 to-indigo-900/20" />
-                <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-slate-950/85 via-transparent to-transparent" />
-                <div className="pointer-events-none absolute -left-8 top-5 h-36 w-80 rotate-6 bg-white/10 blur-2xl" />
-                <div className="pointer-events-none absolute bottom-4 left-4 right-4 rounded-2xl border border-white/15 bg-white/5 px-4 py-3 backdrop-blur-md">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-200">Cinematic Product Visual</p>
-                  <p className="mt-1 text-xs text-slate-300">Blue pickup + low trailer kombinasyonu, yüksek kontrast gece sahnesi.</p>
+            <aside className="rounded-3xl border border-slate-200 bg-slate-50 p-5 lg:col-span-5 lg:p-6">
+              <div className="flex h-full flex-col gap-6">
+                <div>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-slate-500">Kurumsal Ürün Serisi</p>
+                  <h2 className="mt-3 text-3xl font-black leading-tight text-slate-900 sm:text-4xl">{product.name}</h2>
+                </div>
+
+                <div className="rounded-2xl border border-blue-200 bg-blue-50 px-4 py-4">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-blue-700">Fiyat</p>
+                  <p className="mt-1 text-2xl font-extrabold text-slate-900">{product.currentPrice} + KDV</p>
+                  <p className="mt-2 text-xs font-medium text-slate-600">Teslim Süresi: 4-6 Hafta (Siparişe Özel Üretim)</p>
+                </div>
+
+                <div>
+                  <ul className="space-y-4 pr-1 text-sm text-slate-600">
+                    {product.features.map((feature, index) => {
+                      const Icon = featureIcons[index % featureIcons.length];
+                      return (
+                        <li key={index} className="flex items-center gap-4">
+                          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white">
+                            <Icon className="h-5 w-5 text-blue-600" />
+                          </span>
+                          <span className="leading-snug">{feature}</span>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+
+                <div className="mt-auto grid grid-cols-1 gap-3 pt-2 sm:grid-cols-2">
+                  <button
+                    type="button"
+                    onClick={handleAddToCart}
+                    className="inline-flex items-center justify-center gap-2 rounded-2xl bg-blue-600 px-4 py-3.5 text-sm font-bold text-slate-50 shadow-[0_14px_34px_rgba(37,99,235,0.18)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-blue-700"
+                  >
+                    <ShoppingCartIcon className="h-5 w-5" />
+                    Sepete Ekle
+                  </button>
+
+                  <a
+                    href={whatsappHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3.5 text-sm font-bold text-slate-700 transition-all duration-300 hover:-translate-y-0.5 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+                  >
+                    <QuestionMarkCircleIcon className="h-5 w-5 text-blue-600" />
+                    Soru Sor
+                  </a>
                 </div>
               </div>
-
-              {/* Sağ Taraf: İçerik */}
-              <aside className="relative overflow-hidden rounded-3xl border border-white/15 bg-white/8 p-5 shadow-[0_26px_80px_rgba(5,10,30,0.65)] backdrop-blur-2xl lg:col-span-5 lg:p-6">
-                <div className="pointer-events-none absolute right-0 top-0 h-32 w-32 rounded-full bg-emerald-400/20 blur-3xl" />
-                <div className="pointer-events-none absolute -bottom-10 left-0 h-36 w-36 rounded-full bg-indigo-500/20 blur-3xl" />
-
-                <div className="relative z-10 grid h-full content-start gap-y-16">
-                  
-                  {/* Başlık Grubu */}
-                  <div>
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-slate-300">Automotive Premium Series</p>
-                    <h2 className="mt-3 text-3xl font-black leading-tight text-white sm:text-4xl">{product.name}</h2>
-                  </div>
-
-                  {/* Fiyat Grubu */}
-                  <div>
-                    <div className="rounded-2xl border border-yellow-300/30 bg-yellow-300/10 px-4 py-3">
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-yellow-200/90">Fiyat</p>
-                      <p className="mt-1 text-2xl font-extrabold text-yellow-300">{product.currentPrice} + KDV</p>
-                      <p className="mt-2 text-xs font-medium text-slate-300">Teslim Süresi: 4–6 Hafta (Siparişe Özel Üretim)</p>
-                    </div>
-                  </div>
-
-                  {/* Özellikler Listesi Grubu - PARLAMA KALDIRILDI */}
-                  <div>
-                    <ul className="space-y-5 pr-1 text-sm text-slate-200">
-                      {product.features.map((feature, index) => {
-                        const Icon = featureIcons[index % featureIcons.length];
-                        return (
-                          <li key={index} className="flex items-center gap-4">
-                            {/* İkon Kapsayıcı: Parlamalar kaldırıldı, resimdeki gibi köşeli ve mat yapıldı */}
-                            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/5">
-                              <Icon className="h-5 w-5 text-slate-300" />
-                            </span>
-                            {/* Metin */}
-                            <span className="leading-snug">{feature}</span>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  </div>
-
-                  {/* Butonlar Grubu */}
-                  <div className="mt-auto grid grid-cols-2 gap-3 pt-2">
-                    <button
-                      type="button"
-                      onClick={handleAddToCart}
-                      className="inline-flex items-center justify-center gap-2 rounded-2xl bg-linear-to-r from-yellow-500 via-amber-500 to-amber-600 px-4 py-3.5 text-sm font-bold text-white shadow-[0_0_0_1px_rgba(255,255,255,0.1),0_14px_34px_rgba(245,158,11,0.45)] transition-all duration-300 hover:-translate-y-0.5 hover:brightness-105"
-                    >
-                      <ShoppingCartIcon className="h-5 w-5" />
-                      Satın Al
-                    </button>
-
-                    <a
-                      href={whatsappHref}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/35 bg-white/5 px-4 py-3.5 text-sm font-bold text-white transition-all duration-300 hover:bg-white/10 hover:-translate-y-0.5"
-                    >
-                      <QuestionMarkCircleIcon className="h-5 w-5 text-slate-300" />
-                      Soru Sor
-                    </a>
-                  </div>
-                </div>
-              </aside>
-            </div>
+            </aside>
           </div>
         </article>
 
-        {/* 2. Kısım: Detaylı Bilgi Bölümü */}
-        <section
-          id="urun-detayli-bilgi"
-          className="relative overflow-hidden rounded-4xl border border-white/10 bg-linear-to-b from-slate-900/80 to-[#060b1f]/90 p-8 shadow-[0_30px_100px_rgba(2,6,23,0.8)] backdrop-blur-2xl sm:p-10 lg:p-12"
-        >
-          {/* Arka plan süslemeleri (Glow efektleri) */}
-          <div className="pointer-events-none absolute -left-20 -top-20 h-64 w-64 rounded-full bg-indigo-500/10 blur-[80px]" />
-          <div className="pointer-events-none absolute -bottom-20 -right-20 h-64 w-64 rounded-full bg-cyan-500/10 blur-[80px]" />
-          
-          {/* Sol taraftaki şık neon vurgu çizgisi */}
-          <div className="absolute bottom-0 left-0 top-0 w-1.5 bg-linear-to-b from-cyan-400 via-indigo-500 to-transparent opacity-80" />
-
+        <section id="urun-detayli-bilgi" className="overflow-hidden rounded-[32px] border border-slate-200 bg-white p-8 shadow-[0_24px_70px_rgba(15,23,42,0.08)] sm:p-10 lg:p-12">
           <div className="relative z-10">
-            {/* Üst Etiket (Eyebrow) ve Çizgi */}
             <div className="flex items-center gap-4">
-              <span className="h-0.5 w-8 rounded-full bg-cyan-400/60" />
-              <p className="text-xs font-bold uppercase tracking-[0.25em] text-cyan-300">
-                Detaylı Bilgi
-              </p>
+              <span className="h-0.5 w-8 rounded-full bg-blue-600/60" />
+              <p className="text-xs font-bold uppercase tracking-[0.25em] text-blue-700">Detaylı Bilgi</p>
             </div>
-            
-            {/* Ana Başlık */}
-            <h3 className="mt-5 text-2xl font-black tracking-tight text-white sm:text-3xl lg:text-4xl">
-              {product.name} <span className="font-light text-slate-400">Teknik Detayı</span>
+
+            <h3 className="mt-5 text-2xl font-black tracking-tight text-slate-900 sm:text-3xl lg:text-4xl">
+              {product.name} <span className="font-medium text-slate-500">Teknik Detayı</span>
             </h3>
-            
-            {/* Açıklama Metni */}
-            <p className="mt-6 max-w-4xl text-base leading-relaxed text-slate-300 sm:text-lg sm:leading-loose">
+
+            <p className="mt-6 max-w-4xl text-base leading-relaxed text-slate-600 sm:text-lg sm:leading-loose">
               {product.detailDescription}
             </p>
           </div>
         </section>
 
-        <section className="rounded-4xl border border-white/10 bg-slate-900/75 p-6 shadow-[0_30px_100px_rgba(2,6,23,0.8)] backdrop-blur-2xl sm:p-8">
-          <h3 className="text-2xl font-black text-white">Ürün Yorumları</h3>
-          <p className="mt-2 text-sm text-slate-400">Onaylanmış yorumlar aşağıda listelenir. Siz de yorum gönderebilirsiniz.</p>
+        <section className="rounded-[32px] border border-slate-200 bg-white p-6 shadow-[0_24px_70px_rgba(15,23,42,0.08)] sm:p-8">
+          <h3 className="text-2xl font-black text-slate-900">Ürün Yorumları</h3>
+          <p className="mt-2 text-sm text-slate-500">Onaylanmış yorumlar aşağıda listelenir. Siz de yorum gönderebilirsiniz.</p>
 
           {reviewError && <p className="mt-4 text-sm text-rose-300">{reviewError}</p>}
-          {reviewSuccess && <p className="mt-4 text-sm text-emerald-300">{reviewSuccess}</p>}
+          {reviewSuccess && <p className="mt-4 text-sm text-emerald-600">{reviewSuccess}</p>}
 
           <div className="mt-4 space-y-3">
             {isLoadingReviews ? (
-              <p className="text-sm text-slate-300">Yorumlar yükleniyor...</p>
+              <p className="text-sm text-slate-500">Yorumlar yükleniyor...</p>
             ) : reviews.length === 0 ? (
-              <p className="text-sm text-slate-300">Henüz onaylı yorum bulunmuyor.</p>
+              <p className="text-sm text-slate-500">Henüz onaylı yorum bulunmuyor.</p>
             ) : (
               reviews.map((review) => (
-                <article key={review._id} className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                  <p className="text-sm font-semibold text-white">{review.customerName}</p>
-                  <p className="mt-2 text-sm text-slate-300">{review.comment}</p>
+                <article key={review._id} className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                  <p className="text-sm font-semibold text-slate-900">{review.customerName}</p>
+                  <p className="mt-2 text-sm text-slate-600">{review.comment}</p>
                 </article>
               ))
             )}
@@ -277,19 +231,19 @@ export default function ProductDetailExperience({ product }: ProductDetailExperi
               value={reviewName}
               onChange={(event) => setReviewName(event.target.value)}
               placeholder="Ad Soyad"
-              className="h-11 rounded-xl border border-white/15 bg-slate-950/70 px-4 text-sm text-white outline-none transition-colors focus:border-amber-500"
+              className="h-11 rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-900 outline-none transition-colors focus:border-blue-400"
             />
             <textarea
               value={reviewComment}
               onChange={(event) => setReviewComment(event.target.value)}
               placeholder="Yorumunuz"
               rows={4}
-              className="sm:col-span-2 rounded-xl border border-white/15 bg-slate-950/70 px-4 py-3 text-sm text-white outline-none transition-colors focus:border-amber-500"
+              className="sm:col-span-2 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition-colors focus:border-blue-400"
             />
             <button
               type="submit"
               disabled={isSendingReview}
-              className="sm:col-span-2 h-11 rounded-xl border border-amber-500/70 bg-amber-600 px-6 text-sm font-bold uppercase tracking-[0.14em] text-white transition-all hover:bg-amber-500 disabled:cursor-not-allowed disabled:opacity-60"
+              className="sm:col-span-2 h-11 rounded-xl bg-blue-600 px-6 text-sm font-bold uppercase tracking-[0.14em] text-slate-50 transition-all hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isSendingReview ? "Gönderiliyor..." : "Yorum Gönder"}
             </button>
@@ -300,13 +254,13 @@ export default function ProductDetailExperience({ product }: ProductDetailExperi
 
       {isAddedToastVisible && (
         <div className="fixed inset-x-0 top-5 z-60 flex justify-center px-4 pointer-events-none">
-          <div className="inline-flex min-w-[320px] max-w-md items-center gap-3 rounded-2xl border border-emerald-300/40 bg-slate-950/95 px-5 py-4 text-emerald-100 shadow-[0_18px_44px_rgba(16,185,129,0.45)] backdrop-blur-2xl">
-            <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-500/20 ring-2 ring-emerald-300/30">
-              <CheckCircleIcon className="h-6 w-6 text-emerald-300" />
+          <div className="inline-flex min-w-[320px] max-w-md items-center gap-3 rounded-2xl border border-emerald-200 bg-white px-5 py-4 text-emerald-800 shadow-[0_18px_44px_rgba(16,185,129,0.16)]">
+            <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-50 ring-2 ring-emerald-100">
+              <CheckCircleIcon className="h-6 w-6 text-emerald-600" />
             </span>
             <div>
-              <p className="text-sm font-extrabold uppercase tracking-[0.08em] text-emerald-200">Başarılı</p>
-              <p className="text-sm font-semibold text-white">Ürün sepete eklendi.</p>
+              <p className="text-sm font-extrabold uppercase tracking-[0.08em] text-emerald-700">Başarılı</p>
+              <p className="text-sm font-semibold text-slate-900">Ürün sepete eklendi.</p>
             </div>
           </div>
         </div>

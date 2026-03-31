@@ -97,9 +97,7 @@ export default function AdminProductsPage() {
   }, [products, searchQuery, categoryFilter, stockFilter, sortOrder]);
 
   const fetchProducts = useCallback(async () => {
-    if (!token) {
-      return;
-    }
+    if (!token) return;
 
     setIsLoading(true);
     setErrorMessage("");
@@ -131,14 +129,10 @@ export default function AdminProductsPage() {
   }, [fetchProducts]);
 
   const handleDelete = async (id: string) => {
-    if (!token) {
-      return;
-    }
+    if (!token) return;
 
     const approved = window.confirm("Bu ürünü silmek istediğinize emin misiniz?");
-    if (!approved) {
-      return;
-    }
+    if (!approved) return;
 
     try {
       const response = await fetch(`${API_BASE_URL}/api/admin/products/${id}`, {
@@ -171,6 +165,8 @@ export default function AdminProductsPage() {
       category: product.category || "Genel",
       imageUrl: product.imageUrl || "",
     });
+    // Form açıldığında yukarı kaydır
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleCancelEdit = () => {
@@ -181,9 +177,7 @@ export default function AdminProductsPage() {
   const handleEditSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
-    if (!token || !editingProductId) {
-      return;
-    }
+    if (!token || !editingProductId) return;
 
     const nextStock = Number(editForm.stock);
     if (!Number.isFinite(nextStock) || nextStock < 0) {
@@ -227,198 +221,219 @@ export default function AdminProductsPage() {
   };
 
   return (
-    <section className="rounded-3xl border border-white/10 bg-slate-900/75 p-5 shadow-[0_24px_70px_rgba(2,6,23,0.6)] backdrop-blur-2xl sm:p-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+    <section className="flex flex-col gap-6">
+      {/* Üst Başlık */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
         <div>
-          <h2 className="text-2xl font-black text-white">Ürün Yönetimi</h2>
-          <p className="mt-1 text-sm text-slate-400">Ürün listesi, stok ve fiyat operasyonları</p>
+          <h2 className="text-xl font-bold text-slate-900">Ürün Yönetimi</h2>
+          <p className="mt-1 text-sm text-slate-500">Katalog listesi, stok durumları ve fiyatlandırma operasyonları.</p>
         </div>
         <Link
           href="/admin/urun-ekle"
-          className="rounded-xl border border-cyan-300/30 bg-cyan-500/10 px-4 py-2.5 text-sm font-semibold text-cyan-100"
+          className="inline-flex items-center justify-center rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
         >
           Yeni Ürün Ekle
         </Link>
       </div>
 
-      {errorMessage && <p className="mt-4 text-sm text-rose-300">{errorMessage}</p>}
-
-      {editingProductId && (
-        <form
-          onSubmit={handleEditSubmit}
-          className="flex flex-col gap-4 mt-5 rounded-2xl border border-cyan-300/25 bg-cyan-500/5 p-4 sm:p-5"
-        >
-          <h3 className="text-base font-bold text-white">Ürün Düzenle</h3>
-          <p className="mt-1 text-xs text-slate-300">Seçili ürün bilgilerini form üzerinden güncelleyebilirsiniz.</p>
-
-          <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            <input
-              type="text"
-              value={editForm.name}
-              onChange={(event) => setEditForm((prev) => ({ ...prev, name: event.target.value }))}
-              placeholder="Ürün adı"
-              required
-              className="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white placeholder:text-slate-400 outline-none focus:border-cyan-400/70"
-            />
-            <input
-              type="text"
-              value={editForm.category}
-              onChange={(event) => setEditForm((prev) => ({ ...prev, category: event.target.value }))}
-              placeholder="Kategori"
-              className="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white placeholder:text-slate-400 outline-none focus:border-cyan-400/70"
-            />
-            <input
-              type="text"
-              value={editForm.price}
-              onChange={(event) => setEditForm((prev) => ({ ...prev, price: event.target.value }))}
-              placeholder="Normal fiyat"
-              required
-              className="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white placeholder:text-slate-400 outline-none focus:border-cyan-400/70"
-            />
-            <input
-              type="text"
-              value={editForm.discountPrice}
-              onChange={(event) => setEditForm((prev) => ({ ...prev, discountPrice: event.target.value }))}
-              placeholder="İndirimli fiyat (opsiyonel)"
-              className="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white placeholder:text-slate-400 outline-none focus:border-cyan-400/70"
-            />
-            <input
-              type="number"
-              min="0"
-              value={editForm.stock}
-              onChange={(event) => setEditForm((prev) => ({ ...prev, stock: event.target.value }))}
-              placeholder="Stok"
-              required
-              className="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white placeholder:text-slate-400 outline-none focus:border-cyan-400/70"
-            />
-            <input
-              type="text"
-              value={editForm.imageUrl}
-              onChange={(event) => setEditForm((prev) => ({ ...prev, imageUrl: event.target.value }))}
-              placeholder="Resim URL"
-              className="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white placeholder:text-slate-400 outline-none focus:border-cyan-400/70"
-            />
-          </div>
-
-          <div className="mt-4 flex flex-wrap items-center gap-2">
-            <button
-              type="submit"
-              disabled={isSavingEdit}
-              className="rounded-lg border border-cyan-300/30 bg-cyan-500/10 px-3 py-2 text-xs font-semibold text-cyan-100 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {isSavingEdit ? "Kaydediliyor..." : "Değişiklikleri Kaydet"}
-            </button>
-            <button
-              type="button"
-              onClick={handleCancelEdit}
-              disabled={isSavingEdit}
-              className="rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-xs font-semibold text-slate-200 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              Vazgeç
-            </button>
-          </div>
-        </form>
+      {errorMessage && (
+        <div className="rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm font-medium text-rose-700">
+          {errorMessage}
+        </div>
       )}
 
-      <div className="mt-5 grid gap-3 rounded-2xl border border-white/10 bg-white/5 p-4 md:grid-cols-4">
+      {/* Düzenleme Paneli (Sadece düzenleme yaparken görünür) */}
+      {editingProductId && (
+        <div className="rounded-xl border border-indigo-200 bg-indigo-50/30 p-6 shadow-sm animate-in fade-in slide-in-from-top-4 duration-300">
+          <div className="mb-4">
+            <h3 className="text-lg font-bold text-slate-900">Ürün Bilgilerini Güncelle</h3>
+            <p className="text-sm text-slate-600">Yapılan değişiklikler anında katalogda güncellenecektir.</p>
+          </div>
+          <form onSubmit={handleEditSubmit} className="space-y-4">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-slate-500 uppercase">Ürün Adı</label>
+                <input
+                  type="text"
+                  value={editForm.name}
+                  onChange={(event) => setEditForm((prev) => ({ ...prev, name: event.target.value }))}
+                  required
+                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-slate-500 uppercase">Kategori</label>
+                <input
+                  type="text"
+                  value={editForm.category}
+                  onChange={(event) => setEditForm((prev) => ({ ...prev, category: event.target.value }))}
+                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-slate-500 uppercase">Normal Fiyat</label>
+                <input
+                  type="text"
+                  value={editForm.price}
+                  onChange={(event) => setEditForm((prev) => ({ ...prev, price: event.target.value }))}
+                  required
+                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-slate-500 uppercase">İndirimli Fiyat</label>
+                <input
+                  type="text"
+                  value={editForm.discountPrice}
+                  onChange={(event) => setEditForm((prev) => ({ ...prev, discountPrice: event.target.value }))}
+                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-slate-500 uppercase">Stok Adedi</label>
+                <input
+                  type="number"
+                  min="0"
+                  value={editForm.stock}
+                  onChange={(event) => setEditForm((prev) => ({ ...prev, stock: event.target.value }))}
+                  required
+                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-slate-500 uppercase">Görsel URL</label>
+                <input
+                  type="text"
+                  value={editForm.imageUrl}
+                  onChange={(event) => setEditForm((prev) => ({ ...prev, imageUrl: event.target.value }))}
+                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 pt-2">
+              <button
+                type="submit"
+                disabled={isSavingEdit}
+                className="rounded-lg bg-indigo-600 px-6 py-2 text-sm font-bold text-white transition-all hover:bg-indigo-700 disabled:opacity-50"
+              >
+                {isSavingEdit ? "Kaydediliyor..." : "Güncelle"}
+              </button>
+              <button
+                type="button"
+                onClick={handleCancelEdit}
+                className="rounded-lg border border-slate-300 bg-white px-6 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+              >
+                İptal Et
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {/* Filtreleme ve Arama */}
+      <div className="grid gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm md:grid-cols-4">
         <input
           type="text"
           value={searchQuery}
           onChange={(event) => setSearchQuery(event.target.value)}
-          placeholder="Ürün veya kategori ara"
-          className="rounded-xl border border-white/10 bg-slate-950/60 px-3 py-2.5 text-sm text-white placeholder:text-slate-400 outline-none focus:border-cyan-400/70"
+          placeholder="Ürün veya kategori ara..."
+          className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-colors"
         />
         <select
           value={categoryFilter}
           onChange={(event) => setCategoryFilter(event.target.value)}
-          className="rounded-xl border border-white/10 bg-slate-950/60 px-3 py-2.5 text-sm text-white outline-none focus:border-cyan-400/70"
+          className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none transition-colors"
         >
-          <option value="all" className="bg-slate-900">Tüm Kategoriler</option>
+          <option value="all">Tüm Kategoriler</option>
           {categories.map((category) => (
-            <option key={category} value={category} className="bg-slate-900">
-              {category}
-            </option>
+            <option key={category} value={category}>{category}</option>
           ))}
         </select>
         <select
           value={stockFilter}
           onChange={(event) => setStockFilter(event.target.value as "all" | "in-stock" | "out-of-stock")}
-          className="rounded-xl border border-white/10 bg-slate-950/60 px-3 py-2.5 text-sm text-white outline-none focus:border-cyan-400/70"
+          className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none transition-colors"
         >
-          <option value="all" className="bg-slate-900">Tüm Stoklar</option>
-          <option value="in-stock" className="bg-slate-900">Stokta Olanlar</option>
-          <option value="out-of-stock" className="bg-slate-900">Stokta Olmayanlar</option>
+          <option value="all">Stok Durumu (Hepsi)</option>
+          <option value="in-stock">Stokta Olanlar</option>
+          <option value="out-of-stock">Tükendi</option>
         </select>
         <select
           value={sortOrder}
           onChange={(event) => setSortOrder(event.target.value as "newest" | "oldest")}
-          className="rounded-xl border border-white/10 bg-slate-950/60 px-3 py-2.5 text-sm text-white outline-none focus:border-cyan-400/70"
+          className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none transition-colors"
         >
-          <option value="newest" className="bg-slate-900">En Yeni</option>
-          <option value="oldest" className="bg-slate-900">En Eski</option>
+          <option value="newest">En Yeni İlk</option>
+          <option value="oldest">En Eski İlk</option>
         </select>
       </div>
 
-      <div className="mt-5 overflow-x-auto">
-        <table className="min-w-full border-separate border-spacing-y-2">
-          <thead>
-            <tr>
-              <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Ürün</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Kategori</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Normal Fiyat</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">İndirimli Fiyat</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">İndirim</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Stok</th>
-              <th className="px-3 py-2 text-right text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">İşlemler</th>
-            </tr>
-          </thead>
-          <tbody>
-            {isLoading ? (
+      {/* Ürün Tablosu */}
+      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-slate-200">
+            <thead className="bg-slate-50">
               <tr>
-                <td colSpan={7} className="px-3 py-4 text-sm text-slate-300">
-                  Ürünler yükleniyor...
-                </td>
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Ürün Bilgisi</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Kategori</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Normal Fiyat</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">İndirimli Fiyat</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">İndirim Oranı</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Stok</th>
+                <th className="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-slate-500">İşlemler</th>
               </tr>
-            ) : filteredProducts.length === 0 ? (
-              <tr>
-                <td colSpan={7} className="px-3 py-4 text-sm text-slate-300">
-                  Filtreye uygun ürün bulunamadı.
-                </td>
-              </tr>
-            ) : (
-              filteredProducts.map((product) => (
-                <tr key={product._id} className="rounded-xl border border-white/10 bg-white/5">
-                  <td className="rounded-l-xl px-3 py-3 text-sm font-semibold text-white">{product.name}</td>
-                  <td className="px-3 py-3 text-sm text-slate-300">{product.category || "Genel"}</td>
-                  <td className="px-3 py-3 text-sm font-semibold text-yellow-300">{formatCurrency(product.price)}</td>
-                  <td className="px-3 py-3 text-sm font-semibold text-cyan-200">
-                    {typeof product.discountPrice === "number" ? formatCurrency(product.discountPrice) : "-"}
-                  </td>
-                  <td className="px-3 py-3 text-sm text-orange-300">%{getDiscountPercent(product.price, product.discountPrice)}</td>
-                  <td className="px-3 py-3 text-sm text-slate-200">{product.stock}</td>
-                  <td className="rounded-r-xl px-3 py-3 text-right">
-                    <div className="inline-flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={() => handleStartEdit(product)}
-                        className="rounded-lg border border-cyan-300/30 bg-cyan-500/10 px-3 py-1.5 text-xs font-semibold text-cyan-100"
-                      >
-                        Düzenle
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleDelete(product._id)}
-                        className="rounded-lg border border-rose-300/30 bg-rose-500/10 px-3 py-1.5 text-xs font-semibold text-rose-200"
-                      >
-                        Sil
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-slate-200 bg-white">
+              {isLoading ? (
+                <tr><td colSpan={7} className="px-6 py-8 text-center text-sm text-slate-500">Yükleniyor...</td></tr>
+              ) : filteredProducts.length === 0 ? (
+                <tr><td colSpan={7} className="px-6 py-8 text-center text-sm text-slate-500">Filtreye uygun ürün bulunamadı.</td></tr>
+              ) : (
+                filteredProducts.map((product) => (
+                  <tr key={product._id} className="transition-colors hover:bg-slate-50">
+                    <td className="px-6 py-4">
+                      <div className="text-sm font-bold text-slate-900">{product.name}</div>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-slate-600">{product.category || "Genel"}</td>
+                    <td className="px-6 py-4 text-sm font-medium text-slate-900">{formatCurrency(product.price)}</td>
+                    <td className="px-6 py-4 text-sm font-bold text-indigo-600">
+                      {typeof product.discountPrice === "number" ? formatCurrency(product.discountPrice) : "-"}
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="inline-flex items-center rounded-full bg-orange-100 px-2.5 py-0.5 text-xs font-bold text-orange-800">
+                        %{getDiscountPercent(product.price, product.discountPrice)}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={`text-sm font-bold ${product.stock <= 0 ? "text-rose-600" : "text-slate-900"}`}>
+                        {product.stock} Adet
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex justify-end gap-2">
+                        <button
+                          type="button"
+                          onClick={() => handleStartEdit(product)}
+                          className="rounded-lg bg-indigo-50 px-3 py-1.5 text-xs font-bold text-indigo-700 hover:bg-indigo-100"
+                        >
+                          Düzenle
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDelete(product._id)}
+                          className="rounded-lg bg-rose-50 px-3 py-1.5 text-xs font-bold text-rose-700 hover:bg-rose-100"
+                        >
+                          Sil
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </section>
   );

@@ -1,13 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 
 const popularProducts = [
   {
-    title: "Filo Yönetimi",
+    title: "Kurumsal Operasyon",
     description:
-      "Araçlarınızı tek panelden izleyin, rota ve görev yönetimini daha hızlı hale getirin.",
+      "Araç, ekip ve süreç takibini tek panelde toplayarak operasyonu daha düzenli yönetin.",
     image: "/products/fleet-management-v2.jpg",
   },
   {
@@ -32,64 +32,95 @@ const popularProducts = [
 
 export default function PopularProductsSlider() {
   const [activeIndex, setActiveIndex] = useState(0);
+
   const activeProduct = useMemo(() => popularProducts[activeIndex], [activeIndex]);
+  const nextProduct = useMemo(
+    () => popularProducts[(activeIndex + 1) % popularProducts.length],
+    [activeIndex]
+  );
+
+  const handleNext = () => {
+    setActiveIndex((prev) => (prev + 1) % popularProducts.length);
+  };
+
+  const handlePrev = () => {
+    setActiveIndex((prev) => (prev - 1 + popularProducts.length) % popularProducts.length);
+  };
+
+  // Otomatik geçiş zamanlayıcısı (5 saniyede bir değişir)
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % popularProducts.length);
+    }, 5000); // 5000 milisaniye = 5 saniye
+
+    // Bileşen ekrandan kalktığında hafıza sızıntısı olmaması için temizliyoruz
+    return () => clearInterval(timer);
+  }, []);
 
   return (
-    <section className="px-4 py-10 sm:px-6 sm:py-12 lg:px-8 lg:py-16">
-      <div className="mx-auto w-full max-w-360 rounded-3xl border border-white/10 bg-slate-900/50 p-5 shadow-[0_20px_60px_rgba(2,6,23,0.45)] backdrop-blur-xl sm:p-6 lg:p-7">
-        <div className="grid gap-6 lg:grid-cols-[1.3fr_1fr] lg:items-stretch">
-          <div className="relative min-h-90 overflow-hidden rounded-2xl border border-white/10 bg-slate-800/40">
+    <section className="py-16 sm:py-24 overflow-hidden flex justify-center items-center min-h-[80vh]">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full flex justify-center items-center">
+        {/* GRID YAPI: 4 Sütun (1 Sol + 2 Orta + 1 Sağ) */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 items-center gap-8 lg:gap-12 w-full">
+          
+          {/* Sol: Aktif Ürün Görseli (1 Sütun) */}
+          <div 
+            className="col-span-1 aspect-square relative rounded-3xl overflow-hidden shadow-lg cursor-pointer group mx-auto"
+            style={{ width: '260px', height: '260px', maxWidth: '100%', maxHeight: '100%' }}
+            onClick={handlePrev}
+            title="Önceki Çözüm"
+          >
             <Image
               src={activeProduct.image}
               alt={activeProduct.title}
               fill
-              sizes="(max-width: 1024px) 100vw, 60vw"
-              className="object-cover"
+              sizes="(max-width: 1024px) 100vw, 28vw"
+              className="object-cover transition-transform duration-700 group-hover:scale-110"
+              priority
             />
-            <div className="absolute inset-0 bg-linear-to-t from-slate-950/70 via-slate-950/20 to-transparent" />
           </div>
 
-          <div className="flex flex-col gap-4">
-            <h2 className="rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-xl font-bold text-white sm:text-2xl">
+          {/* Orta: Metin ve İçerik Alanı (2 Sütun) */}
+          <div className="col-span-1 lg:col-span-2 flex flex-col items-center justify-center text-center px-4 space-y-6 lg:space-y-8 gap-4">
+            
+            {/* Üst Badge */}
+            <div className="inline-flex items-center justify-center px-5 py-2 rounded-full border border-slate-200 text-sm font-medium text-slate-800 bg-white shadow-sm">
+              Sizin için seçtiklerimiz
+            </div>
+            
+            {/* Başlık */}
+            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-medium tracking-tight text-slate-950 leading-tight">
               {activeProduct.title}
             </h2>
-
-            <div className="min-h-54 rounded-lg border border-white/10 bg-white/5 p-4">
-              <p className="text-base leading-relaxed text-slate-200">
-                {activeProduct.description}
-              </p>
-            </div>
-
-            <div className="rounded-lg border border-white/10 bg-white/5 p-3">
-              <input
-                type="range"
-                min={0}
-                max={popularProducts.length - 1}
-                step={1}
-                value={activeIndex}
-                onChange={(event) => setActiveIndex(Number(event.target.value))}
-                className="h-2 w-full cursor-pointer accent-amber-500"
-                aria-label="Popüler ürün kaydırma çubuğu"
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-              {popularProducts.map((product, index) => (
-                <button
-                  key={product.title}
-                  type="button"
-                  onClick={() => setActiveIndex(index)}
-                  className={`rounded-lg border px-3 py-2 text-left text-sm font-medium transition-colors ${
-                    activeIndex === index
-                      ? "border-amber-500/70 bg-amber-500/15 text-amber-200"
-                      : "border-white/10 bg-white/5 text-slate-200 hover:bg-white/10"
-                  }`}
-                >
-                  {product.title}
-                </button>
-              ))}
-            </div>
+            
+            {/* Alt Metin */}
+            <p className="text-lg lg:text-xl text-slate-500 max-w-md mx-auto leading-relaxed">
+              {activeProduct.description}
+            </p>
+            
+            {/* Aksiyon Butonu */}
+            <button className="mt-4 px-8 py-3 rounded-full border border-slate-200 text-base font-medium text-slate-900 hover:border-slate-300 hover:bg-slate-50 transition-all">
+              Detaylı Bilgi Al
+            </button>
+            
           </div>
+
+          {/* Sağ: Sonraki Ürün Görseli (1 Sütun) */}
+          <div 
+            className="hidden lg:block col-span-1 aspect-square relative rounded-3xl overflow-hidden shadow-lg cursor-pointer group opacity-60 hover:opacity-100 transition-opacity duration-300 mx-auto"
+            style={{ width: '340px', height: '425px', maxWidth: '100%', maxHeight: '100%' }}
+            onClick={handleNext}
+            title="Sonraki Çözüm"
+          >
+            <Image
+              src={nextProduct.image}
+              alt={nextProduct.title}
+              fill
+              sizes="(max-width: 1024px) 0vw, 28vw"
+              className="object-cover transition-transform duration-700 group-hover:scale-110"
+            />
+          </div>
+          
         </div>
       </div>
     </section>

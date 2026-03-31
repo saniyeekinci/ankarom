@@ -202,44 +202,43 @@ export default function IletisimPage() {
   return (
     <section className="flex min-h-[calc(100vh-220px)] w-full items-center justify-center py-10 sm:py-14">
       <div className="flex w-full justify-center px-6 md:px-12">
-        <div className="w-full max-w-5xl rounded-3xl border border-white/10 bg-slate-900/55 p-6 shadow-[0_20px_60px_rgba(2,6,23,0.45)] backdrop-blur-xl sm:p-8">
+        <div className="w-full max-w-5xl rounded-3xl border border-slate-200 bg-white p-6 shadow-[0_20px_60px_rgba(15,23,42,0.08)] sm:p-8">
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-5 lg:gap-10">
-            <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-6 text-sm text-slate-300 sm:p-7 lg:col-span-2">
-              <div className="pointer-events-none absolute -left-14 bottom-0 h-36 w-36 rounded-full bg-amber-500/12 blur-3xl" />
+            <div className="flex flex-col gap-6 relative overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 p-6 text-sm text-slate-600 sm:p-7 lg:col-span-2">
+              <div className=" pointer-events-none absolute -left-14 bottom-0 h-36 w-36 rounded-full bg-blue-500/10 blur-3xl" />
 
-              <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-400">Schedule a demo</span>
 
-              <h1 className="mt-5 text-4xl font-bold leading-[1.05] text-white sm:text-5xl">
+              <h1 className="mt-5 text-4xl font-bold leading-[1.05] text-slate-900 sm:text-5xl">
                 Akıllı
-                <span className="bg-linear-to-r from-amber-300 via-fuchsia-400 to-indigo-400 bg-clip-text text-transparent"> Çözümler </span>
+                <span className="bg-linear-to-r from-blue-600 via-sky-600 to-cyan-600 bg-clip-text text-transparent"> Çözümler </span>
                 
                 Sizin İçin
                 <br />
                 Uygun mu?
               </h1>
 
-              <p className="mt-6 text-base leading-relaxed text-slate-300">
+              <p className="mt-6 text-base leading-relaxed text-slate-600">
                 Operasyonunuza en uygun ürünü birlikte belirleyelim. Kısa bir ön görüşme ile ihtiyaçlarınızı analiz edip size özel teklif sunalım.
               </p>
 
-              <div className="mt-8 border-t border-white/10 pt-6">
+              <div className="mt-8 border-t border-slate-200 pt-6">
                 <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
                   <div>
-                    <p className="text-[11px] uppercase tracking-[0.16em] text-slate-400">Görüşme Süresi</p>
-                    <p className="mt-1 text-xl font-semibold text-white">20-30 dk</p>
+                    <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">Görüşme Süresi</p>
+                    <p className="mt-1 text-xl font-semibold text-slate-900">20-30 dk</p>
                   </div>
                   <div>
-                    <p className="text-[11px] uppercase tracking-[0.16em] text-slate-400">Dönüş Süresi</p>
-                    <p className="mt-1 text-xl font-semibold text-white">24 Saat</p>
+                    <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">Dönüş Süresi</p>
+                    <p className="mt-1 text-xl font-semibold text-slate-900">24 Saat</p>
                   </div>
                   <div>
-                    <p className="text-[11px] uppercase tracking-[0.16em] text-slate-400">Görüşme Tipi</p>
-                    <p className="mt-1 text-xl font-semibold text-white">Online / Ofis</p>
+                    <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">Görüşme Tipi</p>
+                    <p className="mt-1 text-xl font-semibold text-slate-900">Online / Ofis</p>
                   </div>
                 </div>
 
-                <p className="mt-6 text-sm text-slate-300">
-                  veya bize yazın: <span className="font-semibold text-white">info@ankarom.com</span>
+                <p className="mt-6 text-sm text-slate-600">
+                  veya bize yazın: <span className="font-semibold text-slate-900">info@ankarom.com</span>
                 </p>
               </div>
             </div>
@@ -252,7 +251,7 @@ export default function IletisimPage() {
                 placeholder="Ad Soyad"
                 value={fullName}
                 onChange={(event) => setFullName(event.target.value)}
-                className="h-12 rounded-xl border border-white/15 bg-slate-950/70 px-4 text-sm text-white outline-none transition-colors focus:border-amber-500"
+                className="h-12 rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-900 outline-none transition-colors focus:border-blue-400"
               />
               <input
                 type="tel"
@@ -260,7 +259,7 @@ export default function IletisimPage() {
                 placeholder="Telefon"
                 value={phone}
                 onChange={(event) => setPhone(event.target.value)}
-                className="h-12 rounded-xl border border-white/15 bg-slate-950/70 px-4 text-sm text-white outline-none transition-colors focus:border-amber-500"
+                className="h-12 rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-900 outline-none transition-colors focus:border-blue-400"
               />
               <div className="relative sm:col-span-2">
                 <input
@@ -277,11 +276,11 @@ export default function IletisimPage() {
                     setTimeout(() => setIsCityListOpen(false), 120);
                   }}
                   autoComplete="off"
-                  className="h-12 w-full rounded-xl border border-white/15 bg-slate-950/70 px-4 text-sm text-white outline-none transition-colors focus:border-amber-500"
+                  className="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-900 outline-none transition-colors focus:border-blue-400"
                 />
 
                 {isCityListOpen && filteredCities.length > 0 && (
-                  <ul className="absolute left-0 right-0 top-[calc(100%+8px)] z-30 max-h-56 overflow-y-auto rounded-xl border border-white/10 bg-slate-900/95 p-1 shadow-[0_16px_38px_rgba(2,6,23,0.6)] backdrop-blur-xl">
+                  <ul className="absolute left-0 right-0 top-[calc(100%+8px)] z-30 max-h-56 overflow-y-auto rounded-xl border border-slate-200 bg-white p-1 shadow-[0_16px_38px_rgba(15,23,42,0.08)]">
                     {filteredCities.map((city) => (
                       <li key={city}>
                         <button
@@ -290,7 +289,7 @@ export default function IletisimPage() {
                             setCityQuery(city);
                             setIsCityListOpen(false);
                           }}
-                          className="w-full rounded-lg px-3 py-2 text-left text-sm text-slate-100 transition-colors hover:bg-white/10"
+                          className="w-full rounded-lg px-3 py-2 text-left text-sm text-slate-700 transition-colors hover:bg-slate-50"
                         >
                           {city}
                         </button>
@@ -305,7 +304,7 @@ export default function IletisimPage() {
                 placeholder="E-posta"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
-                className="h-12 rounded-xl border border-white/15 bg-slate-950/70 px-4 text-sm text-white outline-none transition-colors focus:border-amber-500 sm:col-span-2"
+                className="h-12 rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-900 outline-none transition-colors focus:border-blue-400 sm:col-span-2"
               />
               <input
                 type="text"
@@ -313,7 +312,7 @@ export default function IletisimPage() {
                 placeholder="Hangi ürün ile ilgileniyorsunuz?"
                 value={interestedProduct}
                 onChange={(event) => setInterestedProduct(event.target.value)}
-                className="h-12 rounded-xl border border-white/15 bg-slate-950/70 px-4 text-sm text-white outline-none transition-colors focus:border-amber-500 sm:col-span-2"
+                className="h-12 rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-900 outline-none transition-colors focus:border-blue-400 sm:col-span-2"
               />
               <textarea
                 name="mesaj"
@@ -321,55 +320,20 @@ export default function IletisimPage() {
                 rows={5}
                 value={message}
                 onChange={(event) => setMessage(event.target.value)}
-                className="rounded-xl border border-white/15 bg-slate-950/70 px-4 py-3 text-sm text-white outline-none transition-colors focus:border-amber-500 sm:col-span-2"
+                className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition-colors focus:border-blue-400 sm:col-span-2"
               />
               <button
                 type="submit"
                 disabled={isSubmittingSupport}
-                className="h-12 rounded-xl border border-amber-500/70 bg-amber-600 px-6 text-sm font-bold uppercase tracking-[0.14em] text-white transition-all hover:bg-amber-500 sm:col-span-2"
+                className="h-12 rounded-xl bg-blue-600 px-6 text-sm font-bold uppercase tracking-[0.14em] text-slate-50 transition-all hover:bg-blue-700 sm:col-span-2"
               >
                 {isSubmittingSupport ? "Gönderiliyor..." : "Gönder"}
               </button>
 
-              {supportFeedback && <p className="text-sm text-slate-200 sm:col-span-2">{supportFeedback}</p>}
+              {supportFeedback && <p className="text-sm text-slate-600 sm:col-span-2">{supportFeedback}</p>}
 
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-300 sm:col-span-2">
-                Çalışma Saatleri: Pzt - Cmt / 09:00 - 18:00
-              </div>
             </form>
 
-            <form onSubmit={handleDealerSubmit} className="grid grid-cols-1 gap-4 rounded-2xl border border-white/10 bg-white/5 p-4 sm:grid-cols-3">
-              <p className="sm:col-span-3 text-sm font-semibold text-white">Bayi Başvuru Formu</p>
-              <input
-                type="text"
-                placeholder="Firma Adı"
-                value={dealerCompanyName}
-                onChange={(event) => setDealerCompanyName(event.target.value)}
-                className="h-11 rounded-xl border border-white/15 bg-slate-950/70 px-4 text-sm text-white outline-none transition-colors focus:border-amber-500"
-              />
-              <input
-                type="text"
-                placeholder="Yetkili Ad Soyad"
-                value={dealerContactName}
-                onChange={(event) => setDealerContactName(event.target.value)}
-                className="h-11 rounded-xl border border-white/15 bg-slate-950/70 px-4 text-sm text-white outline-none transition-colors focus:border-amber-500"
-              />
-              <input
-                type="text"
-                placeholder="Şehir"
-                value={dealerCity}
-                onChange={(event) => setDealerCity(event.target.value)}
-                className="h-11 rounded-xl border border-white/15 bg-slate-950/70 px-4 text-sm text-white outline-none transition-colors focus:border-amber-500"
-              />
-              <button
-                type="submit"
-                disabled={isSubmittingDealer}
-                className="sm:col-span-3 h-11 rounded-xl border border-cyan-300/40 bg-cyan-500/15 px-4 text-sm font-semibold text-cyan-100 hover:bg-cyan-500/20 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {isSubmittingDealer ? "Gönderiliyor..." : "Bayi Başvurusu Gönder"}
-              </button>
-              {dealerFeedback && <p className="sm:col-span-3 text-sm text-slate-200">{dealerFeedback}</p>}
-            </form>
             </div>
           </div>
         </div>

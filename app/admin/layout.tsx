@@ -90,81 +90,115 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }, [isAuthenticated, user, router]);
 
   return (
-    <section className="min-h-screen bg-slate-950 text-slate-100">
+    <section className="min-h-screen bg-slate-50 font-sans text-slate-900">
       <div className="grid min-h-screen lg:grid-cols-[280px_1fr]">
-        <aside className="hidden border-r border-white/10 bg-slate-900/80 p-5 backdrop-blur-xl lg:flex lg:flex-col">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-300">Ankarom</p>
-            <h1 className="mt-2 text-2xl font-black text-white">Yönetim Merkezi</h1>
-            <p className="mt-1 text-sm text-slate-400">Admin kontrol paneli</p>
+        
+        {/* SIDEBAR */}
+        <aside className="hidden border-r border-slate-200 bg-white p-6 lg:flex lg:flex-col shadow-sm z-10">
+          <div className="mb-2">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-indigo-600">Ankarom</p>
+            <h1 className="mt-1 text-xl font-bold text-slate-900 tracking-tight">Yönetim Merkezi</h1>
+            <p className="mt-1 text-xs text-slate-500">Admin Kontrol Paneli</p>
           </div>
 
-          <nav className="mt-8 space-y-5">
-            {navSections.map((section) => (
-              <div key={section.title}>
-                <p className="mb-2 px-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{section.title}</p>
-                <div className="space-y-2">
-                  {section.items.map((item) => {
-                    const Icon = item.icon;
-                    const isActive = pathname === item.href;
+          <div className="mt-8 flex-1 overflow-y-auto pr-2 custom-scrollbar">
+            <nav className="space-y-6">
+              {navSections.map((section) => (
+                <div key={section.title}>
+                  <p className="mb-3 px-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
+                    {section.title}
+                  </p>
+                  <div className="space-y-1">
+                    {section.items.map((item) => {
+                      const Icon = item.icon;
+                      const isActive = pathname === item.href;
 
-                    if (!item.enabled) {
+                      if (!item.enabled) {
+                        return (
+                          <div
+                            key={item.label}
+                            className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-300 cursor-not-allowed"
+                          >
+                            <Icon className="h-5 w-5" />
+                            {item.label}
+                          </div>
+                        );
+                      }
+
                       return (
-                        <div
-                          key={item.label}
-                          className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-500"
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                            isActive
+                              ? "bg-indigo-50 text-indigo-700"
+                              : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                          }`}
                         >
-                          <Icon className="h-5 w-5" />
+                          <Icon className={`h-5 w-5 ${isActive ? "text-indigo-600" : "text-slate-400"}`} />
                           {item.label}
-                        </div>
+                        </Link>
                       );
-                    }
-
-                    return (
-                      <Link
-                        key={item.href}
-                        href={item.href}
-                        className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-all ${
-                          isActive
-                            ? "border border-cyan-300/25 bg-cyan-500/10 text-cyan-100"
-                            : "text-slate-300 hover:bg-white/5 hover:text-white"
-                        }`}
-                      >
-                        <Icon className="h-5 w-5" />
-                        {item.label}
-                      </Link>
-                    );
-                  })}
+                    })}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </nav>
+              ))}
+            </nav>
+          </div>
 
-          <button
-            type="button"
-            onClick={logout}
-            className="mt-auto inline-flex items-center justify-center gap-2 rounded-xl border border-rose-300/30 bg-rose-500/10 px-4 py-2.5 text-sm font-semibold text-rose-200"
-          >
-            <ArrowRightOnRectangleIcon className="h-4 w-4" />
-            Çıkış Yap
-          </button>
+          {/* ÇIKIŞ BUTONU */}
+          <div className="pt-6 mt-auto border-t border-slate-100">
+            <button
+              type="button"
+              onClick={logout}
+              className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 transition-colors hover:bg-rose-50 hover:text-rose-600"
+            >
+              <ArrowRightOnRectangleIcon className="h-5 w-5 text-slate-400 group-hover:text-rose-500" />
+              Çıkış Yap
+            </button>
+          </div>
         </aside>
 
+        {/* MAIN CONTENT AREA */}
         <div className="flex min-w-0 flex-col">
-          <header className="sticky top-0 z-20 border-b border-white/10 bg-slate-900/75 px-4 py-4 backdrop-blur-xl sm:px-6">
-            <div className="flex items-center justify-between gap-3 min-w-0">
-              <div className="min-w-0">
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">Admin Dashboard</p>
-                <h2 className="mt-1 wrap-break-word text-lg font-bold text-white sm:text-xl">Ankarom Operasyon Paneli</h2>
+          
+          {/* HEADER */}
+          <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/80 px-6 py-4 backdrop-blur-md">
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <nav className="flex text-xs text-slate-500" aria-label="Breadcrumb">
+                  <ol className="inline-flex items-center space-x-1 md:space-x-3">
+                    <li className="inline-flex items-center uppercase tracking-wider font-semibold">
+                      Admin Dashboard
+                    </li>
+                  </ol>
+                </nav>
+                <h2 className="mt-1 text-2xl font-bold text-slate-900 tracking-tight">
+                  Ankarom Operasyon Paneli
+                </h2>
               </div>
-              <div className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-right">
-                <p className="text-xs text-slate-400">Aktif Kullanıcı</p>
-                <p className="text-sm font-semibold text-cyan-200">{isAdmin ? user?.name : "-"}</p>
+              
+              <div className="flex items-center gap-4">
+                <div className="hidden sm:flex flex-col items-end">
+                  <span className="text-xs text-slate-500">Aktif Kullanıcı</span>
+                  <span className="text-sm font-semibold text-indigo-700">
+                    {isAdmin ? user?.name || "Yönetici" : "-"}
+                  </span>
+                </div>
+                <div className="h-10 w-10 rounded-full bg-indigo-100 border border-indigo-200 flex items-center justify-center text-indigo-700 font-bold">
+                  {user?.name ? user.name.charAt(0).toUpperCase() : "Y"}
+                </div>
               </div>
             </div>
           </header>
 
-          <main className="flex-1 px-4 py-6 sm:px-6">{children}</main>
+          {/* PAGE CONTENT */}
+          <main className="flex-1 px-4 py-8 sm:px-6 lg:px-8">
+            <div className="mx-auto max-w-7xl">
+              {children}
+            </div>
+          </main>
+          
         </div>
       </div>
     </section>

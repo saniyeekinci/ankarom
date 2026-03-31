@@ -106,7 +106,7 @@ export default function AdminSettingsPage() {
         throw new Error(data.message || "Ayarlar güncellenemedi.");
       }
 
-      setSuccessMessage(data.message || "Ayarlar güncellendi.");
+      setSuccessMessage(data.message || "Ayarlar başarıyla güncellendi.");
     } catch (error) {
       const message = error instanceof Error ? error.message : "Ayarlar güncellenirken hata oluştu.";
       setErrorMessage(message);
@@ -116,170 +116,171 @@ export default function AdminSettingsPage() {
   };
 
   return (
-    <section className="space-y-6 flex flex-col gap-4">
-      <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-slate-900/75 p-6 shadow-[0_24px_70px_rgba(2,6,23,0.6)] backdrop-blur-2xl sm:p-7">
-        <div className="pointer-events-none absolute -right-10 top-0 h-36 w-36 rounded-full bg-cyan-500/15 blur-3xl" />
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-300">Sistem Konfigürasyonu</p>
-        <h2 className="mt-3 text-2xl font-black text-white sm:text-3xl">Ayarlar</h2>
-        <p className="mt-2 text-sm text-slate-400">Platform davranışını, sipariş eşiklerini ve iletişim ayarlarını tek panelden yönetin.</p>
-      </div>
+    <section className="flex flex-col gap-6">
+      {/* Sayfa Başlığı */}
+      <header className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <p className="text-xs font-bold uppercase tracking-widest text-indigo-600">Sistem Konfigürasyonu</p>
+        <h2 className="mt-2 text-2xl font-bold text-slate-900">Genel Ayarlar</h2>
+        <p className="mt-1 text-sm text-slate-500">Platform davranışını ve operasyonel eşikleri buradan yönetebilirsiniz.</p>
+      </header>
 
       {isLoading ? (
-        <div className="rounded-3xl border border-white/10 bg-slate-900/75 p-6 text-sm text-slate-300 shadow-[0_24px_70px_rgba(2,6,23,0.6)] backdrop-blur-2xl">
+        <div className="rounded-xl border border-slate-200 bg-white p-12 text-center text-sm font-medium text-slate-500 shadow-sm">
           Ayarlar yükleniyor...
         </div>
       ) : (
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          
+          {/* Özet Kartları */}
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            <article className="rounded-2xl border border-white/10 bg-white/5 p-4">
-              <p className="text-xs uppercase tracking-[0.14em] text-slate-400">Site Adı</p>
-              <p className="mt-2 text-lg font-bold text-white">{siteName || "-"}</p>
+            <article className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Site Adı</p>
+              <p className="mt-1 text-lg font-bold text-slate-900">{siteName || "-"}</p>
             </article>
-            <article className="rounded-2xl border border-white/10 bg-white/5 p-4">
-              <p className="text-xs uppercase tracking-[0.14em] text-slate-400">Misafir Ödeme</p>
-              <p className="mt-2 text-lg font-bold text-cyan-200">{allowGuestCheckout ? "Açık" : "Kapalı"}</p>
+            <article className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Misafir Ödeme</p>
+              <p className={`mt-1 text-lg font-bold ${allowGuestCheckout ? "text-emerald-600" : "text-slate-400"}`}>
+                {allowGuestCheckout ? "Aktif" : "Devre Dışı"}
+              </p>
             </article>
-            <article className="rounded-2xl border border-white/10 bg-white/5 p-4">
-              <p className="text-xs uppercase tracking-[0.14em] text-slate-400">Bakım Modu</p>
-              <p className="mt-2 text-lg font-bold text-amber-200">{maintenanceMode ? "Aktif" : "Pasif"}</p>
+            <article className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Bakım Modu</p>
+              <p className={`mt-1 text-lg font-bold ${maintenanceMode ? "text-amber-600" : "text-slate-400"}`}>
+                {maintenanceMode ? "YAYINDA DEĞİL" : "YAYINDA"}
+              </p>
             </article>
-            <article className="rounded-2xl border border-white/10 bg-white/5 p-4">
-              <p className="text-xs uppercase tracking-[0.14em] text-slate-400">Düşük Stok Limiti</p>
-              <p className="mt-2 text-lg font-bold text-white">{lowStockThreshold}</p>
+            <article className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Düşük Stok</p>
+              <p className="mt-1 text-lg font-bold text-rose-600">{lowStockThreshold} Adet</p>
             </article>
           </div>
 
-          <div className="rounded-3xl border border-white/10 bg-slate-900/75 p-5 shadow-[0_24px_70px_rgba(2,6,23,0.6)] backdrop-blur-2xl sm:p-6">
-            <h3 className="text-lg font-bold text-white">Genel Bilgiler</h3>
-            <div className="mt-4 grid gap-4 md:grid-cols-2">
-              <label className="space-y-2">
-                <span className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Site Adı</span>
-                <input
-                  type="text"
-                  value={siteName}
-                  onChange={(event) => setSiteName(event.target.value)}
-                  placeholder="Site adı"
-                  className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder:text-slate-400 outline-none focus:border-cyan-400/70"
-                />
-              </label>
+          <div className="grid gap-6 lg:grid-cols-2">
+            {/* İletişim Bilgileri */}
+            <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+              <h3 className="text-lg font-bold text-slate-900 border-b border-slate-100 pb-3 mb-5">İletişim ve Kimlik</h3>
+              <div className="space-y-4">
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium text-slate-700">Site Adı</label>
+                  <input
+                    type="text"
+                    value={siteName}
+                    onChange={(event) => setSiteName(event.target.value)}
+                    className="w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm text-slate-900 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium text-slate-700">Destek E-Posta</label>
+                  <input
+                    type="email"
+                    value={supportEmail}
+                    onChange={(event) => setSupportEmail(event.target.value)}
+                    className="w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm text-slate-900 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium text-slate-700">Destek Telefon</label>
+                  <input
+                    type="text"
+                    value={supportPhone}
+                    onChange={(event) => setSupportPhone(event.target.value)}
+                    className="w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm text-slate-900 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
+                  />
+                </div>
+              </div>
+            </div>
 
-              <label className="space-y-2">
-                <span className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Destek E-Posta</span>
-                <input
-                  type="email"
-                  value={supportEmail}
-                  onChange={(event) => setSupportEmail(event.target.value)}
-                  placeholder="Destek e-posta"
-                  className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder:text-slate-400 outline-none focus:border-cyan-400/70"
-                />
-              </label>
-
-              <label className="space-y-2">
-                <span className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Destek Telefon</span>
-                <input
-                  type="text"
-                  value={supportPhone}
-                  onChange={(event) => setSupportPhone(event.target.value)}
-                  placeholder="Destek telefon"
-                  className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder:text-slate-400 outline-none focus:border-cyan-400/70"
-                />
-              </label>
-
-              <label className="space-y-2">
-                <span className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Ana Sayfa Duyurusu</span>
-                <input
-                  type="text"
-                  value={homepageAnnouncement}
-                  onChange={(event) => setHomepageAnnouncement(event.target.value)}
-                  placeholder="Kısa duyuru başlığı"
-                  className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder:text-slate-400 outline-none focus:border-cyan-400/70"
-                />
-              </label>
+            {/* Operasyonel Limitler */}
+            <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+              <h3 className="text-lg font-bold text-slate-900 border-b border-slate-100 pb-3 mb-5">Operasyonel Limitler</h3>
+              <div className="space-y-4">
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium text-slate-700">Ücretsiz Kargo Eşiği (₺)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={freeShippingThreshold}
+                    onChange={(event) => setFreeShippingThreshold(event.target.value)}
+                    className="w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm text-slate-900 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium text-slate-700">Düşük Stok Uyarı Limiti (Adet)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={lowStockThreshold}
+                    onChange={(event) => setLowStockThreshold(event.target.value)}
+                    className="w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm text-slate-900 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
+                  />
+                </div>
+              </div>
             </div>
           </div>
 
-          <div className="rounded-3xl border border-white/10 bg-slate-900/75 p-5 shadow-[0_24px_70px_rgba(2,6,23,0.6)] backdrop-blur-2xl sm:p-6">
-            <h3 className="text-lg font-bold text-white">Operasyon Eşikleri</h3>
-            <div className="mt-4 grid gap-4 md:grid-cols-2">
-              <label className="space-y-2">
-                <span className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Ücretsiz Kargo Limiti</span>
-                <input
-                  type="number"
-                  min="0"
-                  value={freeShippingThreshold}
-                  onChange={(event) => setFreeShippingThreshold(event.target.value)}
-                  placeholder="Ücretsiz kargo limiti"
-                  className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder:text-slate-400 outline-none focus:border-cyan-400/70"
-                />
-              </label>
-
-              <label className="space-y-2">
-                <span className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Düşük Stok Limiti</span>
-                <input
-                  type="number"
-                  min="0"
-                  value={lowStockThreshold}
-                  onChange={(event) => setLowStockThreshold(event.target.value)}
-                  placeholder="Düşük stok limiti"
-                  className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder:text-slate-400 outline-none focus:border-cyan-400/70"
-                />
-              </label>
-            </div>
-          </div>
-
-          <div className="rounded-3xl border border-white/10 bg-slate-900/75 p-5 shadow-[0_24px_70px_rgba(2,6,23,0.6)] backdrop-blur-2xl sm:p-6">
-            <h3 className="text-lg font-bold text-white">Sistem Durumu</h3>
-            <div className="mt-4 grid gap-4 md:grid-cols-2">
+          {/* Sistem Durumu Kontrolleri */}
+          <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+            <h3 className="text-lg font-bold text-slate-900 border-b border-slate-100 pb-3 mb-5">Sistem Durumu</h3>
+            <div className="grid gap-4 md:grid-cols-2">
               <button
                 type="button"
                 onClick={() => setMaintenanceMode((prev) => !prev)}
-                className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-left"
+                className={`flex items-center justify-between rounded-xl border p-4 text-left transition-all ${
+                  maintenanceMode ? "border-amber-200 bg-amber-50" : "border-slate-200 bg-white hover:border-slate-300"
+                }`}
               >
-                <span>
-                  <p className="text-sm font-semibold text-white">Bakım Modu</p>
-                  <p className="mt-1 text-xs text-slate-400">Site erişimini geçici olarak kısıtlar.</p>
-                </span>
-                <span className={`rounded-full px-3 py-1 text-xs font-semibold ${maintenanceMode ? "border border-amber-300/30 bg-amber-500/10 text-amber-200" : "border border-white/20 bg-white/5 text-slate-200"}`}>
-                  {maintenanceMode ? "Aktif" : "Pasif"}
+                <div>
+                  <p className="text-sm font-bold text-slate-900">Bakım Modu</p>
+                  <p className="text-xs text-slate-500">Aktif olduğunda site ziyaretçilere kapatılır.</p>
+                </div>
+                <span className={`rounded-full px-3 py-1 text-xs font-bold ${maintenanceMode ? "bg-amber-600 text-white" : "bg-slate-100 text-slate-600"}`}>
+                  {maintenanceMode ? "AKTİF" : "PASİF"}
                 </span>
               </button>
 
               <button
                 type="button"
                 onClick={() => setAllowGuestCheckout((prev) => !prev)}
-                className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-left"
+                className={`flex items-center justify-between rounded-xl border p-4 text-left transition-all ${
+                  allowGuestCheckout ? "border-indigo-200 bg-indigo-50" : "border-slate-200 bg-white hover:border-slate-300"
+                }`}
               >
-                <span>
-                  <p className="text-sm font-semibold text-white">Misafir Ödeme</p>
-                  <p className="mt-1 text-xs text-slate-400">Giriş yapmadan siparişe izin verir.</p>
-                </span>
-                <span className={`rounded-full px-3 py-1 text-xs font-semibold ${allowGuestCheckout ? "border border-cyan-300/30 bg-cyan-500/10 text-cyan-200" : "border border-white/20 bg-white/5 text-slate-200"}`}>
-                  {allowGuestCheckout ? "Açık" : "Kapalı"}
+                <div>
+                  <p className="text-sm font-bold text-slate-900">Misafir Ödeme</p>
+                  <p className="text-xs text-slate-500">Üyelik zorunluluğunu kaldırır.</p>
+                </div>
+                <span className={`rounded-full px-3 py-1 text-xs font-bold ${allowGuestCheckout ? "bg-indigo-600 text-white" : "bg-slate-100 text-slate-600"}`}>
+                  {allowGuestCheckout ? "AÇIK" : "KAPALI"}
                 </span>
               </button>
             </div>
           </div>
 
-          <div className="rounded-3xl border border-white/10 bg-slate-900/75 p-5 shadow-[0_24px_70px_rgba(2,6,23,0.6)] backdrop-blur-2xl sm:p-6">
-            <h3 className="text-lg font-bold text-white">Duyuru Metni</h3>
+          {/* Duyuru Metni */}
+          <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+            <h3 className="text-lg font-bold text-slate-900 border-b border-slate-100 pb-3 mb-5">Duyuru Paneli</h3>
             <textarea
               value={homepageAnnouncement}
               onChange={(event) => setHomepageAnnouncement(event.target.value)}
-              placeholder="Ana sayfa duyuru metni"
+              placeholder="Ana sayfa üst bandında görünecek mesaj..."
               rows={4}
-              className="mt-4 w-full resize-none rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder:text-slate-400 outline-none focus:border-cyan-400/70"
+              className="w-full resize-none rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
             />
 
-            {errorMessage && <p className="mt-4 text-sm text-rose-300">{errorMessage}</p>}
-            {successMessage && <p className="mt-4 text-sm text-emerald-300">{successMessage}</p>}
+            <div className="mt-6 flex flex-col items-center gap-4 border-t border-slate-100 pt-6 sm:flex-row sm:justify-between">
+              <div className="w-full sm:w-auto">
+                {errorMessage && <p className="text-sm font-semibold text-rose-600">{errorMessage}</p>}
+                {successMessage && <p className="text-sm font-semibold text-emerald-600">{successMessage}</p>}
+              </div>
 
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="mt-4 w-full rounded-2xl border border-cyan-300/30 bg-cyan-500/10 px-4 py-3 text-sm font-semibold text-cyan-100 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {isSubmitting ? "Kaydediliyor..." : "Ayarları Kaydet"}
-            </button>
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full rounded-lg bg-indigo-600 px-8 py-3 text-sm font-bold text-white shadow-sm transition-all hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+              >
+                {isSubmitting ? "Güncelleniyor..." : "Ayarları Kaydet"}
+              </button>
+            </div>
           </div>
         </form>
       )}

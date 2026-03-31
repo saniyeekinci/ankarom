@@ -16,6 +16,7 @@
     "@mui/material": "^7.3.9",
     "ai": "^6.0.138",
     "imap-simple": "^5.1.0",
+    "lucide-react": "^1.7.0",
     "mailparser": "^3.9.6",
     "next": "16.1.6",
     "openai": "^6.33.0",

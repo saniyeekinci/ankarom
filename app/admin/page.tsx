@@ -86,102 +86,141 @@ export default function AdminDashboardPage() {
         key: "revenue",
         title: "Toplam Gelir",
         value: formatCurrency(stats?.totalRevenue || 0),
-        accent: "text-emerald-300",
-        bg: "from-emerald-500/20 to-emerald-500/5",
+        accent: "text-emerald-600",
       },
       {
         key: "sales",
         title: "Toplam Satış",
         value: String(stats?.totalSales || 0),
-        accent: "text-cyan-300",
-        bg: "from-cyan-500/20 to-cyan-500/5",
+        accent: "text-indigo-600",
       },
       {
         key: "users",
         title: "Kayıtlı Kullanıcı",
         value: String(stats?.totalUsers || 0),
-        accent: "text-indigo-300",
-        bg: "from-indigo-500/20 to-indigo-500/5",
+        accent: "text-blue-600",
       },
       {
         key: "stock",
         title: "Kritik Stok (<10)",
         value: String(stats?.lowStockProducts || 0),
-        accent: "text-rose-300",
-        bg: "from-rose-500/20 to-rose-500/5",
+        accent: "text-rose-600",
       },
     ],
     [stats],
   );
 
   return (
-    <div className="flex flex-col gap-6 space-y-6">
+    <div className="flex flex-col gap-6">
+      {/* İstatistik Kartları */}
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {cards.map((card) => (
           <article
             key={card.key}
-            className={`rounded-2xl border border-white/10 bg-linear-to-br ${card.bg} p-5 shadow-[0_16px_40px_rgba(2,6,23,0.45)]`}
+            className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm transition-all hover:shadow-md"
           >
-            <p className="text-xs uppercase tracking-[0.15em] text-slate-400">{card.title}</p>
-            <p className={`mt-3 text-2xl font-black ${card.accent}`}>{card.value}</p>
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">{card.title}</p>
+            <p className={`mt-2 text-3xl font-bold tracking-tight ${card.accent}`}>{card.value}</p>
           </article>
         ))}
       </section>
 
-      <section className="rounded-3xl border border-white/10 bg-slate-900/75 p-5 shadow-[0_24px_70px_rgba(2,6,23,0.6)] backdrop-blur-2xl sm:p-6">
+      {/* Grafik Bölümü */}
+      <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
         <div className="flex items-center justify-between gap-3">
-          <h3 className="text-xl font-bold text-white">Aylık Satış Trendi</h3>
-          {isLoading && <span className="text-sm text-slate-400">Yükleniyor...</span>}
+          <h3 className="text-lg font-bold text-slate-900">Aylık Satış Trendi</h3>
+          {isLoading && <span className="text-sm font-medium text-slate-400">Veriler yükleniyor...</span>}
         </div>
 
-        {errorMessage && <p className="mt-4 text-sm text-rose-300">{errorMessage}</p>}
+        {errorMessage && <p className="mt-4 text-sm font-medium text-rose-500">{errorMessage}</p>}
 
-        <div className="mt-5 h-80 w-full">
+        <div className="mt-6 h-[350px] w-full">
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={stats?.monthlySales || []}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-              <XAxis dataKey="month" stroke="#94a3b8" />
-              <YAxis stroke="#94a3b8" />
+            <LineChart data={stats?.monthlySales || []} margin={{ top: 5, right: 20, left: 20, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+              <XAxis 
+                dataKey="month" 
+                stroke="#64748b" 
+                fontSize={12} 
+                tickLine={false} 
+                axisLine={false} 
+                dy={10} 
+              />
+              <YAxis 
+                stroke="#64748b" 
+                fontSize={12} 
+                tickLine={false} 
+                axisLine={false} 
+                dx={-10}
+                tickFormatter={(value) => `₺${value}`}
+              />
               <Tooltip
                 contentStyle={{
-                  background: "#0f172a",
-                  border: "1px solid #334155",
-                  borderRadius: "12px",
-                  color: "#e2e8f0",
+                  backgroundColor: "#ffffff",
+                  borderColor: "#e2e8f0",
+                  borderRadius: "8px",
+                  color: "#0f172a",
+                  boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)"
                 }}
+                itemStyle={{ color: "#4f46e5", fontWeight: 600 }}
               />
-              <Line type="monotone" dataKey="revenue" stroke="#22d3ee" strokeWidth={3} dot={{ r: 3 }} />
+              <Line 
+                type="monotone" 
+                dataKey="revenue" 
+                name="Gelir"
+                stroke="#4f46e5" 
+                strokeWidth={3} 
+                dot={{ r: 4, fill: "#4f46e5", strokeWidth: 2, stroke: "#ffffff" }} 
+                activeDot={{ r: 6, strokeWidth: 0 }}
+              />
             </LineChart>
           </ResponsiveContainer>
         </div>
       </section>
 
-      <section className="rounded-3xl border border-white/10 bg-slate-900/75 p-5 shadow-[0_24px_70px_rgba(2,6,23,0.6)] backdrop-blur-2xl sm:p-6">
-        <h3 className="text-xl font-bold text-white">Son Eklenen Ürünler</h3>
-        <p className="mt-1 text-sm text-slate-400">Ürün ekleme ekranından kaydedilen son kayıtlar burada listelenir.</p>
+      {/* Tablo Bölümü */}
+      <section className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+        <div className="p-6 border-b border-slate-200">
+          <h3 className="text-lg font-bold text-slate-900">Son Eklenen Ürünler</h3>
+          <p className="mt-1 text-sm text-slate-500">Sisteme kaydedilen en son ürünler aşağıda listelenmektedir.</p>
+        </div>
 
-        <div className="mt-5 overflow-x-auto">
-          <table className="min-w-full border-separate border-spacing-y-2">
-            <thead>
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-slate-200">
+            <thead className="bg-slate-50">
               <tr>
-                <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Ürün</th>
-                <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Kategori</th>
-                <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Fiyat</th>
-                <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Stok</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Ürün</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Kategori</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Fiyat</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Stok</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-slate-200 bg-white">
               {(stats?.recentProducts?.length || 0) === 0 ? (
                 <tr>
-                  <td colSpan={4} className="px-3 py-4 text-sm text-slate-300">Henüz ürün kaydı yok.</td>
+                  <td colSpan={4} className="px-6 py-8 text-center text-sm text-slate-500">
+                    Henüz ürün kaydı bulunmamaktadır.
+                  </td>
                 </tr>
               ) : (
                 stats?.recentProducts.map((product) => (
-                  <tr key={product._id} className="rounded-xl border border-white/10 bg-white/5">
-                    <td className="rounded-l-xl px-3 py-3 text-sm font-semibold text-white">{product.name}</td>
-                    <td className="px-3 py-3 text-sm text-slate-300">{product.category || "Genel"}</td>
-                    <td className="px-3 py-3 text-sm font-semibold text-yellow-300">{formatCurrency(product.price || 0)}</td>
-                    <td className="rounded-r-xl px-3 py-3 text-sm text-slate-200">{product.stock}</td>
+                  <tr key={product._id} className="transition-colors hover:bg-slate-50">
+                    <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-slate-900">
+                      {product.name}
+                    </td>
+                    <td className="whitespace-nowrap px-6 py-4 text-sm text-slate-500">
+                      {product.category || "Genel Kategori"}
+                    </td>
+                    <td className="whitespace-nowrap px-6 py-4 text-sm font-semibold text-slate-900">
+                      {formatCurrency(product.price || 0)}
+                    </td>
+                    <td className="whitespace-nowrap px-6 py-4 text-sm">
+                      <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                        product.stock < 10 ? "bg-rose-100 text-rose-800" : "bg-emerald-100 text-emerald-800"
+                      }`}>
+                        {product.stock} Adet
+                      </span>
+                    </td>
                   </tr>
                 ))
               )}

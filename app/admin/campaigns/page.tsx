@@ -63,7 +63,7 @@ export default function AdminCampaignsPage() {
   const [isActive, setIsActive] = useState(true);
 
   const totalCampaigns = useMemo(() => campaigns.length, [campaigns]);
-  const activeCampaigns = useMemo(() => campaigns.filter((campaign) => campaign.isActive).length, [campaigns]);
+  const activeCount = useMemo(() => campaigns.filter((c) => c.isActive).length, [campaigns]);
 
   const resetForm = () => {
     setTitle("");
@@ -125,7 +125,7 @@ export default function AdminCampaignsPage() {
         },
         body: JSON.stringify({
           title,
-          code,
+          code: code.toUpperCase(),
           discountType,
           discountValue,
           minimumSpend,
@@ -245,7 +245,7 @@ export default function AdminCampaignsPage() {
         },
         body: JSON.stringify({
           title: nextTitle,
-          code: nextCode,
+          code: nextCode.toUpperCase(),
           discountType: nextDiscountType,
           discountValue: nextDiscountValue,
           minimumSpend: nextMinimumSpend,
@@ -268,182 +268,219 @@ export default function AdminCampaignsPage() {
   };
 
   return (
-    <section className="space-y-6 flex flex-col gap-4">
-      <div className="rounded-3xl border border-white/10 bg-slate-900/75 p-5 shadow-[0_24px_70px_rgba(2,6,23,0.6)] backdrop-blur-2xl sm:p-6">
-        <h2 className="text-2xl font-black text-white">Kampanya Yönetimi</h2>
-        <p className="mt-1 text-sm text-slate-400">Kupon ve indirim kampanyalarını yönetin.</p>
+    <section className="flex flex-col gap-6">
+      {/* Üst Başlık ve Özet */}
+      <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h2 className="text-xl font-bold text-slate-900">Kampanya Yönetimi</h2>
+        <p className="mt-1 text-sm text-slate-500">Özel kuponlar ve dönemsel indirim kampanyalarını buradan yönetin.</p>
 
-        <div className="mt-4 grid gap-4 sm:grid-cols-2">
-          <article className="rounded-2xl border border-white/10 bg-white/5 p-4">
-            <p className="text-xs uppercase tracking-[0.14em] text-slate-400">Toplam Kampanya</p>
-            <p className="mt-2 text-2xl font-black text-white">{totalCampaigns}</p>
+        <div className="mt-6 grid gap-4 sm:grid-cols-2">
+          <article className="rounded-xl border border-slate-100 bg-slate-50 p-4">
+            <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Toplam Kampanya</p>
+            <p className="mt-1 text-2xl font-bold text-slate-900">{totalCampaigns}</p>
           </article>
-          <article className="rounded-2xl border border-white/10 bg-white/5 p-4">
-            <p className="text-xs uppercase tracking-[0.14em] text-slate-400">Aktif Kampanya</p>
-            <p className="mt-2 text-2xl font-black text-cyan-200">{activeCampaigns}</p>
+          <article className="rounded-xl border border-indigo-100 bg-indigo-50 p-4">
+            <p className="text-xs font-bold uppercase tracking-wider text-indigo-600">Aktif Kampanya</p>
+            <p className="mt-1 text-2xl font-bold text-indigo-700">{activeCount}</p>
           </article>
         </div>
       </div>
 
-      <article className="rounded-3xl border border-white/10 bg-slate-900/75 p-5 shadow-[0_24px_70px_rgba(2,6,23,0.6)] backdrop-blur-2xl sm:p-6">
-        <h3 className="text-xl font-black text-white">Yeni Kampanya</h3>
+      {/* Yeni Kampanya Formu */}
+      <article className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h3 className="text-lg font-bold text-slate-900 mb-5">Yeni Kampanya Tanımla</h3>
 
-        <form onSubmit={handleCreateCampaign} className="mt-4 grid gap-4 md:grid-cols-2">
-          <input
-            type="text"
-            value={title}
-            onChange={(event) => setTitle(event.target.value)}
-            placeholder="Kampanya başlığı"
-            required
-            className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder:text-slate-400 outline-none focus:border-cyan-400/70"
-          />
+        <form onSubmit={handleCreateCampaign} className="grid gap-4 md:grid-cols-2">
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-slate-500 uppercase">Kampanya Başlığı</label>
+            <input
+              type="text"
+              value={title}
+              onChange={(event) => setTitle(event.target.value)}
+              placeholder="Örn: Bahar Fırsatları"
+              required
+              className="w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-colors"
+            />
+          </div>
 
-          <input
-            type="text"
-            value={code}
-            onChange={(event) => setCode(event.target.value.toUpperCase())}
-            placeholder="Kampanya kodu"
-            required
-            className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder:text-slate-400 outline-none focus:border-cyan-400/70"
-          />
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-slate-500 uppercase">Kampanya Kodu</label>
+            <input
+              type="text"
+              value={code}
+              onChange={(event) => setCode(event.target.value.toUpperCase())}
+              placeholder="Örn: BAHAR25"
+              required
+              className="w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-colors"
+            />
+          </div>
 
-          <select
-            value={discountType}
-            onChange={(event) => setDiscountType(event.target.value as "percent" | "fixed")}
-            className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none focus:border-cyan-400/70"
-          >
-            <option value="percent" className="bg-slate-900">Yüzde İndirim</option>
-            <option value="fixed" className="bg-slate-900">Sabit Tutar</option>
-          </select>
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-slate-500 uppercase">İndirim Tipi</label>
+            <select
+              value={discountType}
+              onChange={(event) => setDiscountType(event.target.value as "percent" | "fixed")}
+              className="w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none transition-colors"
+            >
+              <option value="percent">Yüzde İndirim (%)</option>
+              <option value="fixed">Sabit Tutar (₺)</option>
+            </select>
+          </div>
 
-          <input
-            type="number"
-            min="0"
-            value={discountValue}
-            onChange={(event) => setDiscountValue(event.target.value)}
-            placeholder="İndirim değeri"
-            required
-            className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder:text-slate-400 outline-none focus:border-cyan-400/70"
-          />
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-slate-500 uppercase">İndirim Değeri</label>
+            <input
+              type="number"
+              min="0"
+              value={discountValue}
+              onChange={(event) => setDiscountValue(event.target.value)}
+              placeholder="Örn: 20"
+              required
+              className="w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-colors"
+            />
+          </div>
 
-          <input
-            type="number"
-            min="0"
-            value={minimumSpend}
-            onChange={(event) => setMinimumSpend(event.target.value)}
-            placeholder="Minimum harcama"
-            className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder:text-slate-400 outline-none focus:border-cyan-400/70"
-          />
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-slate-500 uppercase">Minimum Harcama (₺)</label>
+            <input
+              type="number"
+              min="0"
+              value={minimumSpend}
+              onChange={(event) => setMinimumSpend(event.target.value)}
+              placeholder="0"
+              className="w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-colors"
+            />
+          </div>
 
-          <label className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-200">
-            <input type="checkbox" checked={isActive} onChange={(event) => setIsActive(event.target.checked)} />
-            Aktif kampanya
-          </label>
+          <div className="flex items-end">
+            <label className="flex items-center gap-3 w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-700 cursor-pointer">
+              <input 
+                type="checkbox" 
+                checked={isActive} 
+                onChange={(event) => setIsActive(event.target.checked)} 
+                className="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+              />
+              Hemen yayına al
+            </label>
+          </div>
 
-          <input
-            type="datetime-local"
-            value={startsAt}
-            onChange={(event) => setStartsAt(event.target.value)}
-            className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none focus:border-cyan-400/70"
-          />
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-slate-500 uppercase">Başlangıç Tarihi</label>
+            <input
+              type="datetime-local"
+              value={startsAt}
+              onChange={(event) => setStartsAt(event.target.value)}
+              className="w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none transition-colors"
+            />
+          </div>
 
-          <input
-            type="datetime-local"
-            value={endsAt}
-            onChange={(event) => setEndsAt(event.target.value)}
-            className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none focus:border-cyan-400/70"
-          />
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-slate-500 uppercase">Bitiş Tarihi</label>
+            <input
+              type="datetime-local"
+              value={endsAt}
+              onChange={(event) => setEndsAt(event.target.value)}
+              className="w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none transition-colors"
+            />
+          </div>
 
           <button
             type="submit"
             disabled={isSubmitting}
-            className="md:col-span-2 rounded-2xl border border-cyan-300/30 bg-cyan-500/10 px-4 py-3 text-sm font-semibold text-cyan-100 disabled:cursor-not-allowed disabled:opacity-50"
+            className="md:col-span-2 mt-2 rounded-lg bg-indigo-600 px-6 py-3 text-sm font-bold text-white shadow-sm transition-all hover:bg-indigo-700 disabled:opacity-50"
           >
-            {isSubmitting ? "Oluşturuluyor..." : "Kampanya Oluştur"}
+            {isSubmitting ? "Kaydediliyor..." : "Kampanyayı Kaydet"}
           </button>
         </form>
       </article>
 
-      <div className="overflow-x-auto rounded-3xl border border-white/10 bg-slate-900/75 p-4 shadow-[0_24px_70px_rgba(2,6,23,0.6)] backdrop-blur-2xl sm:p-6">
-        {errorMessage && <p className="mb-3 text-sm text-rose-300">{errorMessage}</p>}
-        {successMessage && <p className="mb-3 text-sm text-emerald-300">{successMessage}</p>}
+      {/* Liste Tablosu */}
+      <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+        <div className="p-4 border-b border-slate-100">
+          {errorMessage && <p className="text-sm font-medium text-rose-600">{errorMessage}</p>}
+          {successMessage && <p className="text-sm font-medium text-emerald-600">{successMessage}</p>}
+        </div>
 
-        <table className="min-w-full border-separate border-spacing-y-2">
-          <thead>
-            <tr>
-              <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Kampanya</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">İndirim</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Min. Harcama</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Tarih Aralığı</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Durum</th>
-              <th className="px-3 py-2 text-right text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">İşlemler</th>
-            </tr>
-          </thead>
-          <tbody>
-            {isLoading ? (
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-slate-200">
+            <thead className="bg-slate-50">
               <tr>
-                <td colSpan={6} className="px-3 py-4 text-sm text-slate-300">Kampanyalar yükleniyor...</td>
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Kampanya Bilgisi</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">İndirim</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Min. Harcama</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Geçerlilik Tarihi</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Durum</th>
+                <th className="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-slate-500">İşlemler</th>
               </tr>
-            ) : campaigns.length === 0 ? (
-              <tr>
-                <td colSpan={6} className="px-3 py-4 text-sm text-slate-300">Kayıtlı kampanya bulunamadı.</td>
-              </tr>
-            ) : (
-              campaigns.map((campaign) => (
-                <tr key={campaign._id} className="rounded-xl border border-white/10 bg-white/5">
-                  <td className="rounded-l-xl px-3 py-3 text-sm text-white">
-                    <p className="font-semibold">{campaign.title}</p>
-                    <p className="text-xs text-cyan-200">{campaign.code}</p>
-                  </td>
-                  <td className="px-3 py-3 text-sm text-slate-200">
-                    {campaign.discountType === "percent" ? `%${campaign.discountValue}` : formatCurrency(campaign.discountValue)}
-                  </td>
-                  <td className="px-3 py-3 text-sm text-slate-200">{formatCurrency(campaign.minimumSpend || 0)}</td>
-                  <td className="px-3 py-3 text-sm text-slate-300">
-                    <p>{formatDateTime(campaign.startsAt)}</p>
-                    <p>{formatDateTime(campaign.endsAt)}</p>
-                  </td>
-                  <td className="px-3 py-3 text-sm">
-                    <span
-                      className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${
-                        campaign.isActive
-                          ? "border-emerald-300/30 bg-emerald-500/10 text-emerald-200"
-                          : "border-slate-300/20 bg-white/5 text-slate-300"
-                      }`}
-                    >
-                      {campaign.isActive ? "Aktif" : "Pasif"}
-                    </span>
-                  </td>
-                  <td className="rounded-r-xl px-3 py-3 text-right">
-                    <div className="inline-flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={() => handleToggleActive(campaign)}
-                        className="rounded-lg border border-cyan-300/30 bg-cyan-500/10 px-3 py-1.5 text-xs font-semibold text-cyan-100"
+            </thead>
+            <tbody className="divide-y divide-slate-200 bg-white">
+              {isLoading ? (
+                <tr><td colSpan={6} className="px-6 py-8 text-center text-sm text-slate-500">Yükleniyor...</td></tr>
+              ) : campaigns.length === 0 ? (
+                <tr><td colSpan={6} className="px-6 py-8 text-center text-sm text-slate-500">Kayıtlı kampanya bulunamadı.</td></tr>
+              ) : (
+                campaigns.map((campaign) => (
+                  <tr key={campaign._id} className="hover:bg-slate-50 transition-colors">
+                    <td className="px-6 py-4">
+                      <p className="text-sm font-bold text-slate-900">{campaign.title}</p>
+                      <p className="text-xs font-bold text-indigo-600 tracking-wider uppercase">{campaign.code}</p>
+                    </td>
+                    <td className="px-6 py-4 text-sm font-medium text-slate-900">
+                      {campaign.discountType === "percent" ? `%${campaign.discountValue}` : formatCurrency(campaign.discountValue)}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-slate-600">
+                      {formatCurrency(campaign.minimumSpend || 0)}
+                    </td>
+                    <td className="px-6 py-4 text-xs text-slate-500 leading-relaxed">
+                      <p><span className="font-semibold">Bşl:</span> {formatDateTime(campaign.startsAt)}</p>
+                      <p><span className="font-semibold">Bitiş:</span> {formatDateTime(campaign.endsAt)}</p>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span
+                        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-bold border ${
+                          campaign.isActive
+                            ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                            : "bg-slate-100 text-slate-500 border-slate-200"
+                        }`}
                       >
-                        {campaign.isActive ? "Pasif Yap" : "Aktif Yap"}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleEditCampaign(campaign)}
-                        className="rounded-lg border border-amber-300/30 bg-amber-500/10 px-3 py-1.5 text-xs font-semibold text-amber-200"
-                      >
-                        Düzenle
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleDeleteCampaign(campaign._id)}
-                        className="rounded-lg border border-rose-300/30 bg-rose-500/10 px-3 py-1.5 text-xs font-semibold text-rose-200"
-                      >
-                        Sil
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+                        {campaign.isActive ? "AKTİF" : "PASİF"}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex justify-end gap-2">
+                        <button
+                          type="button"
+                          onClick={() => handleToggleActive(campaign)}
+                          className={`rounded-lg px-3 py-1.5 text-xs font-bold border transition-colors ${
+                            campaign.isActive 
+                            ? "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100" 
+                            : "bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-100"
+                          }`}
+                        >
+                          {campaign.isActive ? "Durdur" : "Başlat"}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleEditCampaign(campaign)}
+                          className="rounded-lg bg-indigo-50 px-3 py-1.5 text-xs font-bold text-indigo-700 border border-indigo-100 hover:bg-indigo-100"
+                        >
+                          Düzenle
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteCampaign(campaign._id)}
+                          className="rounded-lg bg-rose-50 px-3 py-1.5 text-xs font-bold text-rose-700 border border-rose-100 hover:bg-rose-100"
+                        >
+                          Sil
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </section>
   );

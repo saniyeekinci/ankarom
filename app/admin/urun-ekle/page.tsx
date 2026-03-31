@@ -109,160 +109,209 @@ export default function AdminUrunEklePage() {
   };
 
   return (
-    <section className="relative min-h-screen overflow-hidden bg-slate-950 px-4 py-8 sm:px-6 lg:px-8">
-      <div className="pointer-events-none absolute -left-16 top-10 h-80 w-80 rounded-full bg-indigo-500/15 blur-3xl" />
-      <div className="pointer-events-none absolute right-0 top-0 h-80 w-80 rounded-full bg-cyan-500/10 blur-3xl" />
+    <div className="flex flex-col gap-6">
+      
+      {/* Sayfa Başlığı */}
+      <header className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+        <p className="text-xs font-bold uppercase tracking-widest text-indigo-600">Ankarom Yönetim</p>
+        <h1 className="mt-2 text-2xl font-bold text-slate-900 sm:text-3xl">Ürün Yönetim Paneli</h1>
+        <p className="mt-1 text-sm text-slate-500">Sisteme yeni ürün ekleme ve temel stok bilgilerini yönetme alanı.</p>
+      </header>
 
-      <div className="flex flex-col gap-4 relative mx-auto w-full max-w-360 min-w-0">
-        <header className="mb-6 min-w-0 rounded-3xl border border-white/10 bg-slate-900/70 p-5 shadow-[0_24px_70px_rgba(2,6,23,0.6)] backdrop-blur-2xl sm:p-7">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-300">Ankarom Yönetim</p>
-          <h1 className="mt-3 wrap-break-word text-2xl leading-tight font-black text-white sm:text-4xl">Ürün Yönetim Paneli</h1>
-          <p className="mt-2 text-sm text-slate-300">Sisteme yeni ürün ekleme ve temel stok bilgilerini yönetme alanı.</p>
-        </header>
-
-        <div className="grid gap-6 lg:grid-cols-12 ">
-          <aside className="flex flex-col gap-4 rounded-3xl border border-white/10 bg-slate-900/75 p-4 shadow-[0_20px_60px_rgba(2,6,23,0.55)] backdrop-blur-2xl lg:col-span-3">
-            <p className="px-2 text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Panel Bölümleri</p>
-            <div className="mt-3 space-y-2">
-              <div className="rounded-xl border border-cyan-300/25 bg-cyan-500/10 px-3 py-2.5 text-sm font-semibold text-cyan-100">Ürün Ekle</div>
-              <Link href="/admin/products" className="block rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-300 hover:bg-white/5 hover:text-white">
-                Ürün Listesi
-              </Link>
-              <Link href="/admin/orders" className="block rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-300 hover:bg-white/5 hover:text-white">
-                Sipariş Yönetimi
-              </Link>
+      <div className="grid gap-6 lg:grid-cols-12">
+        
+        {/* Sol Menü / Kısayollar */}
+        <aside className="flex flex-col gap-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm lg:col-span-3 h-fit">
+          <p className="px-2 text-xs font-semibold uppercase tracking-wider text-slate-400">Panel Bölümleri</p>
+          <div className="mt-2 space-y-1">
+            <div className="rounded-lg bg-indigo-50 px-3 py-2.5 text-sm font-semibold text-indigo-700">
+              Ürün Ekle
             </div>
-          </aside>
+            <Link href="/admin/products" className="block rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900">
+              Ürün Listesi
+            </Link>
+            <Link href="/admin/orders" className="block rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900">
+              Sipariş Yönetimi
+            </Link>
+          </div>
+        </aside>
 
-          <div className="space-y-6 lg:col-span-9 flex flex-col gap-4">
-            <div className="grid gap-4 sm:grid-cols-3">
-              <article className="rounded-2xl border border-white/10 bg-slate-900/75 p-4 shadow-[0_16px_40px_rgba(2,6,23,0.45)] backdrop-blur-xl">
-                <p className="text-xs uppercase tracking-[0.14em] text-slate-400">İşlem Türü</p>
-                <p className="mt-2 text-lg font-bold text-white">Yeni Ürün Ekleme</p>
-              </article>
-              <article className="rounded-2xl border border-white/10 bg-slate-900/75 p-4 shadow-[0_16px_40px_rgba(2,6,23,0.45)] backdrop-blur-xl">
-                <p className="text-xs uppercase tracking-[0.14em] text-slate-400">Hedef</p>
-                <p className="mt-2 text-lg font-bold text-white">Ürün Kataloğu</p>
-              </article>
-              <article className="rounded-2xl border border-white/10 bg-slate-900/75 p-4 shadow-[0_16px_40px_rgba(2,6,23,0.45)] backdrop-blur-xl">
-                <p className="text-xs uppercase tracking-[0.14em] text-slate-400">Durum</p>
-                <p className="mt-2 text-lg font-bold text-cyan-200">Form Hazır</p>
-              </article>
-            </div>
+        {/* Ana İçerik */}
+        <div className="space-y-6 lg:col-span-9 flex flex-col gap-2">
+          
+          {/* Durum Kartları */}
+          <div className="grid gap-4 sm:grid-cols-3">
+            <article className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">İşlem Türü</p>
+              <p className="mt-1 text-lg font-bold text-slate-900">Yeni Ürün Ekleme</p>
+            </article>
+            <article className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Hedef</p>
+              <p className="mt-1 text-lg font-bold text-slate-900">Ürün Kataloğu</p>
+            </article>
+            <article className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Durum</p>
+              <p className="mt-1 text-lg font-bold text-indigo-600">Form Hazır</p>
+            </article>
+          </div>
 
-            <article className="flex flex-col gap-4 rounded-3xl border border-white/10 bg-slate-900/75 p-5 shadow-[0_24px_70px_rgba(2,6,23,0.6)] backdrop-blur-2xl sm:p-6">
-              <h2 className="text-2xl font-black text-white">Yeni Ürün Bilgileri</h2>
-              <p className="mt-2 text-sm text-slate-400">Aşağıdaki alanları doldurup ürünü sisteme kaydedin.</p>
+          {/* Form Alanı */}
+          <article className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+            <h2 className="text-xl font-bold text-slate-900">Yeni Ürün Bilgileri</h2>
+            <p className="mt-1 text-sm text-slate-500">Aşağıdaki alanları eksiksiz doldurup ürünü sisteme kaydedin.</p>
 
-              {!isAuthenticated && (
-                <p className="mt-6 rounded-2xl border border-rose-300/25 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
-                  Ürün eklemek için önce giriş yapmalısınız.
-                </p>
-              )}
+            {/* Uyarı Mesajları */}
+            {!isAuthenticated && (
+              <div className="mt-6 rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+                Ürün eklemek için önce giriş yapmalısınız.
+              </div>
+            )}
 
-              {isAuthenticated && !isAdmin && (
-                <p className="mt-6 rounded-2xl border border-amber-300/25 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
-                  Hesabınız admin değil. Bu sayfada ürün ekleme yetkiniz yok.
-                </p>
-              )}
+            {isAuthenticated && !isAdmin && (
+              <div className="mt-6 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
+                Hesabınız admin değil. Bu sayfada ürün ekleme yetkiniz bulunmamaktadır.
+              </div>
+            )}
 
-              <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4">
+            <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-5">
+              
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-slate-700">Ürün Adı *</label>
                 <input
                   type="text"
-                  placeholder="Ürün Adı"
+                  placeholder="Örn: Kapalı Kasa Römork"
                   value={name}
                   onChange={(event) => setName(event.target.value)}
                   required
-                  className="w-full rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-white placeholder:text-slate-400 outline-none transition-all focus:border-cyan-400/70"
+                  className="w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-colors"
                 />
+              </div>
 
+              <div className="grid gap-5 sm:grid-cols-2">
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium text-slate-700">Satış Fiyatı *</label>
+                  <input
+                    type="text"
+                    placeholder="Örn: 2450000"
+                    value={currentPrice}
+                    onChange={(event) => setCurrentPrice(event.target.value)}
+                    required
+                    className="w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-colors"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium text-slate-700">İndirimli Fiyat (Opsiyonel)</label>
+                  <input
+                    type="text"
+                    placeholder="Örn: 2350000"
+                    value={discountPrice}
+                    onChange={(event) => setDiscountPrice(event.target.value)}
+                    className="w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-colors"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-slate-700">Ürün Görsel URLsi</label>
                 <input
                   type="text"
-                  placeholder="Fiyat (örn: 2450000 veya ₺2.450.000)"
-                  value={currentPrice}
-                  onChange={(event) => setCurrentPrice(event.target.value)}
-                  required
-                  className="w-full rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-white placeholder:text-slate-400 outline-none transition-all focus:border-cyan-400/70"
-                />
-
-                <input
-                  type="text"
-                  placeholder="İndirimli Fiyat (opsiyonel)"
-                  value={discountPrice}
-                  onChange={(event) => setDiscountPrice(event.target.value)}
-                  className="w-full rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-white placeholder:text-slate-400 outline-none transition-all focus:border-cyan-400/70"
-                />
-
-                <input
-                  type="text"
-                  placeholder="Resim URL"
+                  placeholder="https://ornek-resim-url.com/resim.jpg"
                   value={image}
                   onChange={(event) => setImage(event.target.value)}
-                  className="w-full rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-white placeholder:text-slate-400 outline-none transition-all focus:border-cyan-400/70"
+                  className="w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-colors"
                 />
+              </div>
 
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-slate-700">Kategori</label>
                 <select
                   value={category}
                   onChange={(event) => setCategory(event.target.value)}
-                  className="w-full rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-white outline-none transition-all focus:border-cyan-400/70"
+                  className="w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-colors"
                 >
                   {CATEGORY_OPTIONS.map((option) => (
-                    <option key={option} value={option} className="bg-slate-900 text-white">
+                    <option key={option} value={option}>
                       {option}
                     </option>
                   ))}
                 </select>
+              </div>
 
-                <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-5 sm:grid-cols-2">
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium text-slate-700">Teslimat Bilgisi</label>
                   <input
                     type="text"
-                    placeholder="Teslimat Bilgisi (Stokta Var)"
+                    placeholder="Örn: Stokta Var"
                     value={deliveryText}
                     onChange={(event) => setDeliveryText(event.target.value)}
-                    className="w-full rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-white placeholder:text-slate-400 outline-none transition-all focus:border-cyan-400/70"
-                  />
-
-                  <input
-                    type="number"
-                    min="0"
-                    placeholder="Stok"
-                    value={stock}
-                    onChange={(event) => setStock(event.target.value)}
-                    className="w-full rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-white placeholder:text-slate-400 outline-none transition-all focus:border-cyan-400/70"
+                    className="w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-colors"
                   />
                 </div>
 
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium text-slate-700">Stok Adedi</label>
+                  <input
+                    type="number"
+                    min="0"
+                    placeholder="0"
+                    value={stock}
+                    onChange={(event) => setStock(event.target.value)}
+                    className="w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-colors"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-slate-700">Açıklama</label>
                 <textarea
-                  placeholder="Açıklama"
+                  placeholder="Ürün hakkında genel açıklama yazın..."
                   value={description}
                   onChange={(event) => setDescription(event.target.value)}
-                  rows={5}
-                  className="w-full resize-none rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-white placeholder:text-slate-400 outline-none transition-all focus:border-cyan-400/70"
+                  rows={4}
+                  className="w-full resize-y rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-colors"
                 />
+              </div>
 
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-slate-700">Teknik Özellikler</label>
+                <p className="text-xs text-slate-500 mb-1">Her bir özelliği ayrı satıra yazınız.</p>
                 <textarea
-                  placeholder="Özellikler (her satıra bir madde yazın)"
+                  placeholder="Kapasite: 750 KG&#10;Renk: Galvaniz Gri&#10;Tekerlek: 13 İnç"
                   value={featuresText}
                   onChange={(event) => setFeaturesText(event.target.value)}
-                  rows={5}
-                  className="w-full resize-none rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-white placeholder:text-slate-400 outline-none transition-all focus:border-cyan-400/70"
+                  rows={4}
+                  className="w-full resize-y rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-colors"
                 />
+              </div>
 
-                {errorMessage && <p className="text-sm text-rose-300">{errorMessage}</p>}
-                {successMessage && <p className="text-sm text-emerald-300">{successMessage}</p>}
+              {/* Geri Bildirim Mesajları */}
+              {errorMessage && (
+                <div className="rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm font-medium text-rose-700">
+                  {errorMessage}
+                </div>
+              )}
+              {successMessage && (
+                <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm font-medium text-emerald-700">
+                  {successMessage}
+                </div>
+              )}
 
+              {/* Gönder Butonu */}
+              <div className="pt-2">
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="mt-2 rounded-2xl bg-slate-950 px-4 py-4 text-lg font-semibold text-white shadow-[0_10px_24px_rgba(2,6,23,0.55)] transition-all hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="w-full rounded-lg bg-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition-all hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
                 >
-                  {isSubmitting ? "Ekleniyor..." : "Ürünü Kaydet"}
+                  {isSubmitting ? "Kaydediliyor..." : "Ürünü Kaydet"}
                 </button>
-              </form>
-            </article>
-          </div>
+              </div>
+            </form>
+          </article>
         </div>
       </div>
-    </section>
+    </div>
   );
 }

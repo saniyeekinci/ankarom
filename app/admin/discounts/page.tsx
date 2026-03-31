@@ -30,6 +30,7 @@ export default function AdminDiscountsPage() {
   const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest");
 
   const totalActive = useMemo(() => discounts.filter((item) => item.active).length, [discounts]);
+  
   const filteredDiscounts = useMemo(() => {
     const query = searchQuery.trim().toLocaleLowerCase("tr-TR");
 
@@ -57,9 +58,7 @@ export default function AdminDiscountsPage() {
   }, [discounts, searchQuery, statusFilter, sortOrder]);
 
   const fetchDiscounts = useCallback(async () => {
-    if (!token) {
-      return;
-    }
+    if (!token) return;
 
     setIsLoading(true);
     setErrorMessage("");
@@ -90,9 +89,7 @@ export default function AdminDiscountsPage() {
   const handleCreate = async (event: React.FormEvent) => {
     event.preventDefault();
 
-    if (!token) {
-      return;
-    }
+    if (!token) return;
 
     setErrorMessage("");
 
@@ -113,7 +110,7 @@ export default function AdminDiscountsPage() {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          code,
+          code: code.toUpperCase(),
           type,
           value: numericValue,
           usageLimit: numericLimit,
@@ -139,9 +136,7 @@ export default function AdminDiscountsPage() {
   };
 
   const toggleDiscount = async (id: string) => {
-    if (!token) {
-      return;
-    }
+    if (!token) return;
 
     setErrorMessage("");
 
@@ -164,138 +159,163 @@ export default function AdminDiscountsPage() {
   };
 
   return (
-    <section className="space-y-6 flex flex-col gap-4">
-      <div className="rounded-3xl border border-white/10 bg-slate-900/75 p-5 shadow-[0_24px_70px_rgba(2,6,23,0.6)] backdrop-blur-2xl sm:p-6">
-        <h2 className="text-2xl font-black text-white">İndirim Kuponları</h2>
-        <p className="mt-1 text-sm text-slate-400">Kupon kodları oluşturun, aktif/pasif yönetin.</p>
-      </div>
+    <section className="flex flex-col gap-6">
+      {/* Sayfa Başlığı */}
+      <header className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h2 className="text-xl font-bold text-slate-900">İndirim Kuponları</h2>
+        <p className="mt-1 text-sm text-slate-500">Pazarlama çalışmaları için indirim kodları oluşturun ve yönetin.</p>
+      </header>
 
-      {errorMessage && <p className="text-sm text-rose-300">{errorMessage}</p>}
-
+      {/* İstatistik Özetleri */}
       <div className="grid gap-4 sm:grid-cols-3">
-        <article className="rounded-2xl border border-white/10 bg-white/5 p-4">
-          <p className="text-xs uppercase tracking-[0.14em] text-slate-400">Toplam Kupon</p>
-          <p className="mt-2 text-2xl font-black text-white">{discounts.length}</p>
+        <article className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Toplam Tanımlı Kupon</p>
+          <p className="mt-2 text-2xl font-bold text-slate-900">{discounts.length}</p>
         </article>
-        <article className="rounded-2xl border border-white/10 bg-white/5 p-4">
-          <p className="text-xs uppercase tracking-[0.14em] text-slate-400">Aktif Kupon</p>
-          <p className="mt-2 text-2xl font-black text-cyan-200">{totalActive}</p>
+        <article className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Aktif Kuponlar</p>
+          <p className="mt-2 text-2xl font-bold text-emerald-600">{totalActive}</p>
         </article>
-        <article className="rounded-2xl border border-white/10 bg-white/5 p-4">
-          <p className="text-xs uppercase tracking-[0.14em] text-slate-400">Pasif Kupon</p>
-          <p className="mt-2 text-2xl font-black text-rose-200">{discounts.length - totalActive}</p>
+        <article className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Pasif / Süresi Dolan</p>
+          <p className="mt-2 text-2xl font-bold text-rose-600">{discounts.length - totalActive}</p>
         </article>
       </div>
 
-      <form onSubmit={handleCreate} className="grid gap-3 rounded-3xl border border-white/10 bg-slate-900/75 p-5 shadow-[0_24px_70px_rgba(2,6,23,0.6)] backdrop-blur-2xl md:grid-cols-4">
-        <input
-          value={code}
-          onChange={(event) => setCode(event.target.value)}
-          placeholder="Kupon kodu"
-          className="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white placeholder:text-slate-400 outline-none focus:border-cyan-400/70"
-        />
-        <select
-          value={type}
-          onChange={(event) => setType(event.target.value as "percent" | "fixed")}
-          className="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white outline-none focus:border-cyan-400/70"
-        >
-          <option value="percent" className="bg-slate-900">Yüzde</option>
-          <option value="fixed" className="bg-slate-900">Sabit Tutar</option>
-        </select>
-        <input
-          type="number"
-          min="0"
-          value={value}
-          onChange={(event) => setValue(event.target.value)}
-          placeholder="İndirim değeri"
-          className="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white placeholder:text-slate-400 outline-none focus:border-cyan-400/70"
-        />
-        <input
-          type="number"
-          min="1"
-          value={usageLimit}
-          onChange={(event) => setUsageLimit(event.target.value)}
-          placeholder="Kullanım limiti"
-          className="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white placeholder:text-slate-400 outline-none focus:border-cyan-400/70"
-        />
-
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="md:col-span-4 rounded-xl border border-cyan-300/30 bg-cyan-500/10 px-3 py-2.5 text-sm font-semibold text-cyan-100 disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          {isSubmitting ? "Ekleniyor..." : "Kupon Ekle"}
-        </button>
-      </form>
-
-      <div className="grid gap-3 rounded-2xl border border-white/10 bg-white/5 p-4 md:grid-cols-3">
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={(event) => setSearchQuery(event.target.value)}
-          placeholder="Kod veya tip ara"
-          className="rounded-xl border border-white/10 bg-slate-950/60 px-3 py-2.5 text-sm text-white placeholder:text-slate-400 outline-none focus:border-cyan-400/70"
-        />
-        <select
-          value={statusFilter}
-          onChange={(event) => setStatusFilter(event.target.value as "all" | "active" | "passive")}
-          className="rounded-xl border border-white/10 bg-slate-950/60 px-3 py-2.5 text-sm text-white outline-none focus:border-cyan-400/70"
-        >
-          <option value="all" className="bg-slate-900">Tüm Durumlar</option>
-          <option value="active" className="bg-slate-900">Sadece Aktif</option>
-          <option value="passive" className="bg-slate-900">Sadece Pasif</option>
-        </select>
-        <select
-          value={sortOrder}
-          onChange={(event) => setSortOrder(event.target.value as "newest" | "oldest")}
-          className="rounded-xl border border-white/10 bg-slate-950/60 px-3 py-2.5 text-sm text-white outline-none focus:border-cyan-400/70"
-        >
-          <option value="newest" className="bg-slate-900">En Yeni</option>
-          <option value="oldest" className="bg-slate-900">En Eski</option>
-        </select>
+      {/* Yeni Kupon Oluşturma Formu */}
+      <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h3 className="mb-4 text-lg font-bold text-slate-900">Yeni Kupon Oluştur</h3>
+        <form onSubmit={handleCreate} className="grid gap-4 md:grid-cols-4 items-end">
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-slate-500 uppercase">Kupon Kodu</label>
+            <input
+              value={code}
+              onChange={(event) => setCode(event.target.value.toUpperCase())}
+              placeholder="Örn: YAZ2024"
+              className="w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-slate-500 uppercase">İndirim Tipi</label>
+            <select
+              value={type}
+              onChange={(event) => setType(event.target.value as "percent" | "fixed")}
+              className="w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none"
+            >
+              <option value="percent">Yüzde (%)</option>
+              <option value="fixed">Sabit Tutar (₺)</option>
+            </select>
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-slate-500 uppercase">Değer</label>
+            <input
+              type="number"
+              min="0"
+              value={value}
+              onChange={(event) => setValue(event.target.value)}
+              placeholder="0"
+              className="w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-slate-500 uppercase">Kullanım Limiti</label>
+            <input
+              type="number"
+              min="1"
+              value={usageLimit}
+              onChange={(event) => setUsageLimit(event.target.value)}
+              placeholder="50"
+              className="w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none"
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="md:col-span-4 mt-2 rounded-lg bg-indigo-600 px-6 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:bg-indigo-700 disabled:opacity-50"
+          >
+            {isSubmitting ? "Kupon Ekleniyor..." : "İndirim Kuponu Oluştur"}
+          </button>
+        </form>
+        {errorMessage && <p className="mt-4 text-sm font-medium text-rose-600">{errorMessage}</p>}
       </div>
 
-      <div className="overflow-x-auto rounded-3xl border border-white/10 bg-slate-900/75 p-5 shadow-[0_24px_70px_rgba(2,6,23,0.6)] backdrop-blur-2xl">
-        <table className="min-w-full border-separate border-spacing-y-2">
-          <thead>
-            <tr>
-              <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Kod</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Tip</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Değer</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Limit</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Tarih</th>
-              <th className="px-3 py-2 text-right text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Durum</th>
-            </tr>
-          </thead>
-          <tbody>
-            {isLoading ? (
+      {/* Liste ve Filtreler */}
+      <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+        <div className="grid gap-4 p-4 border-b border-slate-100 md:grid-cols-3">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(event) => setSearchQuery(event.target.value)}
+            placeholder="Kod veya tip ara..."
+            className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none"
+          />
+          <select
+            value={statusFilter}
+            onChange={(event) => setStatusFilter(event.target.value as "all" | "active" | "passive")}
+            className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none"
+          >
+            <option value="all">Durum (Hepsi)</option>
+            <option value="active">Sadece Aktifler</option>
+            <option value="passive">Sadece Pasifler</option>
+          </select>
+          <select
+            value={sortOrder}
+            onChange={(event) => setSortOrder(event.target.value as "newest" | "oldest")}
+            className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none"
+          >
+            <option value="newest">En Yeni İlk</option>
+            <option value="oldest">En Eski İlk</option>
+          </select>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-slate-200">
+            <thead className="bg-slate-50">
               <tr>
-                <td colSpan={6} className="px-3 py-4 text-sm text-slate-300">Kuponlar yükleniyor...</td>
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Kupon Kodu</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Tip</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Değer</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Limit</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Oluşturma</th>
+                <th className="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-slate-500">Durum</th>
               </tr>
-            ) : filteredDiscounts.length === 0 ? (
-              <tr>
-                <td colSpan={6} className="px-3 py-4 text-sm text-slate-300">Filtreye uygun kupon bulunamadı.</td>
-              </tr>
-            ) : filteredDiscounts.map((item) => (
-              <tr key={item._id} className="rounded-xl border border-white/10 bg-white/5">
-                <td className="rounded-l-xl px-3 py-3 text-sm font-semibold text-white">{item.code}</td>
-                <td className="px-3 py-3 text-sm text-slate-200">{item.type === "percent" ? "Yüzde" : "Sabit"}</td>
-                <td className="px-3 py-3 text-sm text-cyan-200">{item.value}</td>
-                <td className="px-3 py-3 text-sm text-slate-200">{item.usageLimit}</td>
-                <td className="px-3 py-3 text-xs text-slate-400">{item.createdAt ? new Date(item.createdAt).toLocaleDateString("tr-TR") : "-"}</td>
-                <td className="rounded-r-xl px-3 py-3 text-right">
-                  <button
-                    type="button"
-                    onClick={() => toggleDiscount(item._id)}
-                    className={`rounded-lg px-3 py-1.5 text-xs font-semibold ${item.active ? "border border-emerald-300/30 bg-emerald-500/10 text-emerald-200" : "border border-rose-300/30 bg-rose-500/10 text-rose-200"}`}
-                  >
-                    {item.active ? "Aktif" : "Pasif"}
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-slate-200 bg-white">
+              {isLoading ? (
+                <tr><td colSpan={6} className="px-6 py-8 text-center text-sm text-slate-500">Yükleniyor...</td></tr>
+              ) : filteredDiscounts.length === 0 ? (
+                <tr><td colSpan={6} className="px-6 py-8 text-center text-sm text-slate-500">Kupon bulunamadı.</td></tr>
+              ) : (
+                filteredDiscounts.map((item) => (
+                  <tr key={item._id} className="hover:bg-slate-50 transition-colors">
+                    <td className="px-6 py-4 text-sm font-bold text-slate-900 tracking-wider">{item.code}</td>
+                    <td className="px-6 py-4 text-sm text-slate-600">{item.type === "percent" ? "Yüzde (%)" : "Sabit Tutar"}</td>
+                    <td className="px-6 py-4 text-sm font-bold text-indigo-600">
+                      {item.type === "percent" ? `%${item.value}` : `₺${item.value}`}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-slate-600">{item.usageLimit} Kullanım</td>
+                    <td className="px-6 py-4 text-xs text-slate-500">
+                      {item.createdAt ? new Date(item.createdAt).toLocaleDateString("tr-TR") : "-"}
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <button
+                        type="button"
+                        onClick={() => toggleDiscount(item._id)}
+                        className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-bold transition-all ${
+                          item.active 
+                            ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200" 
+                            : "bg-rose-100 text-rose-700 hover:bg-rose-200"
+                        }`}
+                      >
+                        {item.active ? "AKTİF" : "PASİF"}
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </section>
   );

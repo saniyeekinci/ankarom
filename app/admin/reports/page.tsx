@@ -80,54 +80,65 @@ export default function AdminReportsPage() {
   const cards = useMemo(() => {
     const summary = reports?.summary;
     return [
-      { key: "revenue", title: "Toplam Gelir", value: formatCurrency(summary?.totalRevenue || 0), accent: "text-emerald-300" },
-      { key: "orders", title: "Toplam Sipariş", value: String(summary?.totalOrders || 0), accent: "text-cyan-300" },
-      { key: "avg", title: "Ortalama Sepet", value: formatCurrency(summary?.averageOrderValue || 0), accent: "text-indigo-300" },
-      { key: "campaigns", title: "Aktif Kampanya", value: String(summary?.activeCampaigns || 0), accent: "text-amber-300" },
+      { key: "revenue", title: "Toplam Gelir", value: formatCurrency(summary?.totalRevenue || 0), accent: "text-emerald-600" },
+      { key: "orders", title: "Toplam Sipariş", value: String(summary?.totalOrders || 0), accent: "text-indigo-600" },
+      { key: "avg", title: "Ortalama Sepet", value: formatCurrency(summary?.averageOrderValue || 0), accent: "text-blue-600" },
+      { key: "campaigns", title: "Aktif Kampanya", value: String(summary?.activeCampaigns || 0), accent: "text-amber-600" },
     ];
   }, [reports]);
 
   return (
-    <section className="space-y-6 flex flex-col gap-4" >
-      <div className="rounded-3xl border border-white/10 bg-slate-900/75 p-5 shadow-[0_24px_70px_rgba(2,6,23,0.6)] backdrop-blur-2xl sm:p-6">
-        <h2 className="text-2xl font-black text-white">Raporlar</h2>
-        <p className="mt-1 text-sm text-slate-400">Satış, sipariş ve ürün performans özetleri.</p>
-      </div>
+    <section className="flex flex-col gap-6">
+      {/* Başlık Kartı */}
+      <header className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h2 className="text-xl font-bold text-slate-900">Raporlar ve Analizler</h2>
+        <p className="mt-1 text-sm text-slate-500">Satış performansınız, sipariş durumlarınız ve ürün başarı özetleriniz.</p>
+      </header>
 
-      {errorMessage && <p className="text-sm text-rose-300">{errorMessage}</p>}
+      {errorMessage && (
+        <div className="rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm font-medium text-rose-700">
+          {errorMessage}
+        </div>
+      )}
 
+      {/* Özet Kartları */}
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {cards.map((card) => (
-          <article key={card.key} className="rounded-2xl border border-white/10 bg-white/5 p-4">
-            <p className="text-xs uppercase tracking-[0.14em] text-slate-400">{card.title}</p>
-            <p className={`mt-2 text-2xl font-black ${card.accent}`}>{isLoading ? "..." : card.value}</p>
+          <article key={card.key} className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:shadow-md">
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">{card.title}</p>
+            <p className={`mt-2 text-2xl font-bold tracking-tight ${card.accent}`}>
+              {isLoading ? "..." : card.value}
+            </p>
           </article>
         ))}
       </div>
 
       <div className="grid gap-6 xl:grid-cols-2">
-        <article className="rounded-3xl border border-white/10 bg-slate-900/75 p-5 shadow-[0_24px_70px_rgba(2,6,23,0.6)] backdrop-blur-2xl sm:p-6">
-          <h3 className="text-lg font-bold text-white">Sipariş Durum Dağılımı</h3>
-          <div className="mt-4 overflow-x-auto">
-            <table className="min-w-full border-separate border-spacing-y-2">
-              <thead>
+        {/* Sipariş Durum Tablosu */}
+        <article className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+          <div className="p-5 border-b border-slate-100 bg-slate-50/50">
+            <h3 className="text-lg font-bold text-slate-900">Sipariş Durum Dağılımı</h3>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-slate-200">
+              <thead className="bg-slate-50">
                 <tr>
-                  <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Durum</th>
-                  <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Adet</th>
-                  <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Tutar</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Durum</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Adet</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Tutar</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-slate-200 bg-white">
                 {(reports?.statusBreakdown?.length || 0) === 0 ? (
                   <tr>
-                    <td colSpan={3} className="px-3 py-4 text-sm text-slate-300">Veri bulunamadı.</td>
+                    <td colSpan={3} className="px-6 py-8 text-center text-sm text-slate-500">Veri bulunamadı.</td>
                   </tr>
                 ) : (
                   reports?.statusBreakdown.map((item) => (
-                    <tr key={item.status} className="rounded-xl border border-white/10 bg-white/5">
-                      <td className="rounded-l-xl px-3 py-3 text-sm text-white">{item.status}</td>
-                      <td className="px-3 py-3 text-sm text-slate-200">{item.count}</td>
-                      <td className="rounded-r-xl px-3 py-3 text-sm text-yellow-300">{formatCurrency(item.revenue)}</td>
+                    <tr key={item.status} className="hover:bg-slate-50 transition-colors">
+                      <td className="px-6 py-4 text-sm font-medium text-slate-900">{item.status}</td>
+                      <td className="px-6 py-4 text-sm text-slate-600">{item.count}</td>
+                      <td className="px-6 py-4 text-sm font-bold text-indigo-700">{formatCurrency(item.revenue)}</td>
                     </tr>
                   ))
                 )}
@@ -136,28 +147,31 @@ export default function AdminReportsPage() {
           </div>
         </article>
 
-        <article className="rounded-3xl border border-white/10 bg-slate-900/75 p-5 shadow-[0_24px_70px_rgba(2,6,23,0.6)] backdrop-blur-2xl sm:p-6">
-          <h3 className="text-lg font-bold text-white">En Çok Ciro Üreten Ürünler</h3>
-          <div className="mt-4 overflow-x-auto">
-            <table className="min-w-full border-separate border-spacing-y-2">
-              <thead>
+        {/* Top Ürünler Tablosu */}
+        <article className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+          <div className="p-5 border-b border-slate-100 bg-slate-50/50">
+            <h3 className="text-lg font-bold text-slate-900">En Çok Ciro Üreten Ürünler</h3>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-slate-200">
+              <thead className="bg-slate-50">
                 <tr>
-                  <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Ürün</th>
-                  <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Adet</th>
-                  <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Ciro</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Ürün</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Adet</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Ciro</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-slate-200 bg-white">
                 {(reports?.topProducts?.length || 0) === 0 ? (
                   <tr>
-                    <td colSpan={3} className="px-3 py-4 text-sm text-slate-300">Veri bulunamadı.</td>
+                    <td colSpan={3} className="px-6 py-8 text-center text-sm text-slate-500">Veri bulunamadı.</td>
                   </tr>
                 ) : (
                   reports?.topProducts.map((item, index) => (
-                    <tr key={`${item.productName}-${index}`} className="rounded-xl border border-white/10 bg-white/5">
-                      <td className="rounded-l-xl px-3 py-3 text-sm text-white">{item.productName || "-"}</td>
-                      <td className="px-3 py-3 text-sm text-slate-200">{item.totalQuantity}</td>
-                      <td className="rounded-r-xl px-3 py-3 text-sm text-yellow-300">{formatCurrency(item.totalRevenue)}</td>
+                    <tr key={`${item.productName}-${index}`} className="hover:bg-slate-50 transition-colors">
+                      <td className="px-6 py-4 text-sm font-medium text-slate-900">{item.productName || "-"}</td>
+                      <td className="px-6 py-4 text-sm text-slate-600">{item.totalQuantity}</td>
+                      <td className="px-6 py-4 text-sm font-bold text-emerald-700">{formatCurrency(item.totalRevenue)}</td>
                     </tr>
                   ))
                 )}

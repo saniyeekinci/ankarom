@@ -1,143 +1,156 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { 
+  ShieldCheckIcon, 
+  UserGroupIcon, 
+  WrenchScrewdriverIcon, 
+  GlobeAltIcon,
+  ArrowUpRightIcon
+} from "@heroicons/react/24/outline";
 
-const principles = [
-  {
-    title: "Operasyon Öncelikli",
-    text: "Gerçek saha ihtiyaçlarını merkeze alır, sadece estetik değil ölçülebilir fayda üretiriz.",
-  },
-  {
-    title: "Yalın ve Hızlı",
-    text: "Karmaşık süreçleri sadeleştirir, ekiplerin daha kısa sürede daha doğru karar almasını sağlarız.",
-  },
-  {
-    title: "Sürekli Evrim",
-    text: "Platformumuzu müşteri geri bildirimiyle sürekli geliştirir, canlı bir ürün yaklaşımıyla ilerleriz.",
-  },
+const stats = [
+  { label: "Yıllık Üretim", value: "1.500+" },
+  { label: "Deneyim", value: "20 Yıl" },
+  { label: "Mutlu Müşteri", value: "5.000+" },
+  { label: "İhracat", value: "12 Ülke" },
 ];
 
-const milestones = [
-  { year: "2018", label: "Temel Atıldı", detail: "Ankarom, otomotiv operasyonlarını dijitalleştirme hedefiyle kuruldu." },
-  { year: "2020", label: "İlk Kurumsal Yayın", detail: "Filo ve servis süreçlerini birleştiren ilk platform sürümü devreye alındı." },
-  { year: "2023", label: "Modüler Büyüme", detail: "Yedek parça, raporlama ve müşteri yönetimi modülleri aktif kullanıma geçti." },
-  { year: "2026", label: "Yeni Nesil Deneyim", detail: "Hız, sadelik ve kurumsal UX odağıyla platform baştan tasarlandı." },
-];
-
-export default function HakkimizdaPage() {
+export default function AboutPage() {
   return (
-    <section className="w-full bg-slate-950 py-10 text-slate-100 sm:py-14 lg:py-20">
-      <div className="mx-auto grid w-full max-w-360 grid-cols-1 gap-y-24 px-6 md:px-12 lg:gap-y-28">
-        <header className="grid gap-8 rounded-3xl border border-white/10 bg-slate-900/55 p-6 shadow-[0_24px_70px_rgba(2,6,23,0.45)] sm:p-8 lg:grid-cols-12 lg:gap-10 lg:p-10">
-          <div className="lg:col-span-8">
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">About Ankarom</p>
-            <h1 className="mt-4 text-4xl font-black leading-[1.14] sm:text-5xl sm:leading-[1.12] lg:text-6xl lg:leading-[1.1]">
-              Operasyonu sadeleştiren,
-              <br />
-              veriyi eyleme dönüştüren
-              <br />
-              bir teknoloji ekibiyiz.
-            </h1>
-            <p className="mt-6 max-w-3xl text-base leading-relaxed text-slate-300 sm:text-lg">
-              Ankarom; filo, servis, yedek parça ve müşteri süreçlerini tek bir akışta birleştirir. Hedefimiz sadece
-              yazılım sunmak değil, ekiplerin günlük karar hızını somut şekilde artırmaktır.
-            </p>
-          </div>
-          <div className="grid gap-8 lg:col-span-4">
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-              <p className="text-[11px] uppercase tracking-[0.18em] text-slate-400">Aktif Müşteri</p>
-              <p className="mt-1 text-3xl font-black">240+</p>
+    <main className="bg-[#fcfcfc] text-slate-900">
+      
+      {/* SECTION 1: MINIMALIST HERO */}
+      <section className="relative pt-20 pb-16 lg:pt-32 lg:pb-24 px-6">
+        <div className="mx-auto max-w-7xl">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-end">
+            <div>
+              <div className="flex items-center gap-3 mb-6">
+                <span className="h-px w-12 bg-indigo-600"></span>
+                <span className="text-xs font-bold uppercase tracking-[0.3em] text-indigo-600">Biz Kimiz?</span>
+              </div>
+              <h1 className="text-5xl lg:text-7xl font-extrabold tracking-tighter leading-[0.95] text-slate-900">
+                Metale Form, <br />
+                <span className="text-slate-400">Lojistiğe Güven</span> <br />
+                Veriyoruz.
+              </h1>
             </div>
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-              <p className="text-[11px] uppercase tracking-[0.18em] text-slate-400">Canlı Entegrasyon</p>
-              <p className="mt-1 text-3xl font-black">17</p>
-            </div>
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-              <p className="text-[11px] uppercase tracking-[0.18em] text-slate-400">Süreklilik</p>
-              <p className="mt-1 text-3xl font-black">99.9%</p>
+            <div className="lg:pb-4">
+              <p className="text-lg lg:text-xl text-slate-500 leading-relaxed max-w-md">
+                Ankara'da başlayan yolculuğumuzda, bugün Türkiye'nin en dayanıklı römorklarını üreten bir teknoloji üssüne dönüştük.
+              </p>
             </div>
           </div>
-        </header>
+        </div>
+      </section>
 
-        <div className="grid items-stretch gap-12 lg:grid-cols-12 lg:gap-14">
-          <article className="relative overflow-hidden rounded-3xl border border-white/10 bg-slate-900/55 shadow-[0_24px_70px_rgba(2,6,23,0.45)] lg:col-span-7">
-            <div className="relative h-full min-h-95 w-full">
-              <Image
-                src="/products/service-planning-v2.jpg"
-                alt="Ankarom operasyon yönetim yaklaşımı"
-                fill
-                sizes="(max-width: 1024px) 100vw, 60vw"
-                className="object-cover"
-              />
-              <div className="absolute inset-0 bg-linear-to-t from-slate-900/80 via-slate-900/30 to-transparent" />
-              <div className="absolute bottom-0 p-6 sm:p-8">
-                <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-200">Misyon</p>
-                <p className="mt-3 max-w-xl text-2xl font-bold leading-tight text-white sm:text-3xl">
-                  Saha gerçekliğine uygun, hızlı öğrenilen ve kalıcı verimlilik üreten platformlar inşa etmek.
+      {/* SECTION 2: THE IMAGE BOX */}
+      <section className="px-6 mb-24">
+        <div className="mx-auto max-w-7xl">
+          <div className="relative h-[400px] lg:h-[600px] w-full overflow-hidden rounded-[40px] shadow-2xl">
+            <Image
+              src="/images/factory-bg.jpg"
+              alt="Ankarom Üretim"
+              fill
+              className="object-cover scale-105 hover:scale-100 transition-transform duration-1000"
+              priority
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent" />
+            <div className="absolute bottom-10 left-10 text-white">
+              <p className="text-sm font-medium opacity-80 uppercase tracking-widest mb-2">Üretim Tesisimiz</p>
+              <h2 className="text-2xl font-bold">Ankara Kahramankazan Endüstri Bölgesi</h2>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* SECTION 3: STATS STRIP */}
+      <section className="bg-slate-900 py-16 px-6">
+        <div className="mx-auto max-w-7xl">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-12">
+            {stats.map((stat, i) => (
+              <div key={i} className="text-center lg:text-left">
+                <p className="text-5xl font-black text-white tracking-tighter mb-2">{stat.value}</p>
+                <p className="text-xs font-bold uppercase tracking-widest text-indigo-400">{stat.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* SECTION 4: CURATED CONTENT */}
+      <section className="py-24 lg:py-32 px-6">
+        <div className="mx-auto max-w-7xl">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-16 lg:gap-24">
+            
+            <div className="lg:col-span-1">
+              <h3 className="text-3xl font-bold tracking-tight mb-6">Vizyonumuz</h3>
+              <p className="text-slate-600 leading-relaxed mb-8">
+                Sadece römork üretmiyoruz; taşımacılığın standartlarını yeniden tanımlıyoruz. Her tasarımımızda güvenlik, hafiflik ve maksimum taşıma kapasitesini optimize ediyoruz.
+              </p>
+              <Link href="/urunler" className="group flex items-center gap-3 text-indigo-600 font-bold">
+                <span>Üretim Kataloğuna Git</span>
+                <ArrowUpRightIcon className="h-5 w-5 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
+              </Link>
+            </div>
+
+            <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-12">
+              <div className="space-y-4">
+                <div className="h-10 w-10 text-indigo-600"><WrenchScrewdriverIcon /></div>
+                <h4 className="text-xl font-bold">İleri Mühendislik</h4>
+                <p className="text-sm text-slate-500 leading-relaxed">
+                  3D modelleme ve stres testleriyle, römorklarımızın ömrünü rakiplerimizden %40 daha uzun kılıyoruz.
+                </p>
+              </div>
+              <div className="space-y-4">
+                <div className="h-10 w-10 text-indigo-600"><ShieldCheckIcon /></div>
+                <h4 className="text-xl font-bold">Global Standartlar</h4>
+                <p className="text-sm text-slate-500 leading-relaxed">
+                  Tüm ürünlerimiz Avrupa Birliği Tip Onay belgelerine sahiptir. Sınır ötesi taşımada tam uyumluluk sağlar.
+                </p>
+              </div>
+              <div className="space-y-4">
+                <div className="h-10 w-10 text-indigo-600"><UserGroupIcon /></div>
+                <h4 className="text-xl font-bold">Usta İşçilik</h4>
+                <p className="text-sm text-slate-500 leading-relaxed">
+                  Robotik üretimle geleneksel el ustalığını birleştirerek hatasız kaynak ve montaj kalitesi sunuyoruz.
+                </p>
+              </div>
+              <div className="space-y-4">
+                <div className="h-10 w-10 text-indigo-600"><GlobeAltIcon /></div>
+                <h4 className="text-xl font-bold">Hızlı Lojistik</h4>
+                <p className="text-sm text-slate-500 leading-relaxed">
+                  Kendi lojistik ağımızla Türkiye'nin 81 iline ve komşu ülkelere kapıdan kapıya teslimat yapıyoruz.
                 </p>
               </div>
             </div>
-          </article>
 
-          <aside className="flex h-full flex-col rounded-3xl border border-white/10 bg-slate-900/55 p-6 shadow-[0_24px_70px_rgba(2,6,23,0.45)] sm:p-8 lg:col-span-5">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Prensiplerimiz</p>
-            <div className="mt-8 space-y-8 lg:space-y-9">
-              {principles.map((item) => (
-                <article key={item.title} className="rounded-2xl border border-white/10 bg-white/5 p-5">
-                  <h3 className="text-lg font-bold text-white">{item.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-slate-300">{item.text}</p>
-                </article>
-              ))}
-            </div>
-          </aside>
+          </div>
         </div>
+      </section>
 
-        <section className="mb-10 rounded-3xl border border-white/10 bg-slate-900/55 p-6 shadow-[0_24px_70px_rgba(2,6,23,0.45)] sm:mb-12 sm:p-8 lg:mb-14 lg:p-10">
-          <div className="mb-10 flex flex-wrap items-end justify-between gap-5 sm:mb-12">
-            <h2 className="text-3xl font-black sm:text-4xl">Yolculuk</h2>
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-400">2018 — 2026</p>
-          </div>
-
-          <div className="border-l-2 border-white/15 pl-5 sm:pl-7">
-            <div className="grid gap-6 sm:gap-7">
-              {milestones.map((item) => (
-                <article key={item.year} className="relative rounded-2xl border border-white/15 bg-white/5 p-5 shadow-[0_8px_24px_rgba(2,6,23,0.2)]">
-                  <span className="absolute -left-9.5 top-6 h-4 w-4 rounded-full border-2 border-slate-950 bg-amber-300" />
-                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">{item.year}</p>
-                  <h3 className="mt-2 text-xl font-bold">{item.label}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-slate-300">{item.detail}</p>
-                </article>
-              ))}
+      {/* SECTION 5: SIGNATURE CTA */}
+      <section className="pb-32 px-6">
+        <div className="mx-auto max-w-7xl bg-indigo-50 rounded-[50px] p-12 lg:p-24 relative overflow-hidden">
+          <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/4 h-96 w-96 rounded-full bg-indigo-200/50 blur-3xl" />
+          
+          <div className="relative z-10 max-w-2xl">
+            <h2 className="text-4xl lg:text-6xl font-extrabold tracking-tight text-slate-900 mb-8">
+              Profesyonel bir <br /> çözüm ortağı mı <br /> arıyorsunuz?
+            </h2>
+            <div className="flex flex-wrap gap-4">
+              <Link href="/iletisim" className="bg-indigo-600 text-white px-10 py-5 rounded-2xl font-bold text-lg hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-200 active:scale-95">
+                Bize Yazın
+              </Link>
+              <Link href="/bayilik" className="bg-white text-slate-900 px-10 py-5 rounded-2xl font-bold text-lg border border-slate-200 hover:bg-slate-50 transition-all">
+                Bayilik Başvurusu
+              </Link>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        <section className="rounded-3xl border border-slate-900 bg-slate-900 p-6 text-white shadow-[0_24px_70px_rgba(15,23,42,0.28)] sm:p-8 lg:p-10">
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-amber-300">Birlikte Çalışalım</p>
-          <h2 className="mt-3 text-3xl font-black leading-tight sm:text-4xl">
-            Operasyonuna uygun çözümü
-            <br />
-            birlikte planlayalım.
-          </h2>
-          <p className="mt-4 max-w-3xl text-sm leading-relaxed text-slate-300 sm:text-base">
-            Sektörünüz, operasyon hacminiz ve ekip yapınıza göre en doğru modül kombinasyonunu kısa bir keşif
-            görüşmesiyle netleştirelim.
-          </p>
-          <div className="mt-7 flex flex-wrap gap-3">
-            <Link
-              href="/iletisim"
-              className="rounded-xl border border-amber-400 bg-amber-500 px-6 py-3 text-sm font-black uppercase tracking-[0.14em] text-slate-950 transition-colors hover:bg-amber-400"
-            >
-              Keşif Görüşmesi Al
-            </Link>
-            <Link
-              href="/"
-              className="rounded-xl border border-white/25 bg-white/5 px-6 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-white transition-colors hover:bg-white/10"
-            >
-              Anasayfa
-            </Link>
-          </div>
-        </section>
-      </div>
-    </section>
+    </main>
   );
 }

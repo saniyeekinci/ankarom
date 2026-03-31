@@ -63,72 +63,86 @@ export default function AdminStockPage() {
   }, [fetchStock, threshold]);
 
   return (
-    <section className="space-y-6 flex flex-col gap-4">
-      <div className=" rounded-3xl border border-white/10 bg-slate-900/75 p-5 shadow-[0_24px_70px_rgba(2,6,23,0.6)] backdrop-blur-2xl sm:p-6">
-        <h2 className="text-2xl font-black text-white">Kritik Stok Takibi</h2>
-        <p className="mt-1 text-sm text-slate-400">Stoku belirlenen eşik değerinin altında kalan ürünleri görüntüleyin.</p>
+    <section className="flex flex-col gap-6">
+      {/* Üst Başlık ve Filtreleme Kartı */}
+      <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h2 className="text-xl font-bold text-slate-900">Kritik Stok Takibi</h2>
+        <p className="mt-1 text-sm text-slate-500">Stoku belirlenen eşik değerinin altında kalan ürünleri yönetin.</p>
 
-        <div className="mt-5 flex flex-wrap items-end gap-3">
-          <label className="flex flex-col gap-2">
-            <span className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Eşik Değeri</span>
+        <div className="mt-6 flex flex-wrap items-end gap-4">
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold uppercase tracking-wider text-slate-500">Eşik Değeri</label>
             <input
               type="number"
               min="1"
               value={threshold}
               onChange={(event) => setThreshold(event.target.value)}
-              className="w-36 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none"
+              className="block w-36 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-colors"
             />
-          </label>
+          </div>
+          
           <button
             type="button"
             onClick={() => fetchStock(threshold)}
-            className="rounded-xl border border-cyan-300/30 bg-cyan-500/10 px-4 py-2 text-sm font-semibold text-cyan-100"
+            className="inline-flex items-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
           >
             Listeyi Güncelle
           </button>
-          <div className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-slate-300">
-            Kritik Ürün Sayısı: <span className="font-bold text-rose-200">{data?.count ?? 0}</span>
+
+          <div className="inline-flex items-center rounded-lg border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-medium text-slate-700">
+            Kritik Ürün Sayısı: <span className="ml-2 font-bold text-rose-600">{data?.count ?? 0}</span>
           </div>
         </div>
       </div>
 
-      <div className="overflow-x-auto rounded-3xl border border-white/10 bg-slate-900/75 p-4 shadow-[0_24px_70px_rgba(2,6,23,0.6)] backdrop-blur-2xl sm:p-6">
-        {errorMessage && <p className="mb-4 text-sm text-rose-300">{errorMessage}</p>}
+      {/* Veri Tablosu Kartı */}
+      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+        {errorMessage && (
+          <div className="m-4 rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm font-medium text-rose-700">
+            {errorMessage}
+          </div>
+        )}
 
-        <table className="min-w-full border-separate border-spacing-y-2">
-          <thead>
-            <tr>
-              <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Ürün</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Kategori</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Fiyat</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Stok</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Son Güncelleme</th>
-            </tr>
-          </thead>
-          <tbody>
-            {isLoading ? (
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-slate-200">
+            <thead className="bg-slate-50">
               <tr>
-                <td colSpan={5} className="px-3 py-4 text-sm text-slate-300">Stok verisi yükleniyor...</td>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Ürün</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Kategori</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Fiyat</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Stok</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Son Güncelleme</th>
               </tr>
-            ) : !data || data.products.length === 0 ? (
-              <tr>
-                <td colSpan={5} className="px-3 py-4 text-sm text-slate-300">Kritik stokta ürün bulunamadı.</td>
-              </tr>
-            ) : (
-              data.products.map((product) => (
-                <tr key={product._id} className="rounded-xl border border-white/10 bg-white/5">
-                  <td className="rounded-l-xl px-3 py-3 text-sm font-semibold text-white">{product.name}</td>
-                  <td className="px-3 py-3 text-sm text-slate-300">{product.category || "Genel"}</td>
-                  <td className="px-3 py-3 text-sm font-semibold text-yellow-300">{formatCurrency(product.price || 0)}</td>
-                  <td className="px-3 py-3 text-sm font-bold text-rose-200">{product.stock}</td>
-                  <td className="rounded-r-xl px-3 py-3 text-sm text-slate-400">
-                    {product.updatedAt ? new Date(product.updatedAt).toLocaleDateString("tr-TR") : "-"}
-                  </td>
+            </thead>
+            <tbody className="divide-y divide-slate-200 bg-white">
+              {isLoading ? (
+                <tr>
+                  <td colSpan={5} className="px-6 py-8 text-center text-sm text-slate-500">Stok verisi yükleniyor...</td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : !data || data.products.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="px-6 py-8 text-center text-sm text-slate-500">Kritik stokta ürün bulunamadı.</td>
+                </tr>
+              ) : (
+                data.products.map((product) => (
+                  <tr key={product._id} className="transition-colors hover:bg-slate-50">
+                    <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-slate-900">{product.name}</td>
+                    <td className="whitespace-nowrap px-6 py-4 text-sm text-slate-500">{product.category || "Genel"}</td>
+                    <td className="whitespace-nowrap px-6 py-4 text-sm font-semibold text-slate-900">{formatCurrency(product.price || 0)}</td>
+                    <td className="whitespace-nowrap px-6 py-4 text-sm">
+                      <span className="inline-flex items-center rounded-md bg-rose-50 px-2 py-1 text-sm font-bold text-rose-700 ring-1 ring-inset ring-rose-600/10">
+                        {product.stock} Adet
+                      </span>
+                    </td>
+                    <td className="whitespace-nowrap px-6 py-4 text-sm text-slate-500">
+                      {product.updatedAt ? new Date(product.updatedAt).toLocaleDateString("tr-TR") : "-"}
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </section>
   );

@@ -55,7 +55,7 @@ export default function PaymentPage() {
 
         <div className="grid items-start gap-6 lg:grid-cols-12">
           {/* SOL TARAF: Fatura Bilgileri (Orijinal Yapı Korundu) */}
-          <article className="flex flex-col gap-4 rounded-3xl border border-white/10 bg-linear-to-b from-slate-900/75 to-slate-950/85 p-5 shadow-[0_24px_70px_rgba(2,6,23,0.6)] backdrop-blur-2xl lg:col-span-8 lg:p-6">
+          <article className="flex flex-col gap-4 rounded-3xl border border-white/10  p-5  backdrop-blur-2xl lg:col-span-8 lg:p-6">
             <h2 className="text-xl font-bold text-white sm:text-2xl">Fatura Bilgileri</h2>
 
             <form className="flex flex-col gap-4 mt-6 space-y-5">
@@ -196,10 +196,7 @@ export default function PaymentPage() {
                 <input type="email" className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white outline-none transition-all focus:border-cyan-400/70" />
               </div>
 
-              <label className="flex items-center gap-2 text-xs text-slate-300 cursor-pointer">
-                <input type="checkbox" className="h-4 w-4 rounded border-white/20 bg-white/5 accent-cyan-500" />
-                Kampanya ve duyuru e-postaları almak istiyorum (opsiyonel)
-              </label>
+              
             </form>
           </article>
 
@@ -244,10 +241,11 @@ export default function PaymentPage() {
               </div>
 
               {/* Ödeme Bilgileri Kartı - İYİLEŞTİRİLMİŞ VERSİYON */}
-<div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-5 shadow-inner">
-  <div className="flex items-center gap-2 mb-4">
-    <div className="h-2 w-2 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.8)]" />
-    <span className="text-[11px] font-bold uppercase tracking-widest text-slate-200">Kart Bilgileri</span>
+<div className="mt-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+  {/* Başlık ve İndikatör */}
+  <div className="flex items-center gap-2 mb-5">
+    <div className="h-2 w-2 rounded-full bg-indigo-600" />
+    <span className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Kart Bilgileri</span>
   </div>
 
   <div className="flex flex-col gap-3">
@@ -257,14 +255,14 @@ export default function PaymentPage() {
         <input 
           type="text" 
           placeholder="Ad" 
-          className="w-full rounded-xl border border-white/5 bg-slate-950/50 px-4 py-3 text-sm text-white placeholder:text-slate-600 outline-none transition-all focus:border-cyan-500/50 focus:bg-slate-950" 
+          className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition-all focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" 
         />
       </div>
       <div className="flex flex-col gap-1.5">
         <input 
           type="text" 
           placeholder="Soyad" 
-          className="w-full rounded-xl border border-white/5 bg-slate-950/50 px-4 py-3 text-sm text-white placeholder:text-slate-600 outline-none transition-all focus:border-cyan-500/50 focus:bg-slate-950" 
+          className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition-all focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" 
         />
       </div>
     </div>
@@ -274,10 +272,10 @@ export default function PaymentPage() {
       <input 
         type="text" 
         placeholder="0000 0000 0000 0000" 
-        className="w-full rounded-xl border border-white/5 bg-slate-950/50 px-4 py-3 text-sm text-white tracking-[0.15em] placeholder:text-slate-600 outline-none transition-all focus:border-cyan-500/50 focus:bg-slate-950" 
+        className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 tracking-[0.15em] placeholder:text-slate-400 outline-none transition-all focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" 
       />
       <div className="absolute right-4 top-1/2 -translate-y-1/2">
-        <svg className="w-6 h-6 text-slate-500" viewBox="0 0 24 24" fill="currentColor">
+        <svg className="w-6 h-6 text-slate-400" viewBox="0 0 24 24" fill="currentColor">
           <path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/>
         </svg>
       </div>
@@ -295,13 +293,13 @@ export default function PaymentPage() {
           const digits = target.value.replace(/\D/g, "").slice(0, 4);
           target.value = digits.length > 2 ? `${digits.slice(0, 2)}/${digits.slice(2)}` : digits;
         }}
-        className="w-full rounded-xl border border-white/5 bg-slate-950/50 px-4 py-3 text-sm text-white text-center placeholder:text-slate-600 outline-none transition-all focus:border-cyan-500/50 focus:bg-slate-950" 
+        className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 text-center placeholder:text-slate-400 outline-none transition-all focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" 
       />
       <input 
         type="password" 
         placeholder="CVV" 
         maxLength={3}
-        className="w-full rounded-xl border border-white/5 bg-slate-950/50 px-4 py-3 text-sm text-white text-center placeholder:text-slate-600 outline-none transition-all focus:border-cyan-400/50 focus:bg-slate-950" 
+        className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 text-center placeholder:text-slate-400 outline-none transition-all focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" 
       />
     </div>
   </div>

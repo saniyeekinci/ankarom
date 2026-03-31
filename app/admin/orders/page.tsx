@@ -29,10 +29,10 @@ const formatCurrency = (value: number) =>
   }).format(value);
 
 const statusClassMap: Record<string, string> = {
-  Hazırlanıyor: "border-amber-300/30 bg-amber-500/10 text-amber-200",
-  Kargolandı: "border-cyan-300/30 bg-cyan-500/10 text-cyan-200",
-  "Teslim Edildi": "border-emerald-300/30 bg-emerald-500/10 text-emerald-200",
-  "İptal Edildi": "border-rose-300/30 bg-rose-500/10 text-rose-200",
+  Hazırlanıyor: "bg-amber-100 text-amber-700 border-amber-200",
+  Kargolandı: "bg-blue-100 text-blue-700 border-blue-200",
+  "Teslim Edildi": "bg-emerald-100 text-emerald-700 border-emerald-200",
+  "İptal Edildi": "bg-rose-100 text-rose-700 border-rose-200",
 };
 
 export default function AdminOrdersPage() {
@@ -74,6 +74,7 @@ export default function AdminOrdersPage() {
   }, [token]);
 
   const totalOrderAmount = useMemo(() => orders.reduce((sum, order) => sum + (order.totalAmount || 0), 0), [orders]);
+  
   const filteredOrders = useMemo(() => {
     const query = searchQuery.trim().toLocaleLowerCase("tr-TR");
 
@@ -98,97 +99,111 @@ export default function AdminOrdersPage() {
   }, [orders, searchQuery, statusFilter, sortOrder]);
 
   return (
-    <section className="space-y-6 flex flex-col gap-4">
-      <div className="rounded-3xl border border-white/10 bg-slate-900/75 p-5 shadow-[0_24px_70px_rgba(2,6,23,0.6)] backdrop-blur-2xl sm:p-6">
-        <h2 className="text-2xl font-black text-white">Sipariş Yönetimi</h2>
-        <p className="mt-1 text-sm text-slate-400">Tüm kullanıcı siparişlerini tek panelden yönetin.</p>
+    <section className="flex flex-col gap-6">
+      {/* Üst Başlık ve Özet Kartları */}
+      <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h2 className="text-xl font-bold text-slate-900">Sipariş Yönetimi</h2>
+        <p className="mt-1 text-sm text-slate-500">Tüm kullanıcı siparişlerini tek panelden takip edin ve yönetin.</p>
 
-        <div className="mt-4 grid gap-4 sm:grid-cols-2">
-          <article className="rounded-2xl border border-white/10 bg-white/5 p-4">
-            <p className="text-xs uppercase tracking-[0.14em] text-slate-400">Toplam Sipariş</p>
-            <p className="mt-2 text-2xl font-black text-white">{orders.length}</p>
+        <div className="mt-6 grid gap-4 sm:grid-cols-2">
+          <article className="rounded-xl border border-slate-100 bg-slate-50 p-4">
+            <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Toplam Sipariş Adedi</p>
+            <p className="mt-1 text-2xl font-bold text-slate-900">{orders.length} Adet</p>
           </article>
-          <article className="rounded-2xl border border-white/10 bg-white/5 p-4">
-            <p className="text-xs uppercase tracking-[0.14em] text-slate-400">Toplam Tutar</p>
-            <p className="mt-2 text-2xl font-black text-yellow-300">{formatCurrency(totalOrderAmount)}</p>
+          <article className="rounded-xl border border-slate-100 bg-slate-50 p-4">
+            <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Toplam Ciro</p>
+            <p className="mt-1 text-2xl font-bold text-indigo-600">{formatCurrency(totalOrderAmount)}</p>
           </article>
         </div>
       </div>
 
-      <div className="overflow-x-auto rounded-3xl border border-white/10 bg-slate-900/75 p-4 shadow-[0_24px_70px_rgba(2,6,23,0.6)] backdrop-blur-2xl sm:p-6">
-        {errorMessage && <p className="mb-4 text-sm text-rose-300">{errorMessage}</p>}
+      {/* Filtreleme ve Tablo Alanı */}
+      <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+        {errorMessage && (
+          <div className="m-6 rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm font-medium text-rose-700">
+            {errorMessage}
+          </div>
+        )}
 
-        <div className="mb-4 grid gap-3 rounded-2xl border border-white/10 bg-white/5 p-4 md:grid-cols-3">
+        {/* Filtreler */}
+        <div className="grid gap-3 p-6 border-b border-slate-100 md:grid-cols-3">
           <input
             type="text"
             value={searchQuery}
             onChange={(event) => setSearchQuery(event.target.value)}
-            placeholder="Sipariş no, müşteri adı veya e-posta ara"
-            className="rounded-xl border border-white/10 bg-slate-950/60 px-3 py-2.5 text-sm text-white placeholder:text-slate-400 outline-none focus:border-cyan-400/70"
+            placeholder="Sipariş no, müşteri adı veya e-posta..."
+            className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-colors"
           />
           <select
             value={statusFilter}
             onChange={(event) => setStatusFilter(event.target.value as "all" | AdminOrder["status"])}
-            className="rounded-xl border border-white/10 bg-slate-950/60 px-3 py-2.5 text-sm text-white outline-none focus:border-cyan-400/70"
+            className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none transition-colors"
           >
-            <option value="all" className="bg-slate-900">Tüm Durumlar</option>
-            <option value="Hazırlanıyor" className="bg-slate-900">Hazırlanıyor</option>
-            <option value="Kargolandı" className="bg-slate-900">Kargolandı</option>
-            <option value="Teslim Edildi" className="bg-slate-900">Teslim Edildi</option>
-            <option value="İptal Edildi" className="bg-slate-900">İptal Edildi</option>
+            <option value="all">Tüm Durumlar</option>
+            <option value="Hazırlanıyor">Hazırlanıyor</option>
+            <option value="Kargolandı">Kargolandı</option>
+            <option value="Teslim Edildi">Teslim Edildi</option>
+            <option value="İptal Edildi">İptal Edildi</option>
           </select>
           <select
             value={sortOrder}
             onChange={(event) => setSortOrder(event.target.value as "newest" | "oldest")}
-            className="rounded-xl border border-white/10 bg-slate-950/60 px-3 py-2.5 text-sm text-white outline-none focus:border-cyan-400/70"
+            className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none transition-colors"
           >
-            <option value="newest" className="bg-slate-900">En Yeni</option>
-            <option value="oldest" className="bg-slate-900">En Eski</option>
+            <option value="newest">En Yeni İlk</option>
+            <option value="oldest">En Eski İlk</option>
           </select>
         </div>
 
-        <table className="min-w-full border-separate border-spacing-y-2">
-          <thead>
-            <tr>
-              <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Sipariş</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Müşteri</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Ürün Sayısı</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Toplam</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Durum</th>
-            </tr>
-          </thead>
-          <tbody>
-            {isLoading ? (
+        {/* Tablo */}
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-slate-200">
+            <thead className="bg-slate-50">
               <tr>
-                <td colSpan={5} className="px-3 py-4 text-sm text-slate-300">Siparişler yükleniyor...</td>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Sipariş</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Müşteri</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Ürün Sayısı</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Toplam Tutar</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Durum</th>
               </tr>
-            ) : filteredOrders.length === 0 ? (
-              <tr>
-                <td colSpan={5} className="px-3 py-4 text-sm text-slate-300">Filtreye uygun sipariş bulunamadı.</td>
-              </tr>
-            ) : (
-              filteredOrders.map((order) => (
-                <tr key={order._id} className="rounded-xl border border-white/10 bg-white/5">
-                  <td className="rounded-l-xl px-3 py-3 text-sm text-white">
-                    <p className="font-semibold">#{order._id.slice(-6).toUpperCase()}</p>
-                    <p className="text-xs text-slate-400">{new Date(order.createdAt).toLocaleDateString("tr-TR")}</p>
-                  </td>
-                  <td className="px-3 py-3 text-sm text-slate-200">
-                    <p>{order.user?.name || "-"}</p>
-                    <p className="text-xs text-slate-400">{order.user?.email || "-"}</p>
-                  </td>
-                  <td className="px-3 py-3 text-sm text-slate-200">{order.items?.length || 0}</td>
-                  <td className="px-3 py-3 text-sm font-semibold text-yellow-300">{formatCurrency(order.totalAmount || 0)}</td>
-                  <td className="rounded-r-xl px-3 py-3">
-                    <span className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${statusClassMap[order.status] || "border-white/20 bg-white/5 text-white"}`}>
-                      {order.status}
-                    </span>
-                  </td>
+            </thead>
+            <tbody className="divide-y divide-slate-200 bg-white">
+              {isLoading ? (
+                <tr>
+                  <td colSpan={5} className="px-6 py-8 text-center text-sm text-slate-500">Siparişler yükleniyor...</td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : filteredOrders.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="px-6 py-8 text-center text-sm text-slate-500">Filtreye uygun sipariş bulunamadı.</td>
+                </tr>
+              ) : (
+                filteredOrders.map((order) => (
+                  <tr key={order._id} className="transition-colors hover:bg-slate-50">
+                    <td className="px-6 py-4">
+                      <p className="text-sm font-bold text-slate-900">#{order._id.slice(-6).toUpperCase()}</p>
+                      <p className="text-xs text-slate-500">{new Date(order.createdAt).toLocaleDateString("tr-TR")}</p>
+                    </td>
+                    <td className="px-6 py-4">
+                      <p className="text-sm font-medium text-slate-900">{order.user?.name || "-"}</p>
+                      <p className="text-xs text-slate-500">{order.user?.email || "-"}</p>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-slate-600">
+                      {order.items?.length || 0} Kalem Ürün
+                    </td>
+                    <td className="px-6 py-4 text-sm font-bold text-slate-900">
+                      {formatCurrency(order.totalAmount || 0)}
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-bold ${statusClassMap[order.status] || "border-slate-200 bg-slate-100 text-slate-600"}`}>
+                        {order.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </section>
   );

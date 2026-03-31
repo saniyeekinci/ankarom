@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useMemo } from "react";
 import { useAuth } from "@/components/auth/AuthProvider";
+import FAQSection from "@/components/FAQSection";
 
 type SupportTicket = {
   _id: string;
@@ -161,87 +162,128 @@ export default function AdminSupportPage() {
     }
   };
 
+  // Öncelik durumuna göre renk belirleme yardımcısı
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case "Yüksek":
+        return "text-rose-600 bg-rose-50";
+      case "Orta":
+        return "text-amber-600 bg-amber-50";
+      case "Düşük":
+      default:
+        return "text-emerald-600 bg-emerald-50";
+    }
+  };
+
   return (
-    <section className="space-y-6 flex flex-col gap-4">
-      <div className="rounded-3xl border border-white/10 bg-slate-900/75 p-5 shadow-[0_24px_70px_rgba(2,6,23,0.6)] backdrop-blur-2xl sm:p-6">
-        <h2 className="text-2xl font-black text-white">Destek Talepleri</h2>
-        <p className="mt-1 text-sm text-slate-400">Müşteri destek taleplerini yönetip hızlıca yanıtlayın.</p>
+    <section className="flex flex-col gap-6">
+      
+      {/* Sıkça Sorulan Sorular */}
+      <FAQSection />
+      
+      {/* Sayfa Başlığı */}
+      <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h2 className="text-xl font-bold text-slate-900">Destek Talepleri</h2>
+        <p className="mt-1 text-sm text-slate-500">Müşteri destek taleplerini yönetip hızlıca yanıtlayın.</p>
       </div>
 
-      {errorMessage && <p className="text-sm text-rose-300">{errorMessage}</p>}
+      {/* Hata Mesajı */}
+      {errorMessage && (
+        <div className="rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm font-medium text-rose-700">
+          {errorMessage}
+        </div>
+      )}
 
-      <div className="grid gap-3 rounded-2xl border border-white/10 bg-white/5 p-4 md:grid-cols-3">
+      {/* Filtreleme ve Arama */}
+      <div className="flex flex-col sm:flex-row gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
         <input
           type="text"
           value={searchQuery}
           onChange={(event) => setSearchQuery(event.target.value)}
           placeholder="Talep no, müşteri veya konu ara"
-          className="rounded-xl border border-white/10 bg-slate-950/60 px-3 py-2.5 text-sm text-white placeholder:text-slate-400 outline-none focus:border-cyan-400/70"
+          className="flex-1 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-colors"
         />
         <select
           value={statusFilter}
           onChange={(event) => setStatusFilter(event.target.value as "all" | "open" | "answered")}
-          className="rounded-xl border border-white/10 bg-slate-950/60 px-3 py-2.5 text-sm text-white outline-none focus:border-cyan-400/70"
+          className="rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-colors min-w-[150px]"
         >
-          <option value="all" className="bg-slate-900">Tüm Durumlar</option>
-          <option value="open" className="bg-slate-900">Açık</option>
-          <option value="answered" className="bg-slate-900">Yanıtlandı</option>
+          <option value="all">Tüm Durumlar</option>
+          <option value="open">Açık</option>
+          <option value="answered">Yanıtlandı</option>
         </select>
         <select
           value={sortOrder}
           onChange={(event) => setSortOrder(event.target.value as "newest" | "oldest")}
-          className="rounded-xl border border-white/10 bg-slate-950/60 px-3 py-2.5 text-sm text-white outline-none focus:border-cyan-400/70"
+          className="rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-colors min-w-[150px]"
         >
-          <option value="newest" className="bg-slate-900">En Yeni</option>
-          <option value="oldest" className="bg-slate-900">En Eski</option>
+          <option value="newest">En Yeni</option>
+          <option value="oldest">En Eski</option>
         </select>
       </div>
 
-      <div className="overflow-x-auto rounded-3xl border border-white/10 bg-slate-900/75 p-5 shadow-[0_24px_70px_rgba(2,6,23,0.6)] backdrop-blur-2xl">
-        <table className="min-w-full border-separate border-spacing-y-2">
-          <thead>
-            <tr>
-              <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Talep No</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Konu</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Müşteri</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Mesaj</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Öncelik</th>
-              <th className="px-3 py-2 text-right text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Durum</th>
-            </tr>
-          </thead>
-          <tbody>
-            {isLoading ? (
+      {/* Tablo */}
+      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-slate-200">
+            <thead className="bg-slate-50">
               <tr>
-                <td colSpan={6} className="px-3 py-4 text-sm text-slate-300">Destek talepleri yükleniyor...</td>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Talep No</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Konu</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Müşteri</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Mesaj</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Öncelik</th>
+                <th scope="col" className="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-slate-500">Durum</th>
               </tr>
-            ) : filteredTickets.length === 0 ? (
-              <tr>
-                <td colSpan={6} className="px-3 py-4 text-sm text-slate-300">Filtreye uygun destek talebi yok.</td>
-              </tr>
-            ) : filteredTickets.map((ticket) => (
-              <tr key={ticket._id} className="rounded-xl border border-white/10 bg-white/5">
-                <td className="rounded-l-xl px-3 py-3 text-sm font-semibold text-white">{ticket.ticketNo}</td>
-                <td className="px-3 py-3 text-sm text-slate-200">{ticket.subject}</td>
-                <td className="px-3 py-3 text-sm text-slate-200">
-                  <p>{ticket.customer}</p>
-                  {ticket.customerEmail && <p className="text-xs text-slate-400">{ticket.customerEmail}</p>}
-                </td>
-                <td className="px-3 py-3 text-sm text-slate-200 max-w-80 truncate" title={getLatestMessageText(ticket) || ""}>{getLatestMessageText(ticket) || "-"}</td>
-                <td className="px-3 py-3 text-sm text-amber-200">{ticket.priority}</td>
-                <td className="rounded-r-xl px-3 py-3 text-right">
-                  <button
-                    type="button"
-                    onClick={() => markAnswered(ticket._id)}
-                    disabled={ticket.status === "Yanıtlandı"}
-                    className="rounded-lg border border-cyan-300/30 bg-cyan-500/10 px-3 py-1.5 text-xs font-semibold text-cyan-100 disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    {ticket.status === "Yanıtlandı" ? "Yanıtlandı" : "Yanıtla"}
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-slate-200 bg-white">
+              {isLoading ? (
+                <tr>
+                  <td colSpan={6} className="px-6 py-8 text-center text-sm text-slate-500">Destek talepleri yükleniyor...</td>
+                </tr>
+              ) : filteredTickets.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-6 py-8 text-center text-sm text-slate-500">Filtreye uygun destek talebi bulunamadı.</td>
+                </tr>
+              ) : filteredTickets.map((ticket) => (
+                <tr key={ticket._id} className="transition-colors hover:bg-slate-50">
+                  <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-slate-900">
+                    {ticket.ticketNo}
+                  </td>
+                  <td className="whitespace-nowrap px-6 py-4 text-sm text-slate-900">
+                    {ticket.subject}
+                  </td>
+                  <td className="whitespace-nowrap px-6 py-4 text-sm">
+                    <p className="font-medium text-slate-900">{ticket.customer}</p>
+                    {ticket.customerEmail && <p className="text-xs text-slate-500">{ticket.customerEmail}</p>}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-slate-500 max-w-xs truncate" title={getLatestMessageText(ticket) || ""}>
+                    {getLatestMessageText(ticket) || "-"}
+                  </td>
+                  <td className="whitespace-nowrap px-6 py-4 text-sm">
+                    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${getPriorityColor(ticket.priority)}`}>
+                      {ticket.priority}
+                    </span>
+                  </td>
+                  <td className="whitespace-nowrap px-6 py-4 text-right">
+                    <button
+                      type="button"
+                      onClick={() => markAnswered(ticket._id)}
+                      disabled={ticket.status === "Yanıtlandı"}
+                      className={`inline-flex items-center rounded-lg px-3 py-1.5 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
+                        ticket.status === "Yanıtlandı" 
+                          ? "bg-emerald-50 text-emerald-700 border border-emerald-200" 
+                          : "bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100"
+                      }`}
+                    >
+                      {ticket.status === "Yanıtlandı" ? "Yanıtlandı" : "Yanıtla"}
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </section>
   );

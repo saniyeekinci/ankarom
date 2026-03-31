@@ -3,20 +3,32 @@
 import { usePathname } from "next/navigation";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
+import FAQSection from "@/components/FAQSection";
+import QuickContactButton from "@/components/QuickContactButton";
 
 export default function AppFrame({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isAdminRoute = pathname?.startsWith("/admin");
+  const isContentRoute = !pathname?.startsWith("/giris") &&
+    !pathname?.startsWith("/kayit") &&
+    !pathname?.startsWith("/odeme") &&
+    !pathname?.startsWith("/hesabim") &&
+    !pathname?.startsWith("/sepetlerim") &&
+    !pathname?.startsWith("/hakkimizda") &&
+    !pathname?.startsWith("/iletisim") &&
+    !pathname?.startsWith("/urunler");
 
   if (isAdminRoute) {
-    return <main className="min-h-screen text-gray-200">{children}</main>;
+    return <main className="min-h-screen">{children}</main>;
   }
 
   return (
-    <>
+    <div className="corporate-theme">
       <Header />
-      <main className="text-gray-200">{children}</main>
+      <main>{children}</main>
+      {isContentRoute && <FAQSection />}
       <Footer />
-    </>
+      <QuickContactButton />
+    </div>
   );
 }
