@@ -134,7 +134,7 @@ export default function FAQSection() {
   };
 
   return (
-    <section id="help-center" className="px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
+    <section id="help-center" className="fluid px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
       <div
         className="mx-auto w-full max-w-360 text-left"
         style={{ borderRadius: 32 }}

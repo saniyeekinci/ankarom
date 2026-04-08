@@ -1,10 +1,17 @@
 import express from "express";
-import { createPublicDealerApplication, createPublicSupportTicket, getPublicSettings } from "../controllers/publicController.js";
+import {
+    getPublicSettings,
+    createPublicSupportTicket,
+    createPublicDealerApplication,
+    contactUs,
+} from "../controllers/publicController.js";
+import { validateRequired } from "../middleware/validateRequest.js";
 
 const router = express.Router();
 
 router.get("/settings", getPublicSettings);
-router.post("/support-tickets", createPublicSupportTicket);
-router.post("/dealer-applications", createPublicDealerApplication);
+router.post("/contact", validateRequired(["name", "message"]), contactUs);
+router.post("/support-tickets", validateRequired(["customer", "message"]), createPublicSupportTicket);
+router.post("/dealer-applications", validateRequired(["companyName", "city", "contactName"]), createPublicDealerApplication);
 
 export default router;

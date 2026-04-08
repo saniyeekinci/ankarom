@@ -4,7 +4,6 @@ import { protect } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-// Bu route altındaki tüm endpoint'ler giriş yapan kullanıcıya özeldir.
 router.use(protect);
 
 router.get("/", getCart);

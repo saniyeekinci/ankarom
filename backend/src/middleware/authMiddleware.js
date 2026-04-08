@@ -1,44 +1,36 @@
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
+import { ApiError } from "./errorMiddleware.js";
+import asyncHandler from "../utils/asyncHandler.js";
 
-export const protect = async (req, res, next) => {
-  try {
-    // Authorization header'ı: "Bearer <token>" formatında gelir.
-    const authHeader = req.headers.authorization;
+export const protect = asyncHandler(async (req, _res, next) => {
+  const authHeader = req.headers.authorization;
 
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      res.status(401);
-      throw new Error("Yetkisiz erişim: Token bulunamadı.");
-    }
-
-    const token = authHeader.split(" ")[1];
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    // Şifre hariç kullanıcıyı req.user içine koyuyoruz.
-    req.user = await User.findById(decoded.id).select("-password");
-
-    if (!req.user) {
-      res.status(401);
-      throw new Error("Kullanıcı bulunamadı.");
-    }
-
-    next();
-  } catch (error) {
-    res.status(401);
-    next(error);
+  if (!authHeader?.startsWith("Bearer ")) {
+    throw new ApiError(401, "Yetkisiz erişim: Token bulunamadı.");
   }
-};
 
-export const admin = (req, res, next) => {
+  const token = authHeader.split(" ")[1];
+  const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+  const user = await User.findById(decoded.id).select("-password");
+
+  if (!user) {
+    throw new ApiError(401, "Kullanıcı bulunamadı.");
+  }
+
+  req.user = user;
+  next();
+});
+
+export const admin = (req, _res, next) => {
   if (!req.user) {
-    res.status(401);
-    return next(new Error("Yetkisiz erişim."));
+    throw new ApiError(401, "Yetkisiz erişim.");
   }
 
   if (req.user.role !== "admin") {
-    res.status(403);
-    return next(new Error("Bu işlem için admin yetkisi gerekiyor."));
+    throw new ApiError(403, "Bu işlem için admin yetkisi gerekiyor.");
   }
 
-  return next();
+  next();
 };

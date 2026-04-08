@@ -1,22 +1,30 @@
+import asyncHandler from "../utils/asyncHandler.js";
+import { ApiError } from "../middleware/errorMiddleware.js";
 import User from "../models/User.js";
-import generateToken from "../utils/generateToken.js";
 import SupportTicket from "../models/SupportTicket.js";
 import AdminNotification from "../models/AdminNotification.js";
+import generateToken from "../utils/generateToken.js";
+import { EMAIL_REGEX } from "../utils/constants.js";
+import { escapeRegex } from "../utils/helpers.js";
 
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-const escapeRegex = (value) => String(value || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const formatUserResponse = (user) => ({
+  id: user._id,
+  name: user.name,
+  email: user.email,
+  phone: user.phone || "",
+  role: user.role,
+});
 
 const normalizeTicketMessages = (ticket) => {
   const existing = Array.isArray(ticket.messages)
-    ? ticket.messages
-        .filter((entry) => entry && String(entry.text || "").trim())
-        .map((entry) => ({
-          sender: entry.sender,
-          text: String(entry.text || "").trim(),
-          createdAt: entry.createdAt || ticket.createdAt || new Date(),
-        }))
-    : [];
+      ? ticket.messages
+          .filter((entry) => entry && String(entry.text || "").trim())
+          .map((entry) => ({
+            sender: entry.sender,
+            text: String(entry.text || "").trim(),
+            createdAt: entry.createdAt || ticket.createdAt || new Date(),
+          }))
+      : [];
 
   if (existing.length > 0) {
     return existing.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
@@ -43,357 +51,215 @@ const normalizeTicketMessages = (ticket) => {
 };
 
 // POST /api/auth/register
-export const register = async (req, res, next) => {
-  try {
-    const { name, email, password } = req.body;
+export const register = asyncHandler(async (req, res) => {
+  const { name, email, password } = req.body;
 
-    if (!name || !email || !password) {
-      res.status(400);
-      throw new Error("İsim, e-posta ve şifre zorunludur.");
-    }
-
-    if (password.length < 6) {
-      res.status(400);
-      throw new Error("Şifre en az 6 karakter olmalıdır.");
-    }
-
-    const existingUser = await User.findOne({ email: email.toLowerCase() });
-    if (existingUser) {
-      res.status(409);
-      throw new Error("Bu e-posta ile kayıtlı kullanıcı zaten var.");
-    }
-
-    const user = await User.create({
-      name,
-      email: email.toLowerCase(),
-      password,
-      role: "user",
-    });
-
-    const token = generateToken(user._id);
-
-    res.status(201).json({
-      message: "Kayıt başarılı.",
-      token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        phone: user.phone || "",
-        role: user.role,
-      },
-    });
-  } catch (error) {
-    if (error instanceof Error && error.message.includes("not allowed to do action")) {
-      res.status(500);
-      return next(new Error("Veritabanı kullanıcı yetkisi eksik. MongoDB Atlas'ta bu kullanıcıya ankarom veritabanı için readWrite yetkisi verin."));
-    }
-    next(error);
+  if (password.length < 6) {
+    throw new ApiError(400, "Şifre en az 6 karakter olmalıdır.");
   }
-};
+
+  const existingUser = await User.findOne({ email: email.toLowerCase() });
+  if (existingUser) {
+    throw new ApiError(409, "Bu e-posta ile kayıtlı kullanıcı zaten var.");
+  }
+
+  const user = await User.create({
+    name,
+    email: email.toLowerCase(),
+    password,
+    role: "user",
+  });
+
+  const token = generateToken(user._id);
+
+  res.status(201).json({
+    message: "Kayıt başarılı.",
+    token,
+    user: formatUserResponse(user),
+  });
+});
 
 // POST /api/auth/login
-export const login = async (req, res, next) => {
-  try {
-    const { email, password } = req.body;
+export const login = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
 
-    if (!email || !password) {
-      res.status(400);
-      throw new Error("E-posta ve şifre zorunludur.");
-    }
+  const user = await User.findOne({ email: email.toLowerCase() });
 
-    const user = await User.findOne({ email: email.toLowerCase() });
-
-    if (!user) {
-      res.status(401);
-      throw new Error("Geçersiz e-posta veya şifre.");
-    }
-
-    const isPasswordCorrect = await user.comparePassword(password);
-    if (!isPasswordCorrect) {
-      res.status(401);
-      throw new Error("Geçersiz e-posta veya şifre.");
-    }
-
-    const token = generateToken(user._id);
-
-    res.status(200).json({
-      message: "Giriş başarılı.",
-      token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        phone: user.phone || "",
-        role: user.role,
-      },
-    });
-  } catch (error) {
-    next(error);
+  if (!user || !(await user.comparePassword(password))) {
+    throw new ApiError(401, "Geçersiz e-posta veya şifre.");
   }
-};
+
+  const token = generateToken(user._id);
+
+  res.status(200).json({
+    message: "Giriş başarılı.",
+    token,
+    user: formatUserResponse(user),
+  });
+});
 
 // POST /api/auth/google
-// Frontend'den gelen email/name/googleId ile kullanıcı bulunur, yoksa oluşturulur.
-export const googleAuth = async (req, res, next) => {
-  try {
-    const { email, name, googleId } = req.body;
+export const googleAuth = asyncHandler(async (req, res) => {
+  const { email, name, googleId } = req.body;
 
-    if (!email) {
-      res.status(400);
-      throw new Error("Google giriş için e-posta zorunludur.");
-    }
+  const normalizedEmail = email.toLowerCase();
+  let user = await User.findOne({ email: normalizedEmail });
 
-    const normalizedEmail = email.toLowerCase();
-    let user = await User.findOne({ email: normalizedEmail });
+  if (!user) {
+    const randomPassword = Math.random().toString(36).slice(-12) + "Aa1!";
 
-    if (!user) {
-      // Google ile ilk girişte sistemin istediği "password" alanını
-      // doldurmak için rastgele bir değer veriyoruz. Kullanıcı bunu kullanmaz.
-      const randomPassword = Math.random().toString(36).slice(-12) + "Aa1!";
-
-      user = await User.create({
-        name: name || normalizedEmail.split("@")[0],
-        email: normalizedEmail,
-        password: randomPassword,
-        googleId: googleId || null,
-        role: "user",
-      });
-    } else if (googleId && !user.googleId) {
-      // Kullanıcı daha önce normal kayıt olduysa, ilk Google girişinde bağlarız.
-      user.googleId = googleId;
-      await user.save();
-    }
-
-    const token = generateToken(user._id);
-
-    res.status(200).json({
-      message: "Google girişi başarılı.",
-      token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        phone: user.phone || "",
-        role: user.role,
-      },
+    user = await User.create({
+      name: name || normalizedEmail.split("@")[0],
+      email: normalizedEmail,
+      password: randomPassword,
+      googleId: googleId || null,
+      role: "user",
     });
-  } catch (error) {
-    next(error);
+  } else if (googleId && !user.googleId) {
+    user.googleId = googleId;
+    await user.save();
   }
-};
+
+  const token = generateToken(user._id);
+
+  res.status(200).json({
+    message: "Google girişi başarılı.",
+    token,
+    user: formatUserResponse(user),
+  });
+});
 
 // GET /api/auth/me
-export const getMyProfile = async (req, res, next) => {
-  try {
-    const user = await User.findById(req.user._id).select("-password");
-
-    if (!user) {
-      res.status(404);
-      throw new Error("Kullanıcı bulunamadı.");
-    }
-
-    res.status(200).json({
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        phone: user.phone || "",
-        role: user.role,
-      },
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+export const getMyProfile = asyncHandler(async (req, res) => {
+  res.status(200).json({ user: formatUserResponse(req.user) });
+});
 
 // PUT /api/auth/me
-export const updateMyProfile = async (req, res, next) => {
-  try {
-    const user = await User.findById(req.user._id);
+export const updateMyProfile = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
+  const { name, email, phone, currentPassword, newPassword } = req.body;
 
-    if (!user) {
-      res.status(404);
-      throw new Error("Kullanıcı bulunamadı.");
+  if (name !== undefined) {
+    const normalizedName = String(name).trim();
+    if (!normalizedName) {
+      throw new ApiError(400, "Ad soyad boş olamaz.");
     }
-
-    const { name, email, phone, currentPassword, newPassword } = req.body;
-
-    if (name !== undefined) {
-      const normalizedName = String(name).trim();
-      if (!normalizedName) {
-        res.status(400);
-        throw new Error("Ad soyad boş olamaz.");
-      }
-      user.name = normalizedName;
-    }
-
-    if (email !== undefined) {
-      const normalizedEmail = String(email).trim().toLowerCase();
-      if (!normalizedEmail || !emailRegex.test(normalizedEmail)) {
-        res.status(400);
-        throw new Error("Geçerli bir e-posta adresi giriniz.");
-      }
-
-      const emailOwner = await User.findOne({ email: normalizedEmail });
-      if (emailOwner && String(emailOwner._id) !== String(user._id)) {
-        res.status(409);
-        throw new Error("Bu e-posta başka bir hesapta kullanılıyor.");
-      }
-
-      user.email = normalizedEmail;
-    }
-
-    if (phone !== undefined) {
-      const normalizedPhone = String(phone).trim();
-      if (normalizedPhone.length > 30) {
-        res.status(400);
-        throw new Error("Telefon alanı en fazla 30 karakter olabilir.");
-      }
-      user.phone = normalizedPhone;
-    }
-
-    if (newPassword !== undefined && String(newPassword).trim() !== "") {
-      const parsedNewPassword = String(newPassword);
-
-      if (!currentPassword) {
-        res.status(400);
-        throw new Error("Şifre değiştirmek için mevcut şifrenizi girmelisiniz.");
-      }
-
-      if (parsedNewPassword.length < 6) {
-        res.status(400);
-        throw new Error("Yeni şifre en az 6 karakter olmalıdır.");
-      }
-
-      const isPasswordCorrect = await user.comparePassword(String(currentPassword));
-      if (!isPasswordCorrect) {
-        res.status(401);
-        throw new Error("Mevcut şifre hatalı.");
-      }
-
-      user.password = parsedNewPassword;
-    }
-
-    await user.save();
-
-    res.status(200).json({
-      message: "Hesap ayarları güncellendi.",
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        phone: user.phone || "",
-        role: user.role,
-      },
-    });
-  } catch (error) {
-    next(error);
+    user.name = normalizedName;
   }
-};
+
+  if (email !== undefined) {
+    const normalizedEmail = String(email).trim().toLowerCase();
+    if (!normalizedEmail || !EMAIL_REGEX.test(normalizedEmail)) {
+      throw new ApiError(400, "Geçerli bir e-posta adresi giriniz.");
+    }
+
+    const emailOwner = await User.findOne({ email: normalizedEmail });
+    if (emailOwner && String(emailOwner._id) !== String(user._id)) {
+      throw new ApiError(409, "Bu e-posta başka bir hesapta kullanılıyor.");
+    }
+
+    user.email = normalizedEmail;
+  }
+
+  if (phone !== undefined) {
+    const normalizedPhone = String(phone).trim();
+    if (normalizedPhone.length > 30) {
+      throw new ApiError(400, "Telefon alanı en fazla 30 karakter olabilir.");
+    }
+    user.phone = normalizedPhone;
+  }
+
+  if (newPassword !== undefined && String(newPassword).trim() !== "") {
+    if (!currentPassword) {
+      throw new ApiError(400, "Şifre değiştirmek için mevcut şifrenizi girmelisiniz.");
+    }
+
+    if (String(newPassword).length < 6) {
+      throw new ApiError(400, "Yeni şifre en az 6 karakter olmalıdır.");
+    }
+
+    const isPasswordCorrect = await user.comparePassword(String(currentPassword));
+    if (!isPasswordCorrect) {
+      throw new ApiError(401, "Mevcut şifre hatalı.");
+    }
+
+    user.password = String(newPassword);
+  }
+
+  await user.save();
+
+  res.status(200).json({
+    message: "Hesap ayarları güncellendi.",
+    user: formatUserResponse(user),
+  });
+});
 
 // GET /api/auth/my-support-tickets
-export const getMySupportTickets = async (req, res, next) => {
-  try {
-    const userEmail = String(req.user?.email || "").trim().toLowerCase();
-    const userName = String(req.user?.name || "").trim();
+export const getMySupportTickets = asyncHandler(async (req, res) => {
+  const userEmail = String(req.user?.email || "").trim().toLowerCase();
+  const userName = String(req.user?.name || "").trim();
 
-    const nameFilter = userName
-      ? { customer: { $regex: `^${escapeRegex(userName)}$`, $options: "i" } }
-      : null;
+  const orFilters = [];
+  if (userEmail) {
+    orFilters.push({ customerEmail: userEmail });
+  }
+  if (userName) {
+    orFilters.push({ customer: { $regex: `^${escapeRegex(userName)}$`, $options: "i" } });
+  }
 
-    const orFilters = [];
-    if (userEmail) {
-      orFilters.push({ customerEmail: userEmail });
-    }
-    if (nameFilter) {
-      orFilters.push(nameFilter);
-    }
+  const query = orFilters.length > 0 ? { $or: orFilters } : { _id: null };
 
-    const query = orFilters.length > 0 ? { $or: orFilters } : { _id: null };
-
-    const tickets = await SupportTicket.find(query)
+  const tickets = await SupportTicket.find(query)
       .sort({ createdAt: -1 })
       .select("ticketNo subject message adminReply messages status createdAt answeredAt updatedAt");
 
-    const payload = tickets.map((ticket) => {
-      const item = ticket.toObject();
-      return {
-        ...item,
-        messages: normalizeTicketMessages(item),
-      };
-    });
+  const payload = tickets.map((ticket) => ({
+    ...ticket.toObject(),
+    messages: normalizeTicketMessages(ticket.toObject()),
+  }));
 
-    res.status(200).json(payload);
-  } catch (error) {
-    next(error);
-  }
-};
+  res.status(200).json(payload);
+});
 
 // GET /api/auth/notifications
-export const getMyNotifications = async (req, res, next) => {
-  try {
-    const user = await User.findById(req.user._id).select("notificationReadAt email");
+export const getMyNotifications = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id).select("notificationReadAt email");
+  const userEmail = String(user.email || "").trim().toLowerCase();
 
-    if (!user) {
-      res.status(404);
-      throw new Error("Kullanıcı bulunamadı.");
-    }
+  const recipientFilters = [{ recipientEmail: "" }, { recipientEmail: { $exists: false } }];
+  if (userEmail) {
+    recipientFilters.push({ recipientEmail: userEmail });
+  }
 
-    const userEmail = String(user.email || "").trim().toLowerCase();
-    const recipientFilters = [{ recipientEmail: "" }, { recipientEmail: { $exists: false } }];
-
-    if (userEmail) {
-      recipientFilters.push({ recipientEmail: userEmail });
-    }
-
-    const notifications = await AdminNotification.find({ channel: "site", $or: recipientFilters })
+  const notifications = await AdminNotification.find({ channel: "site", $or: recipientFilters })
       .sort({ createdAt: -1 })
       .limit(25)
       .select("title message createdAt channel type recipientEmail");
 
-    const readAt = user.notificationReadAt ? new Date(user.notificationReadAt) : null;
-    const payload = notifications.map((notification) => {
-      const createdAt = notification.createdAt ? new Date(notification.createdAt) : null;
-      const isRead = readAt && createdAt ? createdAt <= readAt : false;
+  const readAt = user.notificationReadAt ? new Date(user.notificationReadAt) : null;
+  const payload = notifications.map((notification) => {
+    const createdAt = notification.createdAt ? new Date(notification.createdAt) : null;
+    const isRead = readAt && createdAt ? createdAt <= readAt : false;
+    return { ...notification.toObject(), isRead };
+  });
 
-      return {
-        ...notification.toObject(),
-        isRead,
-      };
-    });
+  const unreadCount = payload.reduce((count, item) => count + (item.isRead ? 0 : 1), 0);
 
-    const unreadCount = payload.reduce((count, item) => count + (item.isRead ? 0 : 1), 0);
-
-    res.status(200).json({
-      notifications: payload,
-      unreadCount,
-      notificationReadAt: user.notificationReadAt,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+  res.status(200).json({
+    notifications: payload,
+    unreadCount,
+    notificationReadAt: user.notificationReadAt,
+  });
+});
 
 // PUT /api/auth/notifications/read-all
-export const markAllNotificationsAsRead = async (req, res, next) => {
-  try {
-    const user = await User.findById(req.user._id);
+export const markAllNotificationsAsRead = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
+  user.notificationReadAt = new Date();
+  await user.save();
 
-    if (!user) {
-      res.status(404);
-      throw new Error("Kullanıcı bulunamadı.");
-    }
-
-    user.notificationReadAt = new Date();
-    await user.save();
-
-    res.status(200).json({
-      message: "Bildirimler okundu olarak işaretlendi.",
-      notificationReadAt: user.notificationReadAt,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
+  res.status(200).json({
+    message: "Bildirimler okundu olarak işaretlendi.",
+    notificationReadAt: user.notificationReadAt,
+  });
+});

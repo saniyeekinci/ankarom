@@ -4,90 +4,90 @@ import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import dotenv from "dotenv";
 
+dotenv.config();
+
 import connectDB from "./src/config/db.js";
-import authRoutes from "./src/routes/authRoutes.js";
 import productRoutes from "./src/routes/productRoutes.js";
 import orderRoutes from "./src/routes/orderRoutes.js";
-import cartRoutes from "./src/routes/cartRoutes.js";
-import adminRoutes from "./src/routes/adminRoutes.js";
 import publicRoutes from "./src/routes/publicRoutes.js";
+import adminRoutes from "./src/routes/adminRoutes.js";
+import authRoutes from "./src/routes/authRoutes.js";
+import cartRoutes from "./src/routes/cartRoutes.js";
 import { startImapListener } from "./src/utils/imapListener.js";
 import { notFound, errorHandler } from "./src/middleware/errorMiddleware.js";
 
-dotenv.config();
-
-
 const app = express();
 
-// Güvenlik: HTTP başlıklarını güvenli hale getirir.
+// Security: Secure HTTP headers
 app.use(helmet());
 
-// Güvenlik: Çok kısa sürede aşırı istek atılmasını sınırlar (basit DDoS/brute-force önlemi).
+// Security: Rate limiting (DDoS/brute-force protection)
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 300,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, message: "Çok fazla istek gönderildi, lütfen daha sonra tekrar deneyin." },
+});
+app.use(limiter);
+
+// CORS configuration
+const allowedOrigins = [
+  process.env.CLIENT_URL,
+  "http://localhost:3000",
+  "http://localhost:3001",
+  "http://127.0.0.1:3000",
+  "http://127.0.0.1:3001",
+].filter(Boolean);
+
 app.use(
-  rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 300,
-    standardHeaders: true,
-    legacyHeaders: false,
-    message: { message: "Çok fazla istek gönderildi, lütfen daha sonra tekrar deneyin." },
-  })
+    cors({
+      origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin)) {
+          return callback(null, true);
+        }
+        return callback(new Error("CORS hatası: Bu origin için erişim izni yok."));
+      },
+      credentials: true,
+    })
 );
 
-// Frontend'den gelen istekleri kabul eder.
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      const allowedOrigins = [
-        process.env.CLIENT_URL,
-        "http://localhost:3000",
-        "http://localhost:3001",
-        "http://127.0.0.1:3000",
-        "http://127.0.0.1:3001",
-      ].filter(Boolean);
+// Body parser middleware
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
-      // Postman/sunucu içi çağrılar gibi origin'siz istekleri engellemeyiz.
-      if (!origin) {
-        return callback(null, true);
-      }
-
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
-
-      return callback(new Error("CORS hatası: Bu origin için erişim izni yok."));
-    },
-    credentials: true,
-  })
-);
-
-// JSON body okumak için gerekli middleware.
-app.use(express.json());
-
-// Basit sağlık kontrol endpoint'i.
-app.get("/", (req, res) => {
-  res.status(200).json({ message: "Ankarom Backend API çalışıyor." });
+// Health check endpoint
+app.get("/", (_req, res) => {
+  res.status(200).json({ success: true, message: "Ankarom Backend API çalışıyor." });
 });
 
-// API route'ları
-app.use("/api/auth", authRoutes);
+// API Routes
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
-app.use("/api/cart", cartRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/cart", cartRoutes);
 app.use("/api/public", publicRoutes);
 
-// Hata middleware'leri
+// Error handling middleware (must be last)
 app.use(notFound);
 app.use(errorHandler);
 
-// Mevcut halini şununla değiştir:
+// Server startup
 const PORT = process.env.PORT || 10000;
 
-connectDB().then(() => {
-  startImapListener();
+const startServer = async () => {
+  try {
+    await connectDB();
+    startImapListener();
 
-  // '0.0.0.0' eklemek Render'ın dış dünyadan gelen istekleri yakalamasını sağlar
-  app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Server ${PORT} portunda yayında...`);
-  });
-});
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`✅ Server ${PORT} portunda çalışıyor (${process.env.NODE_ENV || "development"})`);
+    });
+  } catch (error) {
+    console.error("❌ Server başlatılamadı:", error.message);
+    process.exit(1);
+  }
+};
+
+startServer();

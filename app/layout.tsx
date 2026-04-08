@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
-import "@/styles/globals.css";
+import "@/styles/global.css";
 import "@/styles/reset.css";
-import { CartProvider } from "@/components/cart/CartProvider";
-import { AuthProvider } from "@/components/auth/AuthProvider";
 import AppFrame from "@/components/layout/AppFrame";
 
 export const metadata: Metadata = {
@@ -21,12 +19,8 @@ export default function RootLayout({
   return (
     <html lang="tr">
       <body
-        className="container" suppressHydrationWarning={true}>
-        <AuthProvider>
-          <CartProvider>
-            <AppFrame>{children}</AppFrame>
-          </CartProvider>
-        </AuthProvider>
+        className="" suppressHydrationWarning={true}>
+        <AppFrame>{children}</AppFrame>
       </body>
     </html>
   );

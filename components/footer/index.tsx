@@ -14,7 +14,7 @@ export default function Footer() {
   };
 
   return (
-    <footer className="w-full px-4 pb-4 pt-0 sm:px-6 lg:px-8">
+    <footer className="fluid w-full px-4 pb-4 pt-0 sm:px-6 lg:px-8">
       <div
         className="mx-auto w-full overflow-hidden border border-slate-200 bg-white shadow-[0_24px_70px_rgba(15,23,42,0.06)]"
         style={{ borderRadius: 44 }}
