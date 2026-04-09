@@ -28,7 +28,7 @@ export default function RootLayout({
   return (
     <html lang="tr">
       <body
-        className="" suppressHydrationWarning={true}>
+        className="overflow-x-hidden" suppressHydrationWarning={true}>
         <AppFrame>{children}</AppFrame>
       </body>
     </html>

@@ -3,9 +3,9 @@ import Link from "next/link"; // Link bileşenini ekledik
 export default function HeroStatsCard() {
   return (
     <section className="relative flex min-h-[calc(100vh-80px)] items-center overflow-hidden px-4 py-10 sm:px-6 sm:py-12 lg:px-8 lg:py-16">
-      <div className="absolute inset-0 -z-10">
+      <div className="absolute inset-0 -z-10 overflow-hidden">
         <div className="absolute left-1/2 top-8 h-96 w-96 -translate-x-1/2 rounded-full bg-blue-500/10 blur-3xl" />
-        <div className="absolute -left-12 bottom-16 h-72 w-72 rounded-full bg-sky-500/10 blur-3xl" />
+        <div className="absolute -left-8 bottom-16 h-72 w-72 rounded-full bg-sky-500/10 blur-3xl sm:-left-12" />
       </div>
 
       {/* rounded-[32px] yerine rounded-4xl kullandık */}
