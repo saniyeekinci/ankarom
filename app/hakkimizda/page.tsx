@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import Breadcrumb from "@/components/Breadcrumb";
 
 // ============================================
 // ANIMATED COUNTER HOOK
@@ -169,6 +170,17 @@ export default function AboutPage() {
 
   return (
       <main className="relative overflow-hidden bg-white">
+        {/* ==========================================
+          BREADCRUMB
+      ========================================== */}
+        <div className="bg-white px-6 py-4 border-b border-slate-100">
+          <div className="max-w-7xl mx-auto">
+            <Breadcrumb items={[
+              { label: "Ana Sayfa", href: "/" },
+              { label: "Hakkımızda" },
+            ]} />
+          </div>
+        </div>
 
         {/* ==========================================
           HERO SECTION - Parallax Effect

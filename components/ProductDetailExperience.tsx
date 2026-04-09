@@ -29,7 +29,7 @@ export default function ProductDetailExperience({
   const router = useRouter();
 
   const whatsappMessage = `Merhaba, ${product.name} hakkında bir sorum var.`;
-  const whatsappHref = `https://wa.me/905065440466?text=${encodeURIComponent(whatsappMessage)}`;
+  const whatsappHref = `https://wa.me/905079586868?text=${encodeURIComponent(whatsappMessage)}`;
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("tr-TR", {
@@ -56,7 +56,8 @@ export default function ProductDetailExperience({
             items={[
               { label: "Ana Sayfa", href: "/" },
               { label: "Ürünler", href: "/urunler" },
-              { label: product.name }
+              { label: product.name },
+              
             ]}
           />
         </div>
