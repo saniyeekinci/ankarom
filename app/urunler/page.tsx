@@ -1,81 +1,68 @@
+import React from "react";
 import Link from "next/link";
-import { ArrowLeftIcon } from "@heroicons/react/24/outline";
-import { trailerProducts } from "@/lib/trailerProducts";
-import { mapBackendProductToTrailerProduct, type BackendProduct } from "@/lib/productMapper";
-import ProductsGridWithFavorites from "@/components/ProductsGridWithFavorites";
+import ProductListing from "@/components/ProductListing";
+import Breadcrumb from "@/components/Breadcrumb";
+import { products } from "@/lib/products";
 
-const categoryLabels: Record<string, string> = {
-  "arac-romorklari": "Araç Römorkları",
-  "platform-romorklar": "Platform Römorklar",
-  "kapali-kasa-romorklar": "Kapalı Kasa Römorklar",
-  "ozel-uretim-romorklar": "Özel Üretim Römorklar",
-  "yedek-parca-ve-ekipman": "Yedek Parça ve Ekipman",
+export const metadata = {
+  title: "Ürün Kataloğu - Ankarom",
+  description:
+    "Profesyonel taşıma çözümleri için tasarlanmış, yüksek dayanımlı araç römorku ve ekipman serimizi inceleyin.",
 };
 
-const getLiveProducts = async () => {
-  try {
-    const backendUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-    // Ürün eklediğin an sayfada görebilmen için cache'i kapatıyoruz
-    const response = await fetch(`${backendUrl}/api/products`, {
-      cache: "no-store", 
-    });
-
-    if (!response.ok) {
-      return trailerProducts;
-    }
-
-    const data = (await response.json()) as BackendProduct[] | { products?: BackendProduct[] };
-    
-    // Backend'den gelen veri direkt dizi (array) mi yoksa { products: [...] } formatında mı kontrol ediyoruz
-    const productsList: BackendProduct[] | undefined = Array.isArray(data) ? data : data.products;
-
-    if (!productsList || productsList.length === 0) {
-      return trailerProducts;
-    }
-
-    return productsList.map(mapBackendProductToTrailerProduct);
-  } catch {
-    return trailerProducts;
-  }
-};
-
-type ProductsPageProps = {
-  searchParams?: { category?: string };
-};
-
-export default async function ProductsPage({ searchParams }: ProductsPageProps) {
-  const products = await getLiveProducts();
-  const activeCategoryLabel = searchParams?.category ? categoryLabels[searchParams.category] ?? "Kurumsal Ürün Kataloğu" : "Kurumsal Ürün Kataloğu";
+export default function ProductsPage() {
+  // Ürünleri merkezi kaynaktan al
+  const allProducts = products;
 
   return (
-    <section className="relative overflow-hidden px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
-      <div className="pointer-events-none absolute -left-20 top-10 h-72 w-72 rounded-full bg-blue-500/10 blur-3xl" />
-      <div className="pointer-events-none absolute -right-16 top-28 h-72 w-72 rounded-full bg-sky-500/10 blur-3xl" />
-      <div className="pointer-events-none absolute bottom-0 left-1/3 h-60 w-60 rounded-full bg-emerald-500/10 blur-3xl" />
+    <div className="min-h-screen bg-slate-50 font-sans text-slate-600">
+      {/* Navigation Breadcrumb */}
+      <div className="bg-white border-b border-slate-200">
+        <div className="max-w-8xl mx-auto px-6 py-4 lg:px-12">
+          <Breadcrumb
+            items={[
+              { label: "Ana Sayfa", href: "/" },
+              { label: "Ürünler" }
+            ]}
+          />
+        </div>
+      </div>
 
-      <div className="flex gap-14 flex-col relative mx-auto w-full max-w-360">
-        <div className="mb-8 rounded-[28px] border border-slate-200 bg-white p-6 shadow-[0_20px_60px_rgba(15,23,42,0.08)] sm:mb-10 sm:p-8">
-          <div className="flex gap-14 items-start justify-between ">
+      {/* Üst Başlık Bölümü */}
+      <header className="border-b border-slate-200">
+        <div className="mx-auto max-w-8xl px-6 py-10 lg:px-12">
+          <div className="flex flex-col justify-between gap-6 md:flex-row md:items-start">
+            {/* Başlık ve Açıklama */}
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">{activeCategoryLabel}</p>
-              <h1 className="mt-3 text-3xl font-black text-slate-900 sm:text-4xl">Ürün Listesi</h1>
-              <p className="mt-3 max-w-3xl text-sm text-slate-600 sm:text-base">
-                Yüksek dayanım, premium işçilik ve profesyonel taşıma ihtiyaçları için geliştirilen araç römorku çözümlerini keşfedin.
+              <h1 className="mb-3 text-4xl font-bold text-slate-900">
+                Ürün <span className="text-blue-600">Kataloğu</span>
+              </h1>
+              <p className="max-w-md text-sm leading-relaxed text-slate-500">
+                Profesyonel taşıma çözümleri için tasarlanmış, yüksek dayanımlı
+                araç römorku ve ekipman serimizi inceleyin.
               </p>
             </div>
 
-            <Link
-              href="/"
-              className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-semibold text-slate-700 transition-colors hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
-            >
-              <ArrowLeftIcon className="h-4 w-4" />
-              Geri
-            </Link>
+            {/* İstatistikler */}
+            <div className="flex items-center gap-6 py-4 text-center md:gap-10">
+              <div className="flex flex-col">
+                <span className="text-3xl font-bold text-slate-900">
+                  {allProducts.length}
+                </span>
+                <span className="mt-1 text-[10px] font-semibold tracking-[0.2em] text-slate-400">
+                  ÜRÜN
+                </span>
+              </div>
+              
+            </div>
           </div>
         </div>
+      </header>
 
-        <ProductsGridWithFavorites products={products} />
-      </div>
-    </section>
+      {/* Ana Ürün Alanı */}
+      <main className="mx-auto max-w-[1600px] px-6 py-8 lg:px-12">
+        <ProductListing products={allProducts} showViewToggle={true} />
+      </main>
+    </div>
   );
 }

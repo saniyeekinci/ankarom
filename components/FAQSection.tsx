@@ -1,232 +1,184 @@
 "use client";
 
-import Image from "next/image";
-import { useState, useMemo } from "react";
+import { useState } from "react";
+import { ChevronDown } from "lucide-react";
 
 type FaqItem = {
   question: string;
-  answer: string[];
+  answer: string;
 };
 
-type FaqSection = {
+type Category = {
   id: string;
   label: string;
-  heading: string;
   items: FaqItem[];
 };
 
-const faqSections: FaqSection[] = [
+const categories: Category[] = [
   {
-    id: "getting-started",
-    label: "Getting started with Shopify",
-    heading: "Getting started with Shopify",
+    id: "teknik",
+    label: "Teknik & Belgeler",
     items: [
       {
-        question: "What is Shopify and how does it work?",
-        answer: [
-          "Shopify is a complete commerce platform that lets you start, grow, and manage a business.",
-          "Create and customize an online store",
-          "Sell in multiple places, including web, mobile, social media, online marketplaces, brick-and-mortar locations, and pop-up shops",
-        ],
+        question: "O1 ve O2 belgesi nedir, farkları nelerdir?",
+        answer:
+          "O1 belgesi 750 kg altı römorklar içindir; tescil ve muayene gerektirmez. O2 belgesi ise 750 kg - 3500 kg arasıdır, ruhsat ve plaka zorunluluğu vardır. Tüm ürünlerimiz tip onay belgelidir.",
       },
       {
-        question: "Do I need to be a designer or developer to use Shopify?",
-        answer: [
-          "No, you don’t need to be a designer or developer to use Shopify.",
-          "Customize the look and feel of your store with the online store builder and themes.",
-          "Add features and functionality to your store with apps.",
-        ],
+        question: "Römorklarım için ayrı bir sigorta yaptırmalı mıyım?",
+        answer:
+          "O1 belgeli römorklar çekici aracın sigortasına dahildir. O2 belgeli römorklar için ise ayrı mali mesuliyet sigortası gerekebilir.",
+      },
+      {
+        question: "B sınıfı ehliyet ile römork kullanabilir miyim?",
+        answer:
+          "Toplam yüklü ağırlık 3500 kg'ı geçmediği sürece O1 belgeli römorkları B sınıfı ehliyet ile kullanabilirsiniz.",
       },
     ],
   },
   {
-    id: "selling",
-    label: "Selling on Shopify",
-    heading: "Selling on Shopify",
+    id: "uretim",
+    label: "Üretim & Garanti",
     items: [
       {
-        question: "How can I start selling products online?",
-        answer: [
-          "Set up your catalog, connect a payment provider, and publish your storefront when you are ready.",
-          "You can manage products, pricing, and orders from one dashboard.",
-        ],
+        question: "Römorklarda hangi malzemeleri kullanıyorsunuz?",
+        answer:
+          "Tamamı sıcak daldırma galveniz kaplı, korozyona dayanıklı yüksek mukavemetli çelik şaseler kullanıyoruz. Paslanmaya karşı uzun ömür garantilidir.",
       },
       {
-        question: "Can I sell in more than one channel?",
-        answer: [
-          "Yes, Shopify supports web, social, marketplaces, and in-person selling through connected channels.",
-        ],
+        question: "Garanti süresi ve kapsamı nedir?",
+        answer:
+          "Üretim hatalarına karşı tüm römorklarımız 2 yıl resmi garanti kapsamındadır. Ayrıca yedek parça desteği sunmaktayız.",
       },
+      {
+        question: "Kişiye özel veya farklı ölçülerde üretim yapıyor musunuz?",
+        answer:
+          "Evet, teknenizin veya aracınızın ölçülerine göre mühendislik ekibimizle özel konfigürasyonlar hazırlayabiliyoruz.",
+      },
+      {
+        question: "Römorklarınızın taşıma kapasitesi nedir?",
+        answer:
+          "Ürünlerimiz 750 kg'dan başlayarak 3500 kg'a kadar farklı taşıma kapasitelerine sahip modellerle sunulmaktadır. İhtiyacınıza uygun modeli seçebilirsiniz.",
+      },
+      {
+        question: "Römorklarınızın su geçirmezliği hakkında bilgi verebilir misiniz?",
+        answer:
+          "Römorklarımız, su geçirmez kaplamalar ve özel conta sistemleri ile donatılmıştır. Bu sayede tekne taşıma sırasında su sızdırmazlığı sağlanır ve ürünlerimiz uzun ömürlü olur.",
+      }
     ],
   },
   {
-    id: "payments",
-    label: "Payments on Shopify",
-    heading: "Payments on Shopify",
+    id: "siparis",
+    label: "Sipariş & Teslimat",
     items: [
       {
-        question: "Which payment methods are supported?",
-        answer: [
-          "Shopify supports a range of payment gateways and local payment options depending on your market.",
-        ],
+        question: "Teslimat süreniz ne kadardır?",
+        answer: "Stoktaki standart modellerimiz hemen teslim edilirken, özel üretim projelerimiz iş yoğunluğuna göre ortalama 10-15 iş günü içinde tamamlanmaktadır.",
       },
       {
-        question: "Can I track transactions and payouts?",
-        answer: [
-          "Yes, payment activity, order history, and payout details are available in the admin dashboard.",
-        ],
-      },
-    ],
-  },
-  {
-    id: "shipping",
-    label: "Shipping with Shopify",
-    heading: "Shipping with Shopify",
-    items: [
-      {
-        question: "How do shipping settings work?",
-        answer: [
-          "You can define rates, shipping zones, delivery options, and fulfillment rules for different destinations.",
-        ],
+        question: "Türkiye geneline gönderim yapıyor musunuz?",
+        answer: "Evet, Ankara merkezli fabrikamızdan Türkiye’nin her yerine güvenli lojistik ağımızla gönderim sağlıyoruz.",
       },
       {
-        question: "Can I offer local pickup?",
-        answer: [
-          "Yes, local pickup and other fulfillment methods can be configured based on your store setup.",
-        ],
+        question: "Ödeme seçenekleriniz nelerdir?",
+        answer: "Kredi kartına taksit imkanı, havale/EFT ve kurumsal projeler için özel ödeme planları sunuyoruz."
       },
+      {
+        question: "İade ve değişim koşullarınız nelerdir?",
+        answer: "Ürünlerimizle ilgili herhangi bir sorunuz varsa, lütfen bizimle iletişime geçin. İade ve değişim işlemleri, ürünün durumuna ve sebepine göre değerlendirilir."
+      },
+      
     ],
   },
 ];
 
-// -------------------------------------------------------------
+export default function FAQ() {
+  const [activeCategory, setActiveCategory] = useState(categories[0].id);
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
 
-export default function FAQSection() {
-  const [activeSectionId, setActiveSectionId] = useState(faqSections[0].id);
+  const current = categories.find((c) => c.id === activeCategory)!;
 
-  const activeSection = useMemo(
-    () => faqSections.find((s) => s.id === activeSectionId) ?? faqSections[0],
-    [activeSectionId],
-  );
-
-  const renderLine = (line: string) => {
-    const keyword = line.includes("themes")
-      ? "themes"
-      : line.includes("apps")
-        ? "apps"
-        : null;
-
-    if (!keyword) return <p key={line}>{line}</p>;
-
-    const [start, end] = line.split(keyword);
-    return (
-      <p key={line}>
-        {start}
-        <a
-          href="#help-center"
-          className="font-medium text-[#1f8f67] underline decoration-[#1f8f67] underline-offset-2"
-        >
-          {keyword}
-        </a>
-        {end}
-      </p>
-    );
+  const toggle = (index: number) => {
+    setOpenIndex(openIndex === index ? null : index);
   };
 
   return (
-    <section id="help-center" className="fluid px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
+    <section className="px-6 py-20 ">
+      <div className="mx-auto max-w-8xl flex  flex-col gap-4 items-center justify-center">
+        {/* HEADER */}
+        <div className="text-center w-2xl  flex  flex-col gap-4 ">
+          <h2 className="text-4xl font-bold tracking-tight text-slate-900">
+            Sık Sorulan Sorular
+          </h2>
+          <p className="mt-4 text-slate-600">
+            Planlar, fiyatlar ve desteklenen özellikler hakkında sorularınız
+            için size yardımcı olmaktan memnuniyet duyarız.
+          </p>
+        </div>
+
+        {/* CATEGORY PILLS */}
+        <div className="mt-10 flex flex-wrap justify-center gap-3">
+          {categories.map((cat) => {
+            const active = cat.id === activeCategory;
+
+            return (
+              <button
+                key={cat.id}
+                onClick={() => {
+                  setActiveCategory(cat.id);
+                  setOpenIndex(null);
+                }}
+                className={`px-4 py-2 rounded-full text-sm transition ${
+                  active
+                    ? "bg-slate-900 text-white"
+                    : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                }`}
+              >
+                {cat.label}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* ACCORDION */}
+<div className="mt-10 w-full max-w-3xl mx-auto space-y-4"> 
+  {/* max-w-3xl ile tüm satırları sabit bir genişliğe hapsettik */}
+  {current.items.map((item, i) => {
+    const open = openIndex === i;
+
+    return (
       <div
-        className="mx-auto w-full max-w-360 text-left"
-        style={{ borderRadius: 32 }}
+        key={i}
+        className="border border-slate-200 rounded-xl overflow-hidden bg-white w-full transition-all duration-200"
       >
-        <div className="grid gap-10 lg:grid-cols-[minmax(0,1.08fr)_minmax(420px,0.92fr)] lg:items-start px-0">
-          <div className="max-w-140">
-            <h2 className="text-[clamp(2.6rem,5vw,3.9rem)] font-semibold tracking-[-0.055em] text-[#111827]">
-              Ankarom FAQ
-            </h2>
+        <button
+          onClick={() => toggle(i)}
+          className="w-full flex items-center justify-between px-6 py-5 text-left hover:bg-slate-50 transition-colors"
+        >
+          {/* text-left ve w-full sayesinde başlıklar her zaman aynı hizada başlar */}
+          <span className="text-[16px] font-semibold text-slate-900 pr-4">
+            {item.question}
+          </span>
 
-            <p className="mt-4 max-w-130 text-[clamp(1.1rem,2vw,1.45rem)] leading-[1.35] text-[#6b7280]">
-              If you’re new to Shopify or looking to replatform your business,
-              this guide will help you learn more about the platform and its
-              features.
-            </p>
+          <ChevronDown
+            className={`h-5 w-5 flex-shrink-0 text-slate-500 transition-transform duration-300 ${
+              open ? "rotate-180" : ""
+            }`}
+          />
+        </button>
 
-            <div className="mt-8 text-[15px] leading-[1.45] text-[#6b7280] sm:text-[16px]">
-              <p>Already have a Shopify store?</p>
-              <p>
-                Get detailed product information in our{" "}
-                <a
-                  href="#help-center"
-                  className="font-medium text-[#1f8f67] underline decoration-[#1f8f67] underline-offset-2"
-                >
-                  Help Center
-                </a>
-              </p>
+        {/* İçerik alanı açıldığında kartın genişliği değişmez, sadece yüksekliği artar */}
+        {open && (
+          <div className="px-6 pb-5 text-slate-600 text-[15px] leading-relaxed animate-in fade-in slide-in-from-top-2 duration-300">
+            <div className="pt-2 border-t border-slate-100">
+              {item.answer}
             </div>
           </div>
-
-          <div className="relative flex justify-center lg:justify-end lg:pt-2">
-            <div className="absolute inset-x-[10%] top-[10%] h-[68%] rounded-full bg-[#f5f7fc] blur-3xl" />
-            <Image
-              src="/romork.png"
-              alt="Shopify illustration"
-              width={1200} // büyük ver, tarayıcı ekranına göre küçülterek gösterir
-              height={900}
-              className="relative z-10 w-full max-w-140 drop-shadow-[0_22px_36px_rgba(15,23,42,0.08)]"
-            />
-          </div>
-        </div>
-
-        {/* --------- Content --------- */}
-        {/* Sütun genişliğini 214px'den 280px'e çıkardık, gap'i artırdık */}
-        <div className="grid gap-6 pt-14 lg:grid-cols-[280px_minmax(0,1fr)] lg:items-start lg:gap-10">
-          
-          {/* Left Menu */}
-          <nav className="self-start border-l border-[#d7dbe3] pl-0 lg:pt-2">
-            {/* space-y-1 yerine space-y-2 veya 3 kullanarak maddeler arası boşluğu açtık */}
-            <ul className="space-y-2">
-              {faqSections.map((section) => {
-                const isActive = section.id === activeSectionId;
-                return (
-                  <li key={section.id}>
-                    <button
-                      type="button"
-                      onClick={() => setActiveSectionId(section.id)}
-                      // px-5 ve py-4 ile butonların iç hacmini artırdık, yazıyı biraz büyüttük (text-[16px])
-                      className={`relative w-full border-l-2 px-5 py-4 text-left text-[16px] leading-[1.45] transition ${
-                        isActive
-                          ? "border-[#111827] text-[#111827] font-medium"
-                          : "border-transparent text-[#6b7280] hover:text-[#111827]"
-                      }`}
-                    >
-                      {section.label}
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
-          </nav>
-
-          {/* Active Content */}
-          <div className="w-full min-w-0 min-h-[450px] bg-white px-6 py-10 shadow-[0_24px_68px_rgba(15,23,42,0.09)] ring-1 ring-[#eef1f5] sm:px-8 sm:py-12 lg:px-10 lg:py-14 rounded-2xl">
-            <h3 className="text-[21px] font-normal tracking-[-0.03em] text-[#2f343d] sm:text-[22px]">
-              {activeSection.heading}
-            </h3>
-
-            <div className="mt-10 grid gap-x-10 gap-y-12 md:grid-cols-2">
-              {activeSection.items.map((item) => (
-                <article key={item.question} className="min-w-0">
-                  <h4 className="text-[16px] font-semibold leading-[1.35] text-[#2f343d]">
-                    {item.question}
-                  </h4>
-                  <div className="mt-4 space-y-3 text-[15px] leading-[1.6] text-[#6b7280]">
-                    {item.answer.map((line) => renderLine(line))}
-                  </div>
-                </article>
-              ))}
-            </div>
-          </div>
-        </div>
+        )}
+      </div>
+    );
+  })}
+</div>
       </div>
     </section>
   );

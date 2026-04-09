@@ -6,36 +6,17 @@ import Link from "next/link";
 import {
   Bars3Icon,
   XMarkIcon,
-  ChevronDownIcon,
 } from "@heroicons/react/24/outline";
 
 
-const whatsappHref = "https://wa.me/905065440466?text=İyi%20günler,%20hizmetleriniz%20hakkında%20detaylı%20bilgi%20alabilir%20miyim?";
+const whatsappHref = "https://wa.me/905079586868?text=İyi%20günler,%20hizmetleriniz%20hakkında%20detaylı%20bilgi%20alabilir%20miyim?";
 
 const menuLinks = [
   { name: "Hakkımızda", href: "/hakkimizda" },
 ];
 
-const productLinks = [
-  { name: "Araç Römorkları", href: "/urunler?category=arac-romorklari" },
-  { name: "Platform Römorklar", href: "/urunler?category=platform-romorklar" },
-  {
-    name: "Kapalı Kasa Römorklar",
-    href: "/urunler?category=kapali-kasa-romorklar",
-  },
-  {
-    name: "Özel Üretim Römorklar",
-    href: "/urunler?category=ozel-uretim-romorklar",
-  },
-  {
-    name: "Yedek Parça ve Ekipman",
-    href: "/urunler?category=yedek-parca-ve-ekipman",
-  },
-];
-
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isProductsOpen, setIsProductsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
@@ -58,6 +39,10 @@ export default function Header() {
     };
   }, [isMobileMenuOpen]);
 
+  const handleLogoClick = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   return (
       <header
           className={`fluid sticky top-0 z-40 w-full transition-all duration-300 ${
@@ -73,6 +58,8 @@ export default function Header() {
           {/* Logo - Boyut ve Boşluk Düzenlemesi */}
           <Link
               href="/"
+              scroll={true}
+              onClick={handleLogoClick}
               className="group relative flex items-center py-1 transition-transform duration-200 hover:scale-[1.02]"
           >
             <div className="relative">
@@ -89,55 +76,14 @@ export default function Header() {
 
           {/* Desktop Navigation - gap-2 yapıldı */}
           <nav className="hidden items-center gap-2 lg:flex">
-            {/* Catalog Dropdown */}
-            <div className="group relative">
-              <button
-                  type="button"
-                  className="relative inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-[13px] font-semibold uppercase tracking-[0.14em] text-slate-700 transition-all duration-200 hover:bg-slate-50 hover:text-blue-700"
-              >
-                <span>Katalog</span>
-                <ChevronDownIcon className="h-3.5 w-3.5 transition-transform duration-300 group-hover:rotate-180" />
-                {/* Active indicator */}
-                <span className="absolute bottom-1 left-1/2 h-0.5 w-0 -translate-x-1/2 rounded-full bg-blue-600 transition-all duration-300 group-hover:w-8" />
-              </button>
-
-              {/* Dropdown Menu */}
-              <div className="pointer-events-none absolute left-1/2 top-full z-50 w-80 -translate-x-1/2 pt-3 opacity-0 invisible translate-y-3 transition-all duration-300 ease-out group-hover:pointer-events-auto group-hover:opacity-100 group-hover:visible group-hover:translate-y-0">
-                <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white/98 shadow-[0_20px_50px_rgba(15,23,42,0.12)] backdrop-blur-sm">
-                  {/* Dropdown header accent */}
-                  <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-blue-500 via-blue-600 to-blue-500" />
-
-                  <div className="p-5 pt-6">
-                    <p className="mb-4 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400">
-                      <span className="h-px flex-1 bg-gradient-to-r from-slate-200 to-transparent" />
-                      Ürün Kategorileri
-                      <span className="h-px flex-1 bg-gradient-to-l from-slate-200 to-transparent" />
-                    </p>
-                    <div className="grid gap-1">
-                      {productLinks.map((link, index) => (
-                          <Link
-                              key={link.name}
-                              href={link.href}
-                              className="group/item relative flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-slate-600 transition-all duration-200 hover:bg-gradient-to-r hover:from-blue-50 hover:to-transparent hover:text-blue-700"
-                              style={{ animationDelay: `${index * 50}ms` }}
-                          >
-                            <span className="flex h-2 w-2 items-center justify-center rounded-full bg-slate-200 transition-all duration-200 group-hover/item:bg-blue-500 group-hover/item:scale-125" />
-                            <span>{link.name}</span>
-                            <svg
-                                className="ml-auto h-4 w-4 -translate-x-2 text-slate-300 opacity-0 transition-all duration-200 group-hover/item:translate-x-0 group-hover/item:text-blue-500 group-hover/item:opacity-100"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-                            </svg>
-                          </Link>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            {/* Katalog Link */}
+            <Link
+                href="/urunler"
+                className="group relative inline-flex items-center rounded-xl px-5 py-2.5 text-[13px] font-semibold uppercase tracking-[0.14em] text-slate-700 transition-all duration-200 hover:bg-slate-50 hover:text-blue-700"
+            >
+              <span>Katalog</span>
+              <span className="absolute bottom-1 left-1/2 h-0.5 w-0 -translate-x-1/2 rounded-full bg-blue-600 transition-all duration-300 group-hover:w-8" />
+            </Link>
 
             {/* Other Menu Links */}
             {menuLinks.map((link) => (
@@ -190,7 +136,6 @@ export default function Header() {
               aria-label="Mobil menüyü kapat"
               onClick={() => {
                 setIsMobileMenuOpen(false);
-                setIsProductsOpen(false);
               }}
               className={`absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity duration-300 ${
                   isMobileMenuOpen ? "opacity-100" : "opacity-0"
@@ -206,7 +151,15 @@ export default function Header() {
             {/* Mobile Header - Logo küçültüldü */}
             <div className="relative flex items-center justify-between border-b border-slate-100 px-6 py-5">
               <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-blue-500 via-blue-600 to-blue-500" />
-              <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="py-0.5">
+              <Link
+                  href="/"
+                  scroll={true}
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    handleLogoClick();
+                  }}
+                  className="py-0.5"
+              >
                 <Image
                     src="/ankarom.png"
                     width={90} // Mobil logo daha da küçültüldü
@@ -227,47 +180,14 @@ export default function Header() {
             {/* Mobile Navigation */}
             <div className="flex-1 overflow-y-auto px-6 py-8">
               <nav className="flex flex-col gap-3">
-                {/* Catalog Accordion */}
-                <div className="overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-b from-slate-50 to-white">
-                  <button
-                      type="button"
-                      onClick={() => setIsProductsOpen(!isProductsOpen)}
-                      className="flex w-full items-center justify-between px-5 py-4 text-left"
-                  >
-                  <span className="text-sm font-bold uppercase tracking-[0.12em] text-slate-800">
-                    Katalog
-                  </span>
-                    <ChevronDownIcon
-                        className={`h-4 w-4 text-slate-400 transition-transform duration-300 ${
-                            isProductsOpen ? "rotate-180" : ""
-                        }`}
-                    />
-                  </button>
-
-                  <div
-                      className={`grid transition-all duration-300 ease-out ${
-                          isProductsOpen
-                              ? "grid-rows-[1fr] opacity-100"
-                              : "grid-rows-[0fr] opacity-0"
-                      }`}
-                  >
-                    <div className="overflow-hidden">
-                      <div className="border-t border-slate-100 px-3 py-3">
-                        {productLinks.map((link) => (
-                            <Link
-                                key={link.name}
-                                href={link.href}
-                                onClick={() => setIsMobileMenuOpen(false)}
-                                className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-slate-600 transition-colors hover:bg-blue-50 hover:text-blue-700"
-                            >
-                              <span className="h-1.5 w-1.5 rounded-full bg-slate-300" />
-                              {link.name}
-                            </Link>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                {/* Katalog Link */}
+                <Link
+                    href="/urunler"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center rounded-2xl border border-slate-200 bg-white px-5 py-4 text-sm font-bold uppercase tracking-[0.12em] text-slate-700 transition-all hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+                >
+                  Katalog
+                </Link>
 
                 {/* Other Links */}
                 {menuLinks.map((link) => (

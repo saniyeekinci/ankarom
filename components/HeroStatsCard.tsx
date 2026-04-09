@@ -13,25 +13,27 @@ export default function HeroStatsCard() {
         <div className="grid items-center gap-10 lg:grid-cols-12 lg:gap-12 xl:gap-14">
           <div className="flex flex-col gap-4 space-y-7 lg:col-span-7">
             <span className="inline-flex items-center rounded-full   px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-blue-700">
-              Kurumsal Otomotiv Çözümleri
+              GÜVENİLİR VE SERTİFİKALI TAŞIMA ÇÖZÜMLERİ
             </span>
 
             <h1 className="max-w-4xl text-4xl font-bold leading-[1.08] text-slate-900 sm:text-5xl lg:text-6xl">
-              İş süreçlerinizi sadeleştiren, ölçülebilir ve güven veren dijital deneyim
+              O1 ve O2 Belgeli, Her Araca Uygun, Üstün Kaliteli Römork İmalatı
             </h1>
 
             <p className="max-w-3xl text-base leading-relaxed text-slate-600 sm:text-lg">
-              Ankarom, filo ve ürün operasyonlarını tek çatı altında toplayarak ekiplerin daha hızlı karar almasını, daha net raporlamasını ve daha düzenli çalışmasını sağlar.
+              Ankarom olarak; tekneden jet skiye, ATV’den motosiklete kadar tüm
+              taşıma ihtiyaçlarınız için uluslararası standartlarda, dayanıklı
+              ve güvenli römorklar üretiyoruz.
             </p>
 
             <div className="flex flex-wrap items-center gap-4 pt-2">
               {/* a etiketlerini Link olarak değiştirdik */}
               <Link
-  href="/iletisim"
-  className="rounded-xl bg-blue-600 !text-white px-7 py-3.5 text-sm font-bold uppercase tracking-[0.16em] transition-all duration-300 hover:-translate-y-0.5 hover:bg-blue-700"
->
-  İletişime Geç
-</Link>
+                href="/iletisim"
+                className="rounded-xl bg-blue-600 !text-white px-7 py-3.5 text-sm font-bold uppercase tracking-[0.16em] transition-all duration-300 hover:-translate-y-0.5 hover:bg-blue-700"
+              >
+                İletişime Geç
+              </Link>
               <Link
                 href="/urunler"
                 className="rounded-xl border border-slate-200 bg-white px-7 py-3.5 text-sm font-bold uppercase tracking-[0.14em] text-slate-700 transition-all duration-300 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
@@ -47,21 +49,23 @@ export default function HeroStatsCard() {
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-[0_10px_24px_rgba(15,23,42,0.05)]">
                   <p className="text-xs uppercase tracking-[0.18em] text-slate-500">
-                    Aktif Müşteri
+                    MEMNUN MÜŞTERİ
                   </p>
                   <p className="mt-2 text-4xl font-bold text-slate-900">+240</p>
                 </div>
                 <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-[0_10px_24px_rgba(15,23,42,0.05)]">
                   <p className="text-xs uppercase tracking-[0.18em] text-slate-500">
-                    Canlı Entegrasyon
+                    TESLİM EDİLEN RÖMORK
                   </p>
                   <p className="mt-2 text-4xl font-bold text-slate-900">17</p>
                 </div>
                 <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-[0_10px_24px_rgba(15,23,42,0.05)] sm:col-span-2">
                   <p className="text-xs uppercase tracking-[0.18em] text-slate-500">
-                    Platform Performansı
+                    GARANTİ SÜRESİ
                   </p>
-                  <p className="mt-2 text-3xl font-bold text-slate-900">99.9% Uptime</p>
+                  <p className="mt-2 text-3xl font-bold text-slate-900">
+                    2 Yıl
+                  </p>
                 </div>
               </div>
             </div>

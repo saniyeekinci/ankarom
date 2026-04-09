@@ -104,7 +104,7 @@ export default function Footer() {
             </div>
           </div>
 
-          <div className="md:col-span-7 grid grid-cols-2 gap-24 pt-10 md:pl-20 md:pt-16 lg:gap-32">
+          <div className="md:col-span-7 grid grid-cols-3 gap-18 pt-10 md:pl-20 md:pt-16 lg:gap-32">
             <div>
               <h4 className="mb-14 text-[12px] font-bold uppercase tracking-[0.3em] text-slate-400">
                 SITE MAP
@@ -134,14 +134,7 @@ export default function Footer() {
                     Hakkımızda
                   </Link>
                 </li>
-                <li>
-                  <Link
-                    href="/iletisim"
-                    className="border-b border-transparent pb-2 transition-all hover:border-slate-400 hover:text-slate-900"
-                  >
-                    İletişim
-                  </Link>
-                </li>
+                
               </ul>
             </div>
 
@@ -165,6 +158,22 @@ export default function Footer() {
                   >
                     Kullanım Şartları
                   </Link>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="mb-14 text-[12px] font-bold uppercase tracking-[0.3em] text-slate-400">
+                İLETİŞİM
+              </h4>
+              <ul className="space-y-10 text-[16px] font-normal leading-loose text-slate-700">
+                <li className="border-b border-transparent pb-2 transition-all hover:border-slate-400 hover:text-slate-900">
+                  <span>adres</span>
+                </li>
+                <li className="border-b border-transparent pb-2 transition-all hover:border-slate-400 hover:text-slate-900">
+                  <span>telefon</span>
+                </li>
+                <li className="border-b border-transparent pb-2 transition-all hover:border-slate-400 hover:text-slate-900">
+                  <span>email</span>
                 </li>
               </ul>
             </div>

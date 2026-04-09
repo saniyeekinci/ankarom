@@ -9,14 +9,8 @@ import Link from "next/link";
 // ============================================
 function useCountUp(end: number, duration: number = 2000, startOnView: boolean = true) {
   const [count, setCount] = useState(0);
-  const [hasStarted, setHasStarted] = useState(false);
+  const [hasStarted, setHasStarted] = useState(!startOnView);
   const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!startOnView) {
-      setHasStarted(true);
-    }
-  }, [startOnView]);
 
   useEffect(() => {
     if (startOnView && ref.current) {
@@ -139,6 +133,29 @@ const certifications = [
 ];
 
 // ============================================
+// STAT CARD COMPONENT (HATAYI ÇÖZEN KISIM)
+// ============================================
+// Hook kurallarına uymak için istatistik kartını ayrı bir bileşene ayırdık
+function StatCard({ stat }: { stat: { value: number; suffix: string; label: string } }) {
+  const { count, ref } = useCountUp(stat.value, 2500);
+
+  return (
+    <div
+      ref={ref}
+      className="text-center p-8 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm"
+    >
+      <p className="text-5xl lg:text-6xl font-black text-white tracking-tight mb-3">
+        {count}
+        <span className="text-blue-400">{stat.suffix}</span>
+      </p>
+      <p className="text-sm font-semibold uppercase tracking-widest text-slate-400">
+        {stat.label}
+      </p>
+    </div>
+  );
+}
+
+// ============================================
 // MAIN COMPONENT
 // ============================================
 export default function AboutPage() {
@@ -195,7 +212,7 @@ export default function AboutPage() {
             </h1>
 
             <p className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed mb-12">
-              Türkiye'nin kalbinden dünyaya uzanan, hassas mühendislik ve
+              Türkiyenin kalbinden dünyaya uzanan, hassas mühendislik ve
               el ustalığının buluştuğu üretim merkezi.
             </p>
 
@@ -266,7 +283,7 @@ export default function AboutPage() {
                 </div>
 
                 <h2 className="text-4xl lg:text-5xl font-bold tracking-tight text-slate-900 leading-[1.1] mb-8">
-                  Ankara'dan Dünyaya
+                  Ankaradan Dünyaya
                   <br />
                   <span className="text-slate-400">Uzanan Yolculuk</span>
                 </h2>
@@ -274,8 +291,8 @@ export default function AboutPage() {
                 <div className="space-y-6 text-slate-600 leading-relaxed">
                   <p className="text-lg">
                     2004 yılında, mühendisliğe olan tutkumuz ve kaliteden ödün vermeme
-                    ilkemizle yola çıktık. Bugün, <strong className="text-slate-900">15'den fazla ülkeye</strong> ihracat
-                    yapan, Türkiye'nin önde gelen römork üreticilerinden biri haline geldik.
+                    ilkemizle yola çıktık. Bugün, <strong className="text-slate-900">15den fazla ülkeye</strong> ihracat
+                    yapan, Türkiyenin önde gelen römork üreticilerinden biri haline geldik.
                   </p>
                   <p>
                     Her römorkumuz, deneyimli mühendislerimizin titizliği ve modern
@@ -283,7 +300,7 @@ export default function AboutPage() {
                     taşımak değil; güvenle, verimle ve dayanıklılıkla taşımak.
                   </p>
                   <p>
-                    Kahramankazan'daki modern tesisimizde, geleneksel ustalık
+                    Kahramankazandaki modern tesisimizde, geleneksel ustalık
                     ve ileri teknoloji bir arada. Her kaynak noktası, her montaj
                     detayı—hepsi aynı özeni taşıyor.
                   </p>
@@ -388,26 +405,11 @@ export default function AboutPage() {
               </h2>
             </div>
 
-            {/* Statistics Grid */}
+            {/* Statistics Grid - HATANIN ÇÖZÜLDÜĞÜ YER */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
-              {statistics.map((stat, index) => {
-                const { count, ref } = useCountUp(stat.value, 2500);
-                return (
-                    <div
-                        key={index}
-                        ref={ref}
-                        className="text-center p-8 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm"
-                    >
-                      <p className="text-5xl lg:text-6xl font-black text-white tracking-tight mb-3">
-                        {count}
-                        <span className="text-blue-400">{stat.suffix}</span>
-                      </p>
-                      <p className="text-sm font-semibold uppercase tracking-widest text-slate-400">
-                        {stat.label}
-                      </p>
-                    </div>
-                );
-              })}
+              {statistics.map((stat, index) => (
+                <StatCard key={index} stat={stat} />
+              ))}
             </div>
           </div>
         </section>

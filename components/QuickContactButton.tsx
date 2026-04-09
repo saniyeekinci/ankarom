@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 
-// WhatsApp Number: +90 506 544 04 66
-const whatsappHref = "https://wa.me/905065440466?text=İyi%20günler,%20hizmetleriniz%20hakkında%20detaylı%20bilgi%20alabilir%20miyim?";
+// WhatsApp Number: +90 507 958 68 68
+const whatsappHref = "https://wa.me/905079586868?text=İyi%20günler,%20hizmetleriniz%20hakkında%20detaylı%20bilgi%20alabilir%20miyim?";
 
 export default function QuickContactButton() {
   return (
