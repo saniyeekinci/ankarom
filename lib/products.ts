@@ -46,7 +46,7 @@ export const products: Product[] = [
     discountPrice: 2450000,
     capacity: "2.500 kg",
     stockStatus: "Stokta Var",
-    imageUrl: "/products/1.jpg",
+    // imageUrl: "/products/1.jpg",
     description:
       "Düşük gövdeli spor araçların hasarsız yüklenmesi için optimize edilmiş rampa açısı ve güçlendirilmiş şasi yapısı ile geliştirilmiştir. Yük sabitleme noktaları, uzun mesafeli taşımalarda dahi güvenli pozisyon koruyacak şekilde konumlandırılmıştır.",
     features: [
@@ -69,7 +69,7 @@ export const products: Product[] = [
     discountPrice: 1180000,
     capacity: "1.500 kg",
     stockStatus: "Stokta Var",
-    imageUrl: "/products/1.jpg",
+    // imageUrl: "/products/1.jpg",
     description:
       "Pro ATV Transport Trailer, bireysel ve profesyonel ATV taşımacılığı için geliştirilmiş kompakt ve dayanıklı bir çözüm sunar. Denge odaklı aks yapısı sayesinde zorlu yol koşullarında dahi güvenli kullanım performansı sağlar.",
     features: [
@@ -92,7 +92,7 @@ export const products: Product[] = [
     discountPrice: 1960000,
     capacity: "3.500 kg",
     stockStatus: "Siparişe Özel",
-    imageUrl: "/products/1.jpg",
+    // imageUrl: "/products/1.jpg",
     description:
       "Marine Boat Trailer, tekne sahipleri ve marina işletmeleri için güvenilir bir taşıma altyapısı sağlar. Korozyona dayanıklı yapısı ve kontrollü yük dağılımı ile hem kısa hem uzun mesafede stabil performans sunar.",
     features: [
@@ -115,7 +115,7 @@ export const products: Product[] = [
     discountPrice: 890000,
     capacity: "800 kg",
     stockStatus: "Stokta Var",
-    imageUrl: "/products/1.jpg",
+    // imageUrl: "/products/1.jpg",
     description:
       "Moto Duo Carrier, aynı anda iki motosiklet taşımak isteyen kullanıcılar için geliştirildi. Hafif fakat dayanıklı şasi yapısı ile manevra kolaylığı sağlarken taşıma güvenliğini üst seviyede tutar.",
     features: [
@@ -138,7 +138,7 @@ export const products: Product[] = [
     discountPrice: 1120000,
     capacity: "1.200 kg",
     stockStatus: "Stock'ta 1 Kaldı",
-    imageUrl: "/products/1.jpg",
+    // imageUrl: "/products/1.jpg",
     description:
       "Jet Ski Premium Trailer, yüksek performanslı su sporları araçları için tasarlanmış profesyonel taşıma çözümüdür. Suya dayanıklı gövde ve kontrollü süspansiyon sistemi ile maksimum koruma sağlar.",
     features: [
@@ -161,7 +161,7 @@ export const products: Product[] = [
     discountPrice: 1120000,
     capacity: "1.200 kg",
     stockStatus: "Stock'ta 1 Kaldı",
-    imageUrl: "/products/1.jpg",
+    // imageUrl: "/products/1.jpg",
     description:
       "Jet Ski Premium Trailer, yüksek performanslı su sporları araçları için tasarlanmış profesyonel taşıma çözümüdür. Suya dayanıklı gövde ve kontrollü süspansiyon sistemi ile maksimum koruma sağlar.",
     features: [
