@@ -1,75 +1,105 @@
-import Link from "next/link"; // Link bileşenini ekledik
+"use client";
+
+import Link from "next/link";
+import { 
+  ShieldCheckIcon, 
+  WrenchScrewdriverIcon, 
+  GlobeAltIcon,
+  ArrowUpRightIcon 
+} from "@heroicons/react/24/outline";
 
 export default function HeroStatsCard() {
   return (
-    <section className="relative flex min-h-[calc(100vh-80px)] items-center overflow-hidden px-4 py-10 sm:px-6 sm:py-12 lg:px-8 lg:py-16">
-      <div className="absolute inset-0 -z-10 overflow-hidden">
-        <div className="absolute left-1/2 top-8 h-96 w-96 -translate-x-1/2 rounded-full bg-blue-500/10 blur-3xl" />
-        <div className="absolute -left-8 bottom-16 h-72 w-72 rounded-full bg-sky-500/10 blur-3xl sm:-left-12" />
+    <section className="relative flex justify-center min-h-[90vh] items-center overflow-hidden bg-white px-4 py-12 sm:px-6 lg:px-8">
+      {/* Dekoratif Arka Plan Elemanları */}
+      <div className="absolute inset-0 -z-10">
+        <div className="absolute left-[10%] top-[20%] h-72 w-72 rounded-full bg-blue-50 blur-[120px]" />
+        <div className="absolute right-[10%] bottom-[20%] h-96 w-96 rounded-full bg-slate-50 blur-[130px]" />
       </div>
 
-      {/* rounded-[32px] yerine rounded-4xl kullandık */}
-      <div className=" mx-auto w-full max-w-360 rounded-4xl border border-slate-200 bg-white p-6 shadow-[0_24px_70px_rgba(15,23,42,0.08)] sm:p-10 lg:p-14">
-        <div className="grid items-center gap-10 lg:grid-cols-12 lg:gap-12 xl:gap-14">
-          <div className="flex flex-col gap-4 space-y-7 lg:col-span-7">
-            <span className="inline-flex items-center rounded-full   px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-blue-700">
-              GÜVENİLİR VE SERTİFİKALI TAŞIMA ÇÖZÜMLERİ
-            </span>
+      <div className="mx-auto w-full max-w-7xl">
+        <div className="grid items-center gap-12 lg:grid-cols-2">
+          
+          {/* Sol İçerik Alanı */}
+          <div className="flex flex-col gap-8">
+            <div className="inline-flex items-center gap-2 rounded-full bg-blue-50 px-4 py-2 text-[11px] font-bold uppercase tracking-widest text-blue-600">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-600"></span>
+              </span>
+              Premium Römork Teknolojileri
+            </div>
 
-            <h1 className="max-w-4xl text-4xl font-bold leading-[1.08] text-slate-900 sm:text-5xl lg:text-6xl">
-              O1 ve O2 Belgeli, Her Araca Uygun, Üstün Kaliteli Römork İmalatı
+            <h1 className="text-4xl font-black leading-[1.1] text-slate-900 sm:text-6xl lg:text-7xl">
+              Yolu Güvenle <br />
+              <span className="text-blue-600">Sertifikala.</span>
             </h1>
 
-            <p className="max-w-3xl text-base leading-relaxed text-slate-600 sm:text-lg">
-              Ankarom olarak; tekneden jet skiye, ATV’den motosiklete kadar tüm
-              taşıma ihtiyaçlarınız için uluslararası standartlarda, dayanıklı
-              ve güvenli römorklar üretiyoruz.
+            <p className="max-w-xl text-lg leading-relaxed text-slate-500">
+              Ankarom, O1 ve O2 tip onay belgeli üretim standartlarıyla, 
+              tekne, ATV ve özel taşıma ihtiyaçlarınız için mühendislik 
+              odaklı çözümler sunar.
             </p>
 
-            <div className="flex flex-wrap items-center gap-4 pt-2">
-              {/* a etiketlerini Link olarak değiştirdik */}
-              <Link
-                href="/iletisim"
-                className="rounded-xl bg-blue-600 !text-white px-7 py-3.5 text-sm font-bold uppercase tracking-[0.16em] transition-all duration-300 hover:-translate-y-0.5 hover:bg-blue-700"
-              >
-                İletişime Geç
-              </Link>
+            <div className="flex flex-wrap items-center gap-5 pt-4">
               <Link
                 href="/urunler"
-                className="rounded-xl border border-slate-200 bg-white px-7 py-3.5 text-sm font-bold uppercase tracking-[0.14em] text-slate-700 transition-all duration-300 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+                className="group flex items-center gap-2 rounded-2xl bg-slate-900 px-8 py-4 text-sm font-bold uppercase tracking-widest text-white transition-all hover:bg-blue-600 hover:shadow-xl hover:shadow-blue-200"
               >
-                Ürünleri İncele
+                Kataloğu Keşfet
+                <ArrowUpRightIcon className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              </Link>
+              <Link
+                href="/iletisim"
+                className="rounded-2xl border border-slate-200 bg-white px-8 py-4 text-sm font-bold uppercase tracking-widest text-slate-600 transition-all hover:border-blue-600 hover:text-blue-600"
+              >
+                Teklif Al
               </Link>
             </div>
           </div>
 
-          <div className="relative lg:col-span-5">
-            <div className="pointer-events-none absolute -inset-6 rounded-[36px] bg-linear-to-tr from-blue-400/10 via-sky-400/10 to-transparent blur-2xl" />
-            <div className="relative rounded-[30px] border border-slate-200 bg-slate-50 p-6 shadow-[0_24px_80px_rgba(15,23,42,0.08)] sm:p-7">
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-[0_10px_24px_rgba(15,23,42,0.05)]">
-                  <p className="text-xs uppercase tracking-[0.18em] text-slate-500">
-                    MEMNUN MÜŞTERİ
-                  </p>
-                  <p className="mt-2 text-4xl font-bold text-slate-900">+240</p>
+          {/* Sağ Görsel/Kart Alanı */}
+          <div className="relative">
+            <div className="grid gap-4 sm:grid-cols-2">
+              
+              {/* Kart 1 - Belge */}
+              <div className="flex flex-col gap-4 rounded-3xl border border-slate-100 bg-white p-8 shadow-sm transition-all hover:border-blue-100 hover:shadow-md">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50">
+                  <ShieldCheckIcon className="h-6 w-6 text-blue-600" />
                 </div>
-                <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-[0_10px_24px_rgba(15,23,42,0.05)]">
-                  <p className="text-xs uppercase tracking-[0.18em] text-slate-500">
-                    TESLİM EDİLEN RÖMORK
-                  </p>
-                  <p className="mt-2 text-4xl font-bold text-slate-900">17</p>
+                <h3 className="text-xl font-bold text-slate-900">Uluslararası Standart</h3>
+                <p className="text-sm leading-relaxed text-slate-500">
+                  O1 ve O2 Tip Onay belgeli, Avrupa normlarına tam uyumlu üretim süreci.
+                </p>
+              </div>
+
+              {/* Kart 2 - Destek */}
+              <div className="mt-0 flex flex-col gap-4 rounded-3xl border border-slate-100 bg-white p-8 shadow-sm transition-all hover:border-blue-100 hover:shadow-md sm:mt-8">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50">
+                  <WrenchScrewdriverIcon className="h-6 w-6 text-blue-600" />
                 </div>
-                <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-[0_10px_24px_rgba(15,23,42,0.05)] sm:col-span-2">
-                  <p className="text-xs uppercase tracking-[0.18em] text-slate-500">
-                    GARANTİ SÜRESİ
-                  </p>
-                  <p className="mt-2 text-3xl font-bold text-slate-900">
-                    2 Yıl
-                  </p>
+                <h3 className="text-xl font-bold text-slate-900">Teknik Destek</h3>
+                <p className="text-sm leading-relaxed text-slate-500">
+                  Satış sonrası yedek parça ve teknik bakım garantisiyle kesintisiz operasyon.
+                </p>
+              </div>
+
+              {/* Kart 3 - Yerli Üretim (Geniş) */}
+              <div className="flex flex-col gap-4 rounded-3xl border border-slate-100 bg-white p-8 shadow-sm transition-all hover:border-blue-100 hover:shadow-md sm:col-span-2">
+                <div className="flex items-center gap-4">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50">
+                    <GlobeAltIcon className="h-6 w-6 text-blue-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-slate-900">Ankara Merkezli Yerli Üretim</h3>
+                    <p className="text-sm text-slate-500">Türkiye'nin her yerine güvenli lojistik ve teslimat ağı.</p>
+                  </div>
                 </div>
               </div>
+
             </div>
           </div>
+
         </div>
       </div>
     </section>

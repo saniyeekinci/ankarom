@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   ArrowLeftIcon,
@@ -8,6 +9,8 @@ import {
   ShieldCheckIcon,
   BuildingOffice2Icon,
   QuestionMarkCircleIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
 } from "@heroicons/react/24/outline";
 import Breadcrumb from "@/components/Breadcrumb";
 import type { Product } from "@/lib/products";
@@ -20,7 +23,7 @@ const featureIcons = [
 ];
 
 type ProductDetailExperienceProps = {
-  product: Product;
+  product: Product; // Tipinizde 'images?: string[]' olduğunu varsayıyoruz
 };
 
 export default function ProductDetailExperience({
@@ -28,8 +31,13 @@ export default function ProductDetailExperience({
 }: ProductDetailExperienceProps) {
   const router = useRouter();
 
+  // Resim galerisi için state (Hangi resimde olduğumuzu tutar)
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
   const whatsappMessage = `Merhaba, ${product.name} hakkında bir sorum var.`;
-  const whatsappHref = `https://wa.me/905079586868?text=${encodeURIComponent(whatsappMessage)}`;
+  const whatsappHref = `https://wa.me/905079586868?text=${encodeURIComponent(
+    whatsappMessage
+  )}`;
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("tr-TR", {
@@ -40,16 +48,36 @@ export default function ProductDetailExperience({
   };
 
   const displayPrice = product.discountPrice ?? product.price;
-  const features = product.features || [
-    "Yüksek dayanım sunan güçlendirilmiş şasi yapısı",
-    "Uzun ömürlü kullanım için kaliteli malzeme seçimi",
-    "Profesyonel taşımacılığa uygun dengeli platform mimarisi",
-    "Ankarom satış sonrası destek ekibiyle güvenli operasyon",
-  ];
+  // Eğer ürünün kendi features dizisi varsa ve içi doluysa onu kullan, yoksa varsayılanları göster.
+  const features = product.features && product.features.length > 0 
+    ? product.features 
+    : [
+        "Yüksek dayanım sunan güçlendirilmiş şasi yapısı",
+        "Uzun ömürlü kullanım için kaliteli malzeme seçimi",
+        "Profesyonel taşımacılığa uygun dengeli platform mimarisi",
+        "Ankarom satış sonrası destek ekibiyle güvenli operasyon",
+      ];
+
+  // Eğer product.images dizisi varsa onu, yoksa product.imageUrl'i dizi yap, o da yoksa boş dizi.
+  const images = product.images?.length
+    ? product.images
+    : product.imageUrl
+    ? [product.imageUrl]
+    : [];
+
+  // Önceki Resim Fonksiyonu
+  const prevImage = () => {
+    setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
+  };
+
+  // Sonraki Resim Fonksiyonu
+  const nextImage = () => {
+    setCurrentImageIndex((prev) => (prev + 1) % images.length);
+  };
 
   return (
     <>
-      {/* Navigation Breadcrumb - DÜZELTİLDİ: mx-full yerine mx-auto eklendi ve w-full ile desteklendi */}
+      {/* Navigation Breadcrumb */}
       <div className="bg-slate-50 border-b border-slate-200">
         <div className="mx-auto w-full max-w-[1440px] px-6 py-4">
           <Breadcrumb
@@ -57,30 +85,67 @@ export default function ProductDetailExperience({
               { label: "Ana Sayfa", href: "/" },
               { label: "Ürünler", href: "/urunler" },
               { label: product.name },
-              
             ]}
           />
         </div>
       </div>
 
       <section className="relative px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
-        {/* Ürün Ana Konteyneri - DÜZELTİLDİ: max-w-6xl yerine breadcrumb ile aynı olan max-w-[1440px] yapıldı */}
+        {/* Ürün Ana Konteyneri */}
         <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-6 lg:gap-10">
           
           {/* --- ÜRÜN ANA KARTI --- */}
           <article className="w-full overflow-hidden rounded-[32px] border border-slate-200 bg-white p-4 shadow-[0_24px_70px_rgba(15,23,42,0.08)] sm:p-5 lg:p-6">
-            
-
             <div className="grid gap-6 lg:grid-cols-12 lg:items-stretch">
-              {/* Ürün Görseli */}
+              
+              {/* Ürün Görseli ve Slider */}
               <div className="relative min-h-96 overflow-hidden rounded-3xl border border-slate-200 bg-slate-50 lg:col-span-7 lg:min-h-[560px]">
-                {product.imageUrl ? (
-                  <img
-                    src={product.imageUrl}
-                    alt={product.name}
-                    className="h-full w-full object-cover"
-                  />
+                {images.length > 0 ? (
+                  <>
+                    <img
+                      src={images[currentImageIndex]}
+                      alt={`${product.name} - Görsel ${currentImageIndex + 1}`}
+                      className="h-full w-full object-cover transition-opacity duration-300"
+                    />
+
+                    {/* Sağ/Sol Okları (Sadece 1'den fazla resim varsa göster) */}
+                    {images.length > 1 && (
+                      <>
+                        <button
+                          onClick={prevImage}
+                          className="absolute left-4 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/70 text-slate-800 shadow-lg backdrop-blur transition-all hover:bg-white hover:scale-105"
+                          aria-label="Önceki Görsel"
+                        >
+                          <ChevronLeftIcon className="h-6 w-6" />
+                        </button>
+                        <button
+                          onClick={nextImage}
+                          className="absolute right-4 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/70 text-slate-800 shadow-lg backdrop-blur transition-all hover:bg-white hover:scale-105"
+                          aria-label="Sonraki Görsel"
+                        >
+                          <ChevronRightIcon className="h-6 w-6" />
+                        </button>
+
+                        {/* Alt Nokta (Dot) Göstergeleri */}
+                        <div className="absolute bottom-6 left-1/2 flex -translate-x-1/2 gap-2 z-10">
+                          {images.map((_, index) => (
+                            <button
+                              key={index}
+                              onClick={() => setCurrentImageIndex(index)}
+                              className={`h-2.5 rounded-full transition-all ${
+                                currentImageIndex === index
+                                  ? "w-8 bg-blue-600"
+                                  : "w-2.5 bg-white/80 hover:bg-white"
+                              }`}
+                              aria-label={`Görsel ${index + 1}`}
+                            />
+                          ))}
+                        </div>
+                      </>
+                    )}
+                  </>
                 ) : (
+                  // Resim yoksa gösterilecek placeholder
                   <div className="flex h-full items-center justify-center">
                     <svg
                       className="h-32 w-32 text-slate-300"
@@ -91,7 +156,9 @@ export default function ProductDetailExperience({
                     </svg>
                   </div>
                 )}
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-900/25 via-transparent to-transparent" />
+                
+                {/* Alt gradient gölgesi (Noktaların net görünmesi için z-index'ten kaçındık) */}
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-900/40 via-transparent to-transparent opacity-60" />
               </div>
 
               {/* Ürün Bilgileri Yan Panel */}
@@ -104,36 +171,6 @@ export default function ProductDetailExperience({
                     <h2 className="mt-3 text-3xl font-black leading-tight text-slate-900 sm:text-4xl">
                       {product.name}
                     </h2>
-                  </div>
-
-                  {/* Kapasite Bilgisi */}
-                  {product.capacity && (
-                    <div className="flex items-center gap-2 rounded-lg bg-white px-3 py-2">
-                      <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-slate-500">
-                        Taşıma Kapasitesi
-                      </span>
-                      <span className="text-sm font-bold text-slate-900">
-                        {product.capacity}
-                      </span>
-                    </div>
-                  )}
-
-                  {/* Fiyat Bilgisi */}
-                  <div className="rounded-2xl border border-blue-200 bg-blue-50 px-4 py-4">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-blue-700">
-                      Fiyat
-                    </p>
-                    <p className="mt-1 text-2xl font-extrabold text-slate-900">
-                      {formatPrice(displayPrice)}
-                    </p>
-                    {product.discountPrice && (
-                      <p className="mt-2 text-xs font-medium text-slate-600 line-through">
-                        Orjinal Fiyat: {formatPrice(product.price)}
-                      </p>
-                    )}
-                    <p className="mt-2 text-xs font-medium text-slate-600">
-                      Stok Durumu: {product.stockStatus}
-                    </p>
                   </div>
 
                   {/* Özellikler */}
@@ -167,37 +204,9 @@ export default function ProductDetailExperience({
                   </div>
                 </div>
               </aside>
+
             </div>
           </article>
-
-          {/* --- DETAYLI BİLGİ BÖLÜMÜ --- */}
-          <section className="overflow-hidden rounded-[32px] border border-slate-200 bg-white p-8 shadow-[0_24px_70px_rgba(15,23,42,0.08)] sm:p-10 lg:p-12">
-            <div className="relative z-10">
-              <div className="flex items-center gap-4">
-                <span className="h-0.5 w-8 rounded-full bg-blue-600/60" />
-                <p className="text-xs font-bold uppercase tracking-[0.25em] text-blue-700">
-                  Teknik Detaylar
-                </p>
-              </div>
-
-              <h3 className="mt-5 text-2xl font-black tracking-tight text-slate-900 sm:text-3xl lg:text-4xl">
-                {product.name}{" "}
-                <span className="font-medium text-slate-500">Kullanım Deneyimi</span>
-              </h3>
-
-              <p className="mt-6 max-w-4xl text-base leading-relaxed text-slate-600 sm:text-lg sm:leading-loose">
-                {product.description}
-              </p>
-
-              {product.deliveryInfo && (
-                <div className="mt-8 rounded-lg border border-green-200 bg-green-50 px-4 py-3">
-                  <p className="text-sm font-semibold text-green-900">
-                    ✓ {product.deliveryInfo}
-                  </p>
-                </div>
-              )}
-            </div>
-          </section>
         </div>
       </section>
     </>

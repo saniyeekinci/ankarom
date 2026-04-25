@@ -1,0 +1,62 @@
+{
+  "showcase": [
+    {
+      "id": "1",
+      "name": "Dengeli Aks Mimarisi",
+      "images": [
+        "/products/5.png"
+      ],
+      "description": "Düşük gövdeli spor araçların hasarsız yüklenmesi için optimize edilmiştir.",
+      "features": [
+  "Yüksek hızlarda sarsıntıyı en aza indirerek maksimum yol güvenliği sunar."
+]
+    },
+{
+      "id": "2",
+      "name": "Ayarlanabilir Burun Takozu",
+      "images": [
+        "/products/2.png"
+      ],
+      "description": "Teknenizin römork üzerinde sarsıntısız ve güvenle sabitlenmesi için tasarlanmış, her tekne profiline uyarlanabilen profesyonel dayama sistemi.",
+      "features": [
+        "Tekne Dostu Yüzey: UV ışınlarına dayanıklı özel kauçuk/poliüretan yapısı sayesinde teknenizin burun kısmını kesinlikle çizmez ve zedeleyemez.",
+        "Tam Uyumlu Mekanizma: İleri-geri ve aşağı-yukarı eksende kolayca ayarlanabilen profili ile farklı tekne boylarına ve gövde açılarına kusursuz uyum sağlar.",
+        "Güçlendirilmiş Bağlantı: Ağır yüklere, dalga ve rampa sarsıntılarına karşı maksimum direnç gösteren kalın etli galvaniz çelik gövde."
+      ]
+    }
+    ,
+    {
+      "id": "3",
+      "name": "Poliüretan Makara Sistemi",
+      "images": [
+        "/products/8.png"
+      ],
+      "description": "Teknenizi sudan çıkarırken veya suya indirirken sürtünmeyi en aza indiren, gövdeyi koruyan ve rampa operasyonlarını tek başınıza yapmanızı sağlayan özel taşıyıcı sistem.",
+      "features": [
+        "Çizilmez Dış Yüzey: Yüksek kaliteli esnek poliüretan malzeme sayesinde teknenizin jelkot veya boyasına kesinlikle zarar vermeden pürüzsüz bir kayma sağlar.",
+        "Modüler ve Ayarlanabilir: Teknenizin alt omurga açısına ve gövde yapısına tam oturacak şekilde kolayca yönü, yüksekliği ve aralığı ayarlanabilir.",
+        "Deniz Suyuna Tam Direnç: Geleneksel kauçuk makaraların aksine UV ışınlarına, tuzlu suya ve aşırı basınca karşı çatlama veya erime yapmayan uzun ömürlü teknoloji."
+      ]
+    }
+  ],
+  "catalog": [
+    {
+      "id": "4",
+      "name": "Ankarom Marin Serisi Tekne Römorkları",
+      "images": [
+        "/products/2.png",
+        "/products/8.png",
+        "/products/5.png"
+      ],
+      "description": "Profesyonel ATV taşımacılığı için kompakt ve dayanıklı bir çözüm.",
+      "features": [
+        "Poliüretan Makara Sistemi: Tekne gövdesini çizmeyen, rampa iniş-biniş operasyonlarını tek kişiyle bile yapılabilecek kadar kolaylaştıran ayarlanabilir makaralar.",
+        "Kilitli Manuel Vinç: Teknenin römorka güvenle çekilmesini sağlayan, dayanıklı halat ve kilit mekanizmasına sahip burun vinci.",
+        "Ayarlanabilir Burun Takozu: Farklı tekne boylarına ve burun yapılarına tam uyum sağlayacak şekilde ileri-geri ayarlanabilen V tipi kauçuk dayama takozu.",
+        "Ön Destek Tekeri (Jockey Wheel): Römorku araca bağlarken veya park halindeyken kolay manevra yapmanızı sağlayan, yüksekliği ayarlanabilir ön tekerlek.",
+        "Dengeli Tek Aks Mimarisi: 4 ila 6 metre arası tekneler için ideal ağırlık dağılımı sunan, otoyol sürüşlerinde sarsıntıyı minimize eden şasi geometrisi.",
+        "Standart Sinyalizasyon: Karayolları standartlarına uygun, gece sürüşlerinde maksimum görünürlük sağlayan arka stop ve plakalık aydınlatmaları."
+      ]
+    }
+  ]
+}

@@ -43,7 +43,7 @@ const categories: Category[] = [
       {
         question: "Römorklarda hangi malzemeleri kullanıyorsunuz?",
         answer:
-          "Tamamı sıcak daldırma galveniz kaplı, korozyona dayanıklı yüksek mukavemetli çelik şaseler kullanıyoruz. Paslanmaya karşı uzun ömür garantilidir.",
+          "Tamamı sıcak daldırma galvaniz kaplı, korozyona dayanıklı yüksek mukavemetli çelik şaseler kullanıyoruz. Paslanmaya karşı uzun ömür garantilidir.",
       },
       {
         question: "Garanti süresi ve kapsamı nedir?",
@@ -55,16 +55,6 @@ const categories: Category[] = [
         answer:
           "Evet, teknenizin veya aracınızın ölçülerine göre mühendislik ekibimizle özel konfigürasyonlar hazırlayabiliyoruz.",
       },
-      {
-        question: "Römorklarınızın taşıma kapasitesi nedir?",
-        answer:
-          "Ürünlerimiz 750 kg'dan başlayarak 3500 kg'a kadar farklı taşıma kapasitelerine sahip modellerle sunulmaktadır. İhtiyacınıza uygun modeli seçebilirsiniz.",
-      },
-      {
-        question: "Römorklarınızın su geçirmezliği hakkında bilgi verebilir misiniz?",
-        answer:
-          "Römorklarımız, su geçirmez kaplamalar ve özel conta sistemleri ile donatılmıştır. Bu sayede tekne taşıma sırasında su sızdırmazlığı sağlanır ve ürünlerimiz uzun ömürlü olur.",
-      }
     ],
   },
   {
@@ -73,21 +63,12 @@ const categories: Category[] = [
     items: [
       {
         question: "Teslimat süreniz ne kadardır?",
-        answer: "Stoktaki standart modellerimiz hemen teslim edilirken, özel üretim projelerimiz iş yoğunluğuna göre ortalama 10-15 iş günü içinde tamamlanmaktadır.",
+        answer: "Stoktaki standart modellerimiz hemen teslim edilirken, özel üretim projelerimiz ortalama 10-15 iş günü içinde tamamlanmaktadır.",
       },
       {
         question: "Türkiye geneline gönderim yapıyor musunuz?",
         answer: "Evet, Ankara merkezli fabrikamızdan Türkiye’nin her yerine güvenli lojistik ağımızla gönderim sağlıyoruz.",
       },
-      {
-        question: "Ödeme seçenekleriniz nelerdir?",
-        answer: "Kredi kartına taksit imkanı, havale/EFT ve kurumsal projeler için özel ödeme planları sunuyoruz."
-      },
-      {
-        question: "İade ve değişim koşullarınız nelerdir?",
-        answer: "Ürünlerimizle ilgili herhangi bir sorunuz varsa, lütfen bizimle iletişime geçin. İade ve değişim işlemleri, ürünün durumuna ve sebepine göre değerlendirilir."
-      },
-      
     ],
   },
 ];
@@ -103,24 +84,24 @@ export default function FAQ() {
   };
 
   return (
-    <section className="px-6 py-20 ">
-      <div className="mx-auto max-w-8xl flex  flex-col gap-4 items-center justify-center">
-        {/* HEADER */}
-        <div className="text-center w-2xl  flex  flex-col gap-4 ">
-          <h2 className="text-4xl font-bold tracking-tight text-slate-900">
+    <section className="px-4 py-16 sm:px-6 lg:py-24 flex  justify-center ">
+      <div className="mx-auto max-w-5xl flex flex-col  items-center">
+        
+        {/* HEADER - DÜZELTİLDİ: w-2xl yerine max-w-2xl ve responsive genişlik */}
+        <div className="text-center w-full max-w-2xl px-4 flex flex-col gap-3">
+          <h2 className="text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">
             Sık Sorulan Sorular
           </h2>
-          <p className="mt-4 text-slate-600">
-            Planlar, fiyatlar ve desteklenen özellikler hakkında sorularınız
-            için size yardımcı olmaktan memnuniyet duyarız.
+          <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
+            Belgeler, üretim süreci ve teslimat hakkında en çok merak edilen 
+            soruları sizin için bir araya getirdik.
           </p>
         </div>
 
-        {/* CATEGORY PILLS */}
-        <div className="mt-10 flex flex-wrap justify-center gap-3">
+        {/* CATEGORY PILLS - Mobil uyumlu sarma (flex-wrap) */}
+        <div className="mt-10 flex flex-wrap justify-center gap-2 sm:gap-3 ">
           {categories.map((cat) => {
             const active = cat.id === activeCategory;
-
             return (
               <button
                 key={cat.id}
@@ -128,10 +109,10 @@ export default function FAQ() {
                   setActiveCategory(cat.id);
                   setOpenIndex(null);
                 }}
-                className={`px-4 py-2 rounded-full text-sm transition ${
+                className={`px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 ${
                   active
-                    ? "bg-slate-900 text-white"
-                    : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                    ? "bg-slate-900 text-white shadow-lg"
+                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                 }`}
               >
                 {cat.label}
@@ -141,44 +122,42 @@ export default function FAQ() {
         </div>
 
         {/* ACCORDION */}
-<div className="mt-10 w-full max-w-3xl mx-auto space-y-4"> 
-  {/* max-w-3xl ile tüm satırları sabit bir genişliğe hapsettik */}
-  {current.items.map((item, i) => {
-    const open = openIndex === i;
+        <div className="mt-12 w-full max-w-3xl space-y-3 sm:space-y-4">
+          {current.items.map((item, i) => {
+            const open = openIndex === i;
 
-    return (
-      <div
-        key={i}
-        className="border border-slate-200 rounded-xl overflow-hidden bg-white w-full transition-all duration-200"
-      >
-        <button
-          onClick={() => toggle(i)}
-          className="w-full flex items-center justify-between px-6 py-5 text-left hover:bg-slate-50 transition-colors"
-        >
-          {/* text-left ve w-full sayesinde başlıklar her zaman aynı hizada başlar */}
-          <span className="text-[16px] font-semibold text-slate-900 pr-4">
-            {item.question}
-          </span>
+            return (
+              <div
+                key={i}
+                className={`border border-slate-200 rounded-2xl overflow-hidden bg-white transition-all duration-300 ${
+                  open ? "ring-1 ring-slate-200 shadow-md" : "hover:border-slate-300"
+                }`}
+              >
+                <button
+                  onClick={() => toggle(i)}
+                  className="w-full flex items-center justify-between px-5 py-5 sm:px-7 text-left transition-colors"
+                >
+                  <span className="text-[15px] sm:text-base font-bold text-slate-900 pr-4 leading-snug">
+                    {item.question}
+                  </span>
+                  <ChevronDown
+                    className={`h-5 w-5 flex-shrink-0 text-slate-400 transition-transform duration-300 ${
+                      open ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
 
-          <ChevronDown
-            className={`h-5 w-5 flex-shrink-0 text-slate-500 transition-transform duration-300 ${
-              open ? "rotate-180" : ""
-            }`}
-          />
-        </button>
-
-        {/* İçerik alanı açıldığında kartın genişliği değişmez, sadece yüksekliği artar */}
-        {open && (
-          <div className="px-6 pb-5 text-slate-600 text-[15px] leading-relaxed animate-in fade-in slide-in-from-top-2 duration-300">
-            <div className="pt-2 border-t border-slate-100">
-              {item.answer}
-            </div>
-          </div>
-        )}
-      </div>
-    );
-  })}
-</div>
+                {open && (
+                  <div className="px-5 pb-5 sm:px-7 sm:pb-6 animate-in fade-in slide-in-from-top-1">
+                    <div className="pt-3 border-t border-slate-50 text-slate-600 text-[14px] sm:text-[15px] leading-relaxed">
+                      {item.answer}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
     </section>
   );
