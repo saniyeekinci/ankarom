@@ -45,6 +45,7 @@ type RawItem = {
   images?: string[];
   description?: string;
   features?: string[];
+  category?: string; // Bu satırı ekledik
 };
 
 type CatalogData = {
@@ -57,15 +58,19 @@ const parsedCatalog = productCatalog as CatalogData;
 const rawCatalog = parsedCatalog.catalog;
 const rawShowcase = parsedCatalog.showcase;
 
-const showcaseIds = (rawShowcase || []).map((s) => (typeof s === "string" ? s : s.id));
+const showcaseIds = (rawShowcase || []).map((s) =>
+  typeof s === "string" ? s : s.id,
+);
 
 function toProduct(item: RawItem): Product {
   const images = item.images && item.images.length ? item.images : undefined;
+  
   return {
     id: item.id,
     name: item.name ?? item.id,
     slug: item.id,
-    category: "tekne-romorklari" as ProductCategory,
+    // (item as any) kısmını sildik, doğrudan item.category yazıyoruz
+    category: (item.category as ProductCategory) ?? "tekne-romorklari", 
     price: 0,
     discountPrice: null,
     capacity: undefined,
@@ -73,7 +78,7 @@ function toProduct(item: RawItem): Product {
     imageUrl: images ? images[0] : undefined,
     images,
     description: item.description ?? "",
-    features: item.features ?? [], // JSON'daki maddeleri buraya çekiyoruz
+    features: item.features ?? [],
     deliveryInfo: undefined,
     rating: undefined,
     reviewCount: undefined,

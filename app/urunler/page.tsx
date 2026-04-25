@@ -28,7 +28,7 @@ export default function ProductsPage() {
       </div>
 
       {/* Ana Ürün Alanı (Üst Başlık ve Sayaç Kaldırıldı) */}
-      <main className="mx-auto max-w-[1600px] px-6 py-8 lg:px-12">
+      <main className="mx-auto max-w-7xlx-6 py-8 lg:px-12">
         <ProductListing products={catalogProducts} />
       </main>
     </div>
