@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import ProductListing from "@/components/ProductListing";
 import {
-  products,
   getProductsByCategory,
   categoryLabels,
   getAllCategories,
