@@ -104,3 +104,13 @@ export function getFeaturedProducts(): Product[] {
 export function getCatalogOnlyProducts(): Product[] {
   return products.filter((product) => product.isFeatured === false);
 }
+// Tüm kategori sluglarını benzersiz olarak getirir
+export function getAllCategories(): string[] {
+  const categories = products.map((p) => p.category);
+  return Array.from(new Set(categories));
+}
+
+// Belirli bir kategoriye ait ürünleri filtreler
+export function getProductsByCategory(categorySlug: string): Product[] {
+  return products.filter((p) => p.category === categorySlug);
+}

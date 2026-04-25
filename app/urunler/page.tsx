@@ -9,6 +9,8 @@ export const metadata = {
     "Profesyonel taşıma çözümleri için tasarlanmış, yüksek dayanımlı araç römorku ve ekipman serimizi inceleyin.",
 };
 
+
+
 export default function ProductsPage() {
   // Sadece katalog ürünlerini alıyoruz
   const catalogProducts = getCatalogOnlyProducts();
