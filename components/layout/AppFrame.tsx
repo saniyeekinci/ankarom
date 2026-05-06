@@ -28,8 +28,9 @@ export default function AppFrame({ children }: { children: React.ReactNode }) {
   return (
     <div className="corporate-theme overflow-x-hidden">
       <Header />
-        {isHomePage && <HomeVideo />}
+       
       <main>{children}</main>
+       {isHomePage && <HomeVideo />}
       {isContentRoute && <FAQSection />}
       <Footer />
       <QuickContactButton />

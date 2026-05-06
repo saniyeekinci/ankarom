@@ -1,40 +1,33 @@
 "use client";
 
-const scrollToStats = () => {
-  const element = document.getElementById("stats-section");
-  if (element) {
-    element.scrollIntoView({ behavior: "smooth" });
-  }
-};
-
 export default function HomeVideo() {
   return (
-    <section className="relative w-full p-0 m-0">
-      <div className="relative w-full aspect-video min-h-[300px] overflow-hidden">
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          className="absolute inset-0 w-full h-full object-cover"
-          preload="metadata"
+    <section className="relative w-full min-h-screen bg-gradient-to-b from-white to-gray-100 flex items-center justify-center px-6 text-center">
+
+      <div className="max-w-4xl mx-auto flex flex-col items-center">
+
+        <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold text-gray-900 leading-tight tracking-tight">
+          Çok Amaçlı Taşımacılıkta
+          <br />
+          <span className="text-blue-700">Yeni Nesil Çözümler</span>
+        </h1>
+
+        <p className="mt-6 text-gray-600 text-base sm:text-lg md:text-xl max-w-2xl">
+          Sertifikalı düşürülebilir römork teknolojisi ile güvenli, yenilikçi ve pratik sevkiyat çözümleri sunuyoruz.
+        </p>
+
+        <button
+          onClick={() =>
+            document
+              .getElementById("stats-section")
+              ?.scrollIntoView({ behavior: "smooth" })
+          }
+          className="mt-10 px-10 py-4 text-lg font-semibold bg-blue-700 text-white rounded-xl shadow-lg hover:bg-blue-800 transition"
         >
-          <source src="/videos/Homevideo.mp4" type="video/mp4" />
-        </video>
-
-        {/* Başlık — üst 1/4 konumunda */}
-        <div className="absolute top-1/7 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center text-white px-4 w-full">
-          <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight drop-shadow-lg">
-            Çok Amaçlı Taşımacılıkta Yeni Nesil Çözümler
-          </h1>
-          <p className="text-sm sm:text-base md:text-xl lg:text-2xl drop-shadow-md">
-            Sertifikalı düşürülebilir römork teknolojisi ile güvenli ve pratik
-            sevkiyatın adresi.
-          </p>
-        </div>
-
-       
+          Daha Fazla Bilgi
+        </button>
       </div>
+
     </section>
   );
 }

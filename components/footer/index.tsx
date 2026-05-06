@@ -138,7 +138,7 @@ export default function Footer() {
               </ul>
             </div>
 
-            <div>
+            {/* <div>
               <h4 className="mb-14 text-[12px] font-bold uppercase tracking-[0.3em] text-slate-400">
                 LEGAL
               </h4>
@@ -160,7 +160,7 @@ export default function Footer() {
                   </Link>
                 </li>
               </ul>
-            </div>
+            </div> */}
             <div>
               <h4 className="mb-14 text-[12px] font-bold uppercase tracking-[0.3em] text-slate-400">
                 İLETİŞİM
@@ -170,10 +170,7 @@ export default function Footer() {
                   <span>adres</span>
                 </li>
                 <li className="border-b border-transparent pb-2 transition-all hover:border-slate-400 hover:text-slate-900">
-                  <span>telefon</span>
-                </li>
-                <li className="border-b border-transparent pb-2 transition-all hover:border-slate-400 hover:text-slate-900">
-                  <span>email</span>
+                  <span>+90(507) 958 6868</span>
                 </li>
               </ul>
             </div>
