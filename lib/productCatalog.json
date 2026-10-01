@@ -42,20 +42,39 @@
   "catalog": [
     {
       "id": "4",
-      "name": "Ankarom Marin Serisi Tekne Römorkları",
+      "name": "O1 Belgeli Tekne Römorku",
+      "certification": "O1",
+      "category": "tekne-romorklari",
+      "price": 85000,
+      "stockStatus": "Siparişe Özel",
       "images": [
         "/products/2.png",
-        "/products/8.png",
-        "/products/5.png"
+        "/products/8.png"
       ],
-      "description": "Profesyonel ATV taşımacılığı için kompakt ve dayanıklı bir çözüm.",
+      "description": "Tekne taşıma ihtiyaçları için geliştirilen, O1 sınıfı belgeli Ankarom römorku. Ölçü ve donanım detayları sipariş öncesinde netleştirilir.",
+      "deliveryInfo": "3 iş günü içinde fabrikadan teslime hazır.",
       "features": [
-        "Poliüretan Makara Sistemi: Tekne gövdesini çizmeyen, rampa iniş-biniş operasyonlarını tek kişiyle bile yapılabilecek kadar kolaylaştıran ayarlanabilir makaralar.",
-        "Kilitli Manuel Vinç: Teknenin römorka güvenle çekilmesini sağlayan, dayanıklı halat ve kilit mekanizmasına sahip burun vinci.",
-        "Ayarlanabilir Burun Takozu: Farklı tekne boylarına ve burun yapılarına tam uyum sağlayacak şekilde ileri-geri ayarlanabilen V tipi kauçuk dayama takozu.",
-        "Ön Destek Tekeri (Jockey Wheel): Römorku araca bağlarken veya park halindeyken kolay manevra yapmanızı sağlayan, yüksekliği ayarlanabilir ön tekerlek.",
-        "Dengeli Tek Aks Mimarisi: 4 ila 6 metre arası tekneler için ideal ağırlık dağılımı sunan, otoyol sürüşlerinde sarsıntıyı minimize eden şasi geometrisi.",
-        "Standart Sinyalizasyon: Karayolları standartlarına uygun, gece sürüşlerinde maksimum görünürlük sağlayan arka stop ve plakalık aydınlatmaları."
+        "O1 sınıfı belgeli tekne taşıma römorku",
+        "Tekne modeline göre belirlenebilen ölçü ve donanım",
+        "Fabrikadan teslim öncesi ürün kontrolü"
+      ]
+    },
+    {
+      "id": "5",
+      "name": "O2 Belgeli Araç Taşıyıcı",
+      "certification": "O2",
+      "category": "platform-romorklar",
+      "price": 120000,
+      "stockStatus": "Siparişe Özel",
+      "images": [
+        "/romork.png"
+      ],
+      "description": "Araç taşıma ihtiyaçları için O2 sınıfı belgeli platform römorku. Uygun platform ölçüsü ve donanım sipariş öncesinde netleştirilir.",
+      "deliveryInfo": "3 iş günü içinde fabrikadan teslime hazır.",
+      "features": [
+        "O2 sınıfı belgeli araç taşıyıcı",
+        "Araç ve kullanım ihtiyacına göre belirlenebilen donanım",
+        "Fabrikadan teslim öncesi ürün kontrolü"
       ]
     }
   ]

@@ -23,6 +23,7 @@ export type Product = {
   description: string;
   features?: string[];
   deliveryInfo?: string;
+  certification?: "O1" | "O2";
   rating?: number;
   reviewCount?: number;
   isFeatured?: boolean;
@@ -46,6 +47,10 @@ type RawItem = {
   description?: string;
   features?: string[];
   category?: string; // Bu satırı ekledik
+  price?: number;
+  deliveryInfo?: string;
+  stockStatus?: Product["stockStatus"];
+  certification?: Product["certification"];
 };
 
 type CatalogData = {
@@ -71,15 +76,16 @@ function toProduct(item: RawItem): Product {
     slug: item.id,
     // (item as any) kısmını sildik, doğrudan item.category yazıyoruz
     category: (item.category as ProductCategory) ?? "tekne-romorklari", 
-    price: 0,
+    price: item.price ?? 0,
     discountPrice: null,
     capacity: undefined,
-    stockStatus: "Stokta Var",
+    stockStatus: item.stockStatus ?? "Stokta Var",
     imageUrl: images ? images[0] : undefined,
     images,
     description: item.description ?? "",
     features: item.features ?? [],
-    deliveryInfo: undefined,
+    deliveryInfo: item.deliveryInfo,
+    certification: item.certification,
     rating: undefined,
     reviewCount: undefined,
     isFeatured: showcaseIds.includes(item.id),
