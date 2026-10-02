@@ -16,10 +16,10 @@ export default function ProductsPage() {
   const catalogProducts = getCatalogOnlyProducts();
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans text-slate-600">
+    <div className="min-h-screen bg-[#f5f4ef] text-[#202522]">
       {/* Navigation Breadcrumb */}
-      <div className="border-b border-[#e6e3dc] bg-white">
-        <div className="mx-auto max-w-7xl px-6 py-4 lg:px-12">
+      <div className="border-b border-[#e2e0d9] bg-[#fbfaf7]">
+        <div className="mx-auto flex max-w-7xl justify-center px-5 py-4 sm:px-8 lg:px-10" style={{ marginInline: "auto" }}>
           <Breadcrumb
             items={[
               { label: "Ana Sayfa", href: "/" },
@@ -29,7 +29,7 @@ export default function ProductsPage() {
         </div>
       </div>
 
-      <main className="mx-auto max-w-7xl px-6 py-10 lg:px-12 lg:py-14">
+      <main className="mx-auto max-w-7xl px-5 py-10 sm:px-8 lg:px-10 lg:py-14" style={{ marginInline: "auto" }}>
         <ProductListing products={catalogProducts} />
       </main>
     </div>

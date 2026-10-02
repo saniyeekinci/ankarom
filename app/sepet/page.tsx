@@ -1,15 +1,23 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowLeftIcon,
-  ArrowUpRightIcon,
+  ArrowRightIcon,
   MinusIcon,
   PlusIcon,
   TrashIcon,
 } from "@heroicons/react/24/outline";
 import { useCart } from "@/components/cart/CartProvider";
+import { getCatalogOnlyProducts } from "@/lib/products";
+import {
+  catalogActionStyle,
+  setCatalogActionAppearance,
+} from "@/lib/catalogAction";
+
+const exampleProduct = getCatalogOnlyProducts()[0];
 
 const formatPrice = (price: number) =>
   new Intl.NumberFormat("tr-TR", {
@@ -20,24 +28,27 @@ const formatPrice = (price: number) =>
 
 export default function CartPage() {
   const { items, itemCount, subtotal, updateQuantity, removeFromCart } = useCart();
-
-  const orderMessage = [
-    "Merhaba, aşağıdaki ürünler için sipariş vermek istiyorum:",
-    ...items.map(
-      (item) =>
-        `${item.name} x ${item.quantity} - ${formatPrice((item.discountPrice ?? item.price) * item.quantity)}`,
-    ),
-    `Ara toplam: ${formatPrice(subtotal)}`,
-  ].join("\n");
-
-  const whatsappHref = `https://wa.me/905079586868?text=${encodeURIComponent(orderMessage)}`;
+  const [hasRemovedCartContents, setHasRemovedCartContents] = useState(false);
+  const isShowingExample =
+    items.length === 0 && !hasRemovedCartContents && Boolean(exampleProduct);
+  const displayItems = items.length > 0
+    ? items
+          : isShowingExample && exampleProduct
+    ? [{ ...exampleProduct, quantity: 1 }]
+    : [];
+  const displayItemCount = isShowingExample ? 1 : itemCount;
+  const grandTotal = isShowingExample
+    ? exampleProduct?.discountPrice ?? exampleProduct?.price ?? 0
+    : subtotal;
+  const vat = grandTotal - grandTotal / 1.2;
+  const subtotalBeforeVat = grandTotal - vat;
 
   return (
     <main className="min-h-[70vh] bg-[#f7f7f5] text-[#202522]">
-      <div className="mx-auto max-w-7xl px-6 py-12 sm:px-10 sm:py-16 lg:px-16">
-        <div className="mb-10 flex flex-col justify-between gap-6 border-b border-[#dedfd9] pb-7 sm:flex-row sm:items-end">
-          <div>
-            <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.26em] text-[#718077]">
+      <div className="mx-auto flex max-w-6xl flex-col gap-10 px-5 py-10 sm:px-8 sm:py-14" style={{ marginInline: "auto" }}>
+        <header className="flex flex-col items-center gap-4 border-b border-[#dedfd9] pb-8 text-center">
+          <div className="flex flex-col items-center gap-4">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.26em] text-[#718077]">
               ANKAROM / ALIŞVERİŞ
             </p>
             <h1 className="text-[36px] font-medium leading-tight sm:text-[44px]">
@@ -45,13 +56,13 @@ export default function CartPage() {
             </h1>
           </div>
           <p className="text-[12px] uppercase tracking-[0.14em] text-[#778078]">
-            {itemCount} ürün
+            {displayItemCount} ürün
           </p>
-        </div>
+        </header>
 
-        {items.length === 0 ? (
-          <div className="border border-dashed border-[#cfd5cf] bg-white px-6 py-16 text-center">
-            <p className="text-[18px] font-medium text-[#27342c]">
+        {displayItems.length === 0 ? (
+            <div className="flex flex-col items-center gap-4 border border-dashed border-[#cfd5cf] bg-white px-6 py-16 text-center">
+              <p className="text-[18px] font-medium text-[#27342c]">
               Sepetiniz şu an boş.
             </p>
             <p className="mt-3 text-[14px] text-[#68716b]">
@@ -59,16 +70,21 @@ export default function CartPage() {
             </p>
             <Link
               href="/urunler"
-              className="mt-7 inline-flex h-11 items-center gap-2 bg-[#29483c] px-5 text-[11px] font-semibold uppercase tracking-[0.12em] text-white transition-colors hover:bg-[#203b31]"
+              className="catalog-action mt-7 inline-flex items-center gap-5 border border-[#1e344f] bg-white px-7 py-4 text-[9px] font-medium uppercase tracking-[0.22em]"
+              onMouseEnter={(event) => setCatalogActionAppearance(event.currentTarget, true)}
+              onMouseLeave={(event) => setCatalogActionAppearance(event.currentTarget, false)}
+              onFocus={(event) => setCatalogActionAppearance(event.currentTarget, true)}
+              onBlur={(event) => setCatalogActionAppearance(event.currentTarget, false)}
+              style={catalogActionStyle}
             >
               <ArrowLeftIcon className="h-4 w-4" />
               Ürün kataloğuna dön
             </Link>
           </div>
         ) : (
-          <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_330px] lg:gap-14">
+          <div className="mx-auto grid max-w-5xl gap-9 lg:grid-cols-[minmax(0,1fr)_330px] lg:gap-12" style={{ marginInline: "auto" }}>
             <section aria-label="Sepetteki ürünler" className="divide-y divide-[#e0e2dc] border-y border-[#d9ddd8]">
-              {items.map((item) => {
+              {displayItems.map((item) => {
                 const unitPrice = item.discountPrice ?? item.price;
 
                 return (
@@ -88,52 +104,86 @@ export default function CartPage() {
 
                     <div className="flex min-w-0 flex-col justify-between gap-6">
                       <div className="flex items-start justify-between gap-4">
-                        <div>
+                        <div className="flex flex-col gap-2">
+                          {isShowingExample && (
+                            <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#1d4ed8]">
+                              Örnek ürün
+                            </p>
+                          )}
                           {item.certification && (
                             <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#718077]">
                               {item.certification} Belgeli
                             </p>
                           )}
-                          <h2 className="mt-2 text-[19px] font-medium leading-snug text-[#27342c] sm:text-[21px]">
+                          <h2 className="text-[19px] font-medium leading-snug text-[#27342c] sm:text-[21px]">
                             {item.name}
                           </h2>
-                          <p className="mt-2 text-[13px] text-[#68716b]">
+                          <p className="text-[13px] leading-6 text-[#68716b]">
                             Birim fiyat: {formatPrice(unitPrice)}
                           </p>
                         </div>
-                        <button
-                          type="button"
-                          onClick={() => removeFromCart(item.id)}
-                          className="flex h-10 w-10 shrink-0 items-center justify-center text-[#7a817b] transition-colors hover:bg-[#f0efeb] hover:text-[#27342c]"
-                          aria-label={`${item.name} ürününü sepetten çıkar`}
-                          title="Ürünü kaldır"
-                        >
-                          <TrashIcon className="h-4 w-4" />
-                        </button>
+                        {!isShowingExample && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setHasRemovedCartContents(true);
+                              removeFromCart(item.id);
+                            }}
+                            className="catalog-action flex h-10 w-10 shrink-0 items-center justify-center border border-[#1e344f] bg-white text-[#1e344f]"
+                            aria-label={`${item.name} ürününü sepetten çıkar`}
+                            title="Ürünü kaldır"
+                            onMouseEnter={(event) => setCatalogActionAppearance(event.currentTarget, true)}
+                            onMouseLeave={(event) => setCatalogActionAppearance(event.currentTarget, false)}
+                            onFocus={(event) => setCatalogActionAppearance(event.currentTarget, true)}
+                            onBlur={(event) => setCatalogActionAppearance(event.currentTarget, false)}
+                            style={catalogActionStyle}
+                          >
+                            <TrashIcon className="h-4 w-4" />
+                          </button>
+                        )}
                       </div>
 
                       <div className="flex flex-wrap items-end justify-between gap-4">
-                        <div className="inline-flex h-10 items-center border border-[#d8ddd8]">
-                          <button
-                            type="button"
-                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                            className="flex h-9 w-9 items-center justify-center text-[#59625b] transition-colors hover:bg-[#eef0ec]"
-                            aria-label={`${item.name} adedini azalt`}
-                          >
-                            <MinusIcon className="h-3.5 w-3.5" />
-                          </button>
-                          <span className="min-w-9 text-center text-[13px] font-medium tabular-nums">
-                            {item.quantity}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                            className="flex h-9 w-9 items-center justify-center text-[#59625b] transition-colors hover:bg-[#eef0ec]"
-                            aria-label={`${item.name} adedini artır`}
-                          >
-                            <PlusIcon className="h-3.5 w-3.5" />
-                          </button>
-                        </div>
+                        {isShowingExample ? (
+                          <span className="text-[12px] text-[#7a817b]">1 adet · Örnek ürün</span>
+                        ) : (
+                          <div className="inline-flex h-10 items-center gap-1">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (item.quantity === 1) {
+                                  setHasRemovedCartContents(true);
+                                }
+                                updateQuantity(item.id, item.quantity - 1);
+                              }}
+                              className="catalog-action flex h-9 w-9 items-center justify-center border border-[#1e344f] bg-white text-[#1e344f]"
+                              aria-label={`${item.name} adedini azalt`}
+                              onMouseEnter={(event) => setCatalogActionAppearance(event.currentTarget, true)}
+                              onMouseLeave={(event) => setCatalogActionAppearance(event.currentTarget, false)}
+                              onFocus={(event) => setCatalogActionAppearance(event.currentTarget, true)}
+                              onBlur={(event) => setCatalogActionAppearance(event.currentTarget, false)}
+                              style={catalogActionStyle}
+                            >
+                              <MinusIcon className="h-3.5 w-3.5" />
+                            </button>
+                            <span className="min-w-9 text-center text-[13px] font-medium tabular-nums">
+                              {item.quantity}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                              className="catalog-action flex h-9 w-9 items-center justify-center border border-[#1e344f] bg-white text-[#1e344f]"
+                              aria-label={`${item.name} adedini artır`}
+                              onMouseEnter={(event) => setCatalogActionAppearance(event.currentTarget, true)}
+                              onMouseLeave={(event) => setCatalogActionAppearance(event.currentTarget, false)}
+                              onFocus={(event) => setCatalogActionAppearance(event.currentTarget, true)}
+                              onBlur={(event) => setCatalogActionAppearance(event.currentTarget, false)}
+                              style={catalogActionStyle}
+                            >
+                              <PlusIcon className="h-3.5 w-3.5" />
+                            </button>
+                          </div>
+                        )}
                         <p className="text-[18px] font-semibold tabular-nums text-[#202522]">
                           {formatPrice(unitPrice * item.quantity)}
                         </p>
@@ -144,39 +194,55 @@ export default function CartPage() {
               })}
             </section>
 
-            <aside className="h-fit border border-[#e0e2dc] bg-white p-6 sm:p-7 lg:sticky lg:top-28">
+            <aside className="flex h-fit flex-col gap-5 border border-[#e0e2dc] bg-white p-6 sm:p-7 lg:sticky lg:top-28">
               <h2 className="text-[17px] font-medium text-[#27342c]">
                 Sipariş özeti
               </h2>
-              <div className="mt-6 flex items-center justify-between border-t border-[#e8e9e4] pt-5 text-[13px] text-[#68716b]">
-                <span>Ürünler ({itemCount})</span>
-                <span className="font-medium tabular-nums text-[#27342c]">
-                  {formatPrice(subtotal)}
-                </span>
-              </div>
-              <div className="mt-5 flex items-center justify-between border-t border-[#e8e9e4] pt-5">
-                <span className="text-[14px] font-medium text-[#27342c]">
+              <div className="flex items-center justify-between border-t border-[#e8e9e4] pt-5">
+                <span className="text-[13px] text-[#68716b]">
                   Ara toplam
                 </span>
-                <span className="text-[21px] font-semibold tabular-nums text-[#202522]">
-                  {formatPrice(subtotal)}
+                <span className="text-[14px] font-medium tabular-nums text-[#27342c]">
+                  {formatPrice(subtotalBeforeVat)}
                 </span>
               </div>
-              <p className="mt-4 text-[11px] leading-5 text-[#7a817b]">
-                Taşıma ve teslimat ayrıntıları sipariş onayı sırasında netleştirilir.
+              <div className="flex items-center justify-between border-t border-[#e8e9e4] pt-4 text-[13px] text-[#68716b]">
+                <span>KDV (%20)</span>
+                <span className="font-medium tabular-nums text-[#27342c]">
+                  {formatPrice(vat)}
+                </span>
+              </div>
+              <div className="flex items-center justify-between border-t border-[#e8e9e4] pt-5">
+                <span className="text-[14px] font-medium text-[#27342c]">
+                  Genel toplam
+                </span>
+                <span className="text-[21px] font-semibold tabular-nums text-[#202522]">
+                  {formatPrice(grandTotal)}
+                </span>
+              </div>
+              <p className="text-[11px] leading-6 text-[#7a817b]">
+                Ürün fiyatlarına KDV dahildir. Teslimat ayrıntıları ödeme adımında netleştirilir.
               </p>
-              <a
-                href={whatsappHref}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-7 flex min-h-12 w-full items-center justify-center gap-2 bg-[#29483c] px-4 text-center text-[11px] font-semibold uppercase tracking-[0.1em] text-white transition-colors hover:bg-[#203b31]"
+              <Link
+                href="/odeme"
+                className="catalog-action flex w-full items-center justify-center gap-5 border border-[#1e344f] bg-white px-7 py-4 text-center text-[9px] font-medium uppercase tracking-[0.22em]"
+                onMouseEnter={(event) => setCatalogActionAppearance(event.currentTarget, true)}
+                onMouseLeave={(event) => setCatalogActionAppearance(event.currentTarget, false)}
+                onFocus={(event) => setCatalogActionAppearance(event.currentTarget, true)}
+                onBlur={(event) => setCatalogActionAppearance(event.currentTarget, false)}
+                style={catalogActionStyle}
               >
-                WhatsApp ile sipariş ver
-                <ArrowUpRightIcon className="h-4 w-4 shrink-0" />
-              </a>
+                Ödeme Adımına Geç
+                <ArrowRightIcon className="h-4 w-4 shrink-0" />
+              </Link>
               <Link
                 href="/urunler"
-                className="mt-5 block text-center text-[11px] font-medium uppercase tracking-[0.12em] text-[#68716b] underline decoration-[#c4cbc5] underline-offset-4 transition-colors hover:text-[#29483c]"
+                className="catalog-action flex w-full items-center justify-center gap-5 border border-[#1e344f] bg-white px-7 py-4 text-center text-[9px] font-medium uppercase tracking-[0.22em]"
+                onMouseEnter={(event) => setCatalogActionAppearance(event.currentTarget, true)}
+                onMouseLeave={(event) => setCatalogActionAppearance(event.currentTarget, false)}
+                onFocus={(event) => setCatalogActionAppearance(event.currentTarget, true)}
+                onBlur={(event) => setCatalogActionAppearance(event.currentTarget, false)}
+                style={catalogActionStyle}
               >
                 Alışverişe devam et
               </Link>

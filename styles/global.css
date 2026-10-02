@@ -94,6 +94,26 @@ body {
     color: #334155 !important;
 }
 
+.catalog-page .catalog-muted {
+    color: #68716b !important;
+}
+
+.catalog-page .catalog-meta {
+    color: #718077 !important;
+}
+
+.catalog-page .catalog-subtle {
+    color: #858d86 !important;
+}
+
+.product-detail-page .product-cart-button {
+    color: #fff !important;
+}
+
+.product-detail-page .product-cart-button.is-added {
+    color: #1d4ed8 !important;
+}
+
 .corporate-theme :where(.shadow-\[0_20px_60px_rgba\(2\,6\,23\,0\.45\)\], .shadow-\[0_24px_70px_rgba\(2\,6\,23\,0\.6\)\], .shadow-\[0_28px_90px_rgba\(2\,6\,23\,0\.7\)\], .shadow-\[0_30px_100px_rgba\(2\,6\,23\,0\.8\)\], .shadow-\[0_8px_24px_rgba\(2\,6\,23\,0\.35\)\]) {
     box-shadow: 0 18px 50px rgba(15, 23, 42, 0.08) !important;
 }

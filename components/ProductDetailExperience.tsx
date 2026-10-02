@@ -1,40 +1,38 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import Image from "next/image";
 import {
-  ArrowLeftIcon,
-  ArrowDownLeftIcon,
-  AdjustmentsVerticalIcon,
+  CheckIcon,
   ShieldCheckIcon,
-  BuildingOffice2Icon,
   QuestionMarkCircleIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
+  ShoppingCartIcon,
+  TruckIcon,
+  MinusIcon,
+  PlusIcon,
 } from "@heroicons/react/24/outline";
-import Breadcrumb from "@/components/Breadcrumb";
-import type { Product } from "@/lib/products";
 
-const featureIcons = [
-  ArrowDownLeftIcon,
-  AdjustmentsVerticalIcon,
-  ShieldCheckIcon,
-  BuildingOffice2Icon,
-];
+import Breadcrumb from "@/components/Breadcrumb";
+import { categoryLabels, type Product } from "@/lib/products";
+import { useCart } from "@/components/cart/CartProvider";
 
 type ProductDetailExperienceProps = {
-  product: Product; // Tipinizde 'images?: string[]' olduğunu varsayıyoruz
+  product: Product;
 };
 
 export default function ProductDetailExperience({
   product,
 }: ProductDetailExperienceProps) {
-  const router = useRouter();
+  const { addToCart } = useCart();
 
-  // Resim galerisi için state (Hangi resimde olduğumuzu tutar)
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [quantity, setQuantity] = useState(1);
+  const [isAdded, setIsAdded] = useState(false);
 
-  const whatsappMessage = `Merhaba, ${product.name} hakkında bir sorum var.`;
+  const whatsappMessage = `Merhaba, ${product.name} hakkında bilgi almak istiyorum.`;
+
   const whatsappHref = `https://wa.me/905079586868?text=${encodeURIComponent(
     whatsappMessage
   )}`;
@@ -48,38 +46,60 @@ export default function ProductDetailExperience({
   };
 
   const displayPrice = product.discountPrice ?? product.price;
-  // Eğer ürünün kendi features dizisi varsa ve içi doluysa onu kullan, yoksa varsayılanları göster.
-  const features = product.features && product.features.length > 0 
-    ? product.features 
-    : [
-        "Yüksek dayanım sunan güçlendirilmiş şasi yapısı",
-        "Uzun ömürlü kullanım için kaliteli malzeme seçimi",
-        "Profesyonel taşımacılığa uygun dengeli platform mimarisi",
-        "Ankarom satış sonrası destek ekibiyle güvenli operasyon",
-      ];
 
-  // Eğer product.images dizisi varsa onu, yoksa product.imageUrl'i dizi yap, o da yoksa boş dizi.
+  const features =
+    product.features && product.features.length > 0
+      ? product.features
+      : [
+          "Yüksek dayanım sunan güçlendirilmiş şasi yapısı",
+          "Uzun ömürlü kullanım için kaliteli malzeme seçimi",
+          "Profesyonel taşımacılığa uygun dengeli platform mimarisi",
+          "Ankarom satış sonrası destek ekibiyle güvenli operasyon",
+        ];
+
   const images = product.images?.length
     ? product.images
     : product.imageUrl
     ? [product.imageUrl]
     : [];
 
-  // Önceki Resim Fonksiyonu
-  const prevImage = () => {
-    setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
+  const decreaseQuantity = () => {
+    setQuantity((prev) => Math.max(1, prev - 1));
   };
 
-  // Sonraki Resim Fonksiyonu
+  const increaseQuantity = () => {
+    setQuantity((prev) => prev + 1);
+  };
+
+  const handleAddToCart = () => {
+    /*
+     * Mevcut CartProvider Product üzerinden çalıştığı için
+     * quantity desteğiniz yoksa mevcut yapıyı bozmamak adına
+     * ürün bir kez ekleniyor.
+     */
+    addToCart(product);
+    setIsAdded(true);
+  };
+
+  const prevImage = () => {
+    if (!images.length) return;
+
+    setCurrentImageIndex(
+      (prev) => (prev - 1 + images.length) % images.length
+    );
+  };
+
   const nextImage = () => {
+    if (!images.length) return;
+
     setCurrentImageIndex((prev) => (prev + 1) % images.length);
   };
 
   return (
-    <>
-      {/* Navigation Breadcrumb */}
-      <div className="bg-slate-50 border-b border-slate-200">
-        <div className="mx-auto w-full max-w-[1440px] px-6 py-4">
+    <div className="product-detail-page w-full">
+      {/* BREADCRUMB */}
+      <div className="border-b border-[#e5e5e5] bg-white">
+        <div className="mx-auto flex max-w-7xl justify-center px-5 py-4 sm:px-8 lg:px-10" style={{ marginInline: "auto" }}>
           <Breadcrumb
             items={[
               { label: "Ana Sayfa", href: "/" },
@@ -90,125 +110,264 @@ export default function ProductDetailExperience({
         </div>
       </div>
 
-      <section className="relative px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
-        {/* Ürün Ana Konteyneri */}
-        <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-6 lg:gap-10">
-          
-          {/* --- ÜRÜN ANA KARTI --- */}
-          <article className="w-full overflow-hidden rounded-[32px] border border-slate-200 bg-white p-4 shadow-[0_24px_70px_rgba(15,23,42,0.08)] sm:p-5 lg:p-6">
-            <div className="grid gap-6 lg:grid-cols-12 lg:items-stretch">
-              
-              {/* Ürün Görseli ve Slider */}
-              <div className="relative min-h-96 overflow-hidden rounded-3xl border border-slate-200 bg-slate-50 lg:col-span-7 lg:min-h-[560px]">
-                {images.length > 0 ? (
-                  <>
-                    <img
+      <main className="min-h-screen bg-[#f6f6f6]">
+        <div className="mx-auto max-w-7xl px-5 py-9 sm:px-8 sm:py-12 lg:px-10 lg:py-16" style={{ marginInline: "auto" }}>
+
+          {/* PRODUCT CARD */}
+          <div className="mx-auto max-w-6xl border border-[#e2e2e2] bg-white" style={{ marginInline: "auto" }}>
+
+            <div className="grid lg:grid-cols-[58%_42%]">
+
+              {/* ================= IMAGE AREA ================= */}
+              <section className="border-b border-[#e5e5e5] lg:border-b-0 lg:border-r">
+
+                <div className="relative flex aspect-square min-h-[420px] items-center justify-center bg-white sm:min-h-[550px]">
+
+                  {images.length > 0 ? (
+                    <Image
                       src={images[currentImageIndex]}
-                      alt={`${product.name} - Görsel ${currentImageIndex + 1}`}
-                      className="h-full w-full object-cover transition-opacity duration-300"
+                      alt={`${product.name} - Görsel ${
+                        currentImageIndex + 1
+                      }`}
+                      fill
+                      priority
+                      sizes="(max-width: 1024px) 100vw, 58vw"
+                      className="object-contain p-8 sm:p-12 lg:p-16"
                     />
+                  ) : (
+                    <div className="flex items-center justify-center text-[#aaa]">
+                      <svg
+                        className="h-20 w-20"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                      >
+                        <path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm0 2v12h16V6H4zm2 10 3.5-4 2.5 3 2-2 4 5H6v-2z" />
+                      </svg>
+                    </div>
+                  )}
 
-                    {/* Sağ/Sol Okları (Sadece 1'den fazla resim varsa göster) */}
-                    {images.length > 1 && (
-                      <>
-                        <button
-                          onClick={prevImage}
-                          className="absolute left-4 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/70 text-slate-800 shadow-lg backdrop-blur transition-all hover:bg-white hover:scale-105"
-                          aria-label="Önceki Görsel"
-                        >
-                          <ChevronLeftIcon className="h-6 w-6" />
-                        </button>
-                        <button
-                          onClick={nextImage}
-                          className="absolute right-4 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/70 text-slate-800 shadow-lg backdrop-blur transition-all hover:bg-white hover:scale-105"
-                          aria-label="Sonraki Görsel"
-                        >
-                          <ChevronRightIcon className="h-6 w-6" />
-                        </button>
+                  {images.length > 1 && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={prevImage}
+                        aria-label="Önceki görsel"
+                        className="absolute left-4 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-[#ddd] bg-white shadow-sm transition hover:border-[#29483c] hover:text-[#29483c]"
+                      >
+                        <ChevronLeftIcon className="h-5 w-5" />
+                      </button>
 
-                        {/* Alt Nokta (Dot) Göstergeleri */}
-                        <div className="absolute bottom-6 left-1/2 flex -translate-x-1/2 gap-2 z-10">
-                          {images.map((_, index) => (
-                            <button
-                              key={index}
-                              onClick={() => setCurrentImageIndex(index)}
-                              className={`h-2.5 rounded-full transition-all ${
-                                currentImageIndex === index
-                                  ? "w-8 bg-blue-600"
-                                  : "w-2.5 bg-white/80 hover:bg-white"
-                              }`}
-                              aria-label={`Görsel ${index + 1}`}
-                            />
-                          ))}
-                        </div>
-                      </>
-                    )}
-                  </>
-                ) : (
-                  // Resim yoksa gösterilecek placeholder
-                  <div className="flex h-full items-center justify-center">
-                    <svg
-                      className="h-32 w-32 text-slate-300"
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                    >
-                      <path d="M19 7h-3V6a4 4 0 00-8 0v1H5a2 2 0 00-2 2v7a2 2 0 002 2h1.1a3 3 0 005.8 0h4.2a3 3 0 005.8 0H21a2 2 0 002-2V9a2 2 0 00-2-2zM10 6a2 2 0 014 0v1h-4V6zm-2 12a1 1 0 11-2 0 1 1 0 012 0zm10 0a1 1 0 11-2 0 1 1 0 012 0z" />
-                    </svg>
+                      <button
+                        type="button"
+                        onClick={nextImage}
+                        aria-label="Sonraki görsel"
+                        className="absolute right-4 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-[#ddd] bg-white shadow-sm transition hover:border-[#29483c] hover:text-[#29483c]"
+                      >
+                        <ChevronRightIcon className="h-5 w-5" />
+                      </button>
+                    </>
+                  )}
+                </div>
+
+                {/* THUMBNAILS */}
+                {images.length > 1 && (
+                  <div className="border-t border-[#e5e5e5] p-4">
+                    <div className="flex gap-3 overflow-x-auto">
+                      {images.map((image, index) => (
+                        <button
+                          key={`${image}-${index}`}
+                          type="button"
+                          onClick={() => setCurrentImageIndex(index)}
+                          className={`relative h-[72px] w-[88px] shrink-0 overflow-hidden rounded border bg-white ${
+                            currentImageIndex === index
+                              ? "border-2 border-[#29483c]"
+                              : "border-[#ddd] hover:border-[#999]"
+                          }`}
+                        >
+                          <Image
+                            src={image}
+                            alt={`${product.name} görsel ${index + 1}`}
+                            fill
+                            sizes="88px"
+                            className="object-contain p-1"
+                          />
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 )}
-                
-                {/* Alt gradient gölgesi (Noktaların net görünmesi için z-index'ten kaçındık) */}
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-900/40 via-transparent to-transparent opacity-60" />
-              </div>
+              </section>
 
-              {/* Ürün Bilgileri Yan Panel */}
-              <aside className="rounded-3xl border border-slate-200 bg-slate-50 p-5 lg:col-span-5 lg:p-6">
-                <div className="flex h-full flex-col gap-6">
-                  <div>
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-slate-500">
-                      Kurumsal Ürün Serisi
-                    </p>
-                    <h2 className="mt-3 text-3xl font-black leading-tight text-slate-900 sm:text-4xl">
-                      {product.name}
-                    </h2>
+              {/* ================= PRODUCT INFO ================= */}
+              <section className="flex flex-col items-center px-6 py-9 text-center sm:px-9 sm:py-12 lg:px-12 lg:py-14">
+
+                {/* CATEGORY */}
+                <div className="text-[11px] font-medium uppercase tracking-[0.16em] text-[#718077]">
+                  {categoryLabels[product.category]}
+                </div>
+
+                {/* TITLE */}
+                <h1 className="mt-5 max-w-lg text-[30px] font-medium leading-tight text-[#202522] sm:text-[36px]">
+                  {product.name}
+                </h1>
+
+                {/* PRODUCT INFO */}
+                <div className="mt-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-[11px] text-[#777]">
+                  <span>Ürün Kodu: ANK-{product.category}</span>
+
+                  {product.certification && (
+                    <span className="text-[#29483c]">
+                      {product.certification} belgeli
+                    </span>
+                  )}
+                </div>
+
+                {/* DESCRIPTION */}
+                <div className="mt-7 max-w-lg border-t border-[#eee] pt-7">
+                  <p className="text-[14px] leading-9 text-[#555]">
+                    {product.description ||
+                      "Ankarom güvencesiyle sunulan ürünümüz hakkında detaylı bilgi alın."}
+                  </p>
+                </div>
+
+                {/* PRICE */}
+                <div className="mt-8 w-full max-w-md border-y border-[#e8e5df] py-6">
+
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#858d86]">
+                    Satış fiyatı
+                  </p>
+                  <div className="mt-3 flex flex-wrap items-baseline justify-center gap-3">
+
+                    <span className="text-[32px] font-semibold leading-tight text-[#202522] sm:text-[36px]">
+                      {formatPrice(displayPrice)}
+                    </span>
+
+                    {product.discountPrice &&
+                      product.discountPrice < product.price && (
+                        <span className="text-sm text-[#999] line-through">
+                          {formatPrice(product.price)}
+                        </span>
+                      )}
                   </div>
 
-                  {/* Özellikler */}
-                  <div className="flex-1">
-                    <ul className="space-y-4 pr-1 text-sm text-slate-600">
-                      {features.map((feature, index) => {
-                        const Icon = featureIcons[index % featureIcons.length];
-                        return (
-                          <li key={index} className="flex items-center gap-4">
-                            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white">
-                              <Icon className="h-5 w-5 text-blue-600" />
-                            </span>
-                            <span className="leading-snug">{feature}</span>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  </div>
+                  <p className="mt-3 text-[11px] text-[#858d86]">
+                    KDV dahil fiyat
+                  </p>
+                </div>
 
-                  {/* WhatsApp Butonu */}
-                  <div className="mt-auto pt-4">
-                    <a
-                      href={whatsappHref}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#25D366] px-4 py-4 text-sm font-bold text-white shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#1ebe5d]"
+                {/* STOCK */}
+                <div className="mt-6 flex items-center justify-center gap-2 text-[12px] text-[#59635c]">
+                  <span className="h-2 w-2 rounded-full bg-[#4d8b63]" />
+
+                  <span className="font-medium text-[#333]">
+                    {product.stockStatus}
+                  </span>
+                </div>
+
+                {product.deliveryInfo && (
+                  <div className="mt-3 flex items-center justify-center gap-2 text-[12px] leading-6 text-[#59635c]">
+                    <TruckIcon className="h-4 w-4 shrink-0 text-[#718a78]" />
+                    {product.deliveryInfo}
+                  </div>
+                )}
+
+                {/* QUANTITY + CART */}
+                <div className="mt-8 flex w-full max-w-md flex-col items-stretch justify-center gap-3 sm:flex-row">
+
+                  {/* QUANTITY */}
+                  <div className="mx-auto flex h-14 shrink-0 items-center border border-[#d8d8d8] sm:mx-0">
+
+                    <button
+                      type="button"
+                      onClick={decreaseQuantity}
+                      className="flex h-full w-11 items-center justify-center text-[#555] hover:bg-[#f5f5f5]"
                     >
-                      <QuestionMarkCircleIcon className="h-5 w-5" />
-                      Ürün Hakkında Soru Sor
-                    </a>
+                      <MinusIcon className="h-4 w-4" />
+                    </button>
+
+                    <span className="flex w-10 justify-center text-sm font-medium">
+                      {quantity}
+                    </span>
+
+                    <button
+                      type="button"
+                      onClick={increaseQuantity}
+                      className="flex h-full w-11 items-center justify-center text-[#555] hover:bg-[#f5f5f5]"
+                    >
+                      <PlusIcon className="h-4 w-4" />
+                    </button>
+
+                  </div>
+
+                  {/* ADD CART */}
+                  <button
+                    type="button"
+                    onClick={handleAddToCart}
+                    className={`product-cart-button flex h-14 flex-1 items-center justify-center gap-2 text-[12px] font-semibold uppercase tracking-[0.1em] transition-colors ${
+                      isAdded
+                        ? "is-added bg-[#eaf0ff] text-[#1d4ed8]"
+                        : "bg-[#1d4ed8] text-white hover:bg-[#1e40af]"
+                    }`}
+                    style={{ color: isAdded ? "#1d4ed8" : "#fff", borderRadius: 0 }}
+                  >
+                    {isAdded ? (
+                      <CheckIcon className="h-5 w-5" />
+                    ) : (
+                      <ShoppingCartIcon className="h-5 w-5" />
+                    )}
+
+                    {isAdded ? "Sepete eklendi" : "Sepete ekle"}
+                  </button>
+                </div>
+
+                {/* WHATSAPP */}
+                <a
+                  href={whatsappHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-5 inline-flex items-center justify-center gap-2 text-[11px] font-semibold uppercase tracking-[0.1em] text-[#29483c] transition hover:text-[#203b31]"
+                  style={{ color: "#29483c" }}
+                >
+                  <QuestionMarkCircleIcon className="h-5 w-5" />
+                  Ürün hakkında bilgi alın
+                </a>
+
+                {/* SECURITY */}
+                <div className="mt-8 flex w-full max-w-md items-center justify-center gap-3 border-t border-[#eee] pt-6 text-center">
+                  <ShieldCheckIcon className="h-5 w-5 shrink-0 text-[#718a78]" />
+
+                  <div>
+                    <p className="text-[12px] font-medium text-[#333]">
+                      Güvenli alışveriş
+                    </p>
+
+                    <p className="mt-2 text-[11px] leading-7 text-[#777]">
+                      Güvenli ödeme ve Ankarom satış sonrası desteği.
+                    </p>
                   </div>
                 </div>
-              </aside>
 
+              </section>
             </div>
-          </article>
+          </div>
+
+          {/* ================= PRODUCT DETAILS ================= */}
+          <section className="mx-auto mt-12 max-w-4xl border-t border-[#dcd9d1] pt-8 sm:mt-16 sm:pt-10" style={{ marginInline: "auto" }}>
+
+            {/* TITLE */}
+            <div className="text-center">
+              <h2 className="text-[22px] font-medium text-[#202522]">
+                Ürün özellikleri
+              </h2>
+
+              <p className="mx-auto mt-6 max-w-3xl text-[14px] leading-9 text-[#59635c] sm:mt-8 sm:text-[15px] sm:leading-10">
+                {features.join("  ·  ")}
+              </p>
+            </div>
+          </section>
+
         </div>
-      </section>
-    </>
+      </main>
+    </div>
   );
 }
