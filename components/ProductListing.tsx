@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
-import { ArrowRightIcon, ArrowUpRightIcon, CheckIcon, ShoppingBagIcon, TruckIcon } from "@heroicons/react/24/outline";
+import { ArrowRightIcon, CheckIcon, ShoppingBagIcon, TruckIcon } from "@heroicons/react/24/outline";
 import type { Product } from "@/lib/products";
 import { categoryLabels } from "@/lib/products";
 import { useCart } from "@/components/cart/CartProvider";
@@ -59,11 +58,7 @@ export default function ProductListing({ products }: ProductListingProps) {
                 key={product.id}
                 className="group flex flex-col overflow-hidden border border-[#e1dfd8] bg-white transition-colors duration-300 hover:border-[#aeb9b1]"
               >
-                <Link
-                  href={`/urunler/${product.id}`}
-                  className="relative flex aspect-[16/10] items-center justify-center overflow-hidden border-b border-[#e8e5df] bg-[#efeee9]"
-                  aria-label={`${product.name} ürün detayını incele`}
-                >
+                <div className="relative flex aspect-[16/10] items-center justify-center overflow-hidden border-b border-[#e8e5df] bg-[#efeee9]">
                   {imageSrc ? (
                     <Image
                       src={imageSrc}
@@ -84,7 +79,7 @@ export default function ProductListing({ products }: ProductListingProps) {
                   <span className="absolute bottom-4 right-4 text-[9px] font-medium uppercase tracking-[0.16em] text-[#858078]">
                     {String(index + 1).padStart(2, "0")}
                   </span>
-                </Link>
+                </div>
 
                 <div className="flex flex-1 flex-col p-5 sm:p-7">
                   <div className="flex items-center justify-between gap-4">
@@ -96,11 +91,11 @@ export default function ProductListing({ products }: ProductListingProps) {
                     </span>
                   </div>
 
-                  <Link href={`/urunler/${product.id}`} className="mt-5 w-fit max-w-full">
+                  <div className="mt-5 w-fit max-w-full">
                     <h2 className="line-clamp-2 text-[23px] font-medium leading-snug text-[#202522] transition-colors group-hover:text-[#1e344f] sm:text-[26px]">
                       {product.name}
                     </h2>
-                  </Link>
+                  </div>
 
                   <p className="catalog-muted mt-4 line-clamp-3 text-[13px] leading-7 text-[#68716b]" style={{ color: "#68716b" }}>
                     {product.description}
@@ -130,20 +125,7 @@ export default function ProductListing({ products }: ProductListingProps) {
                       )}
                     </div>
 
-                    <div className="grid grid-cols-2 gap-3">
-                      <Link
-                        href={`/urunler/${product.id}`}
-                        className="catalog-action inline-flex min-h-12 items-center justify-center gap-2 border border-[#1e344f] bg-white px-3 py-3 text-center text-[9px] font-medium uppercase tracking-[0.14em]"
-                        aria-label={`${product.name} detayları`}
-                        onMouseEnter={(event) => setCatalogActionAppearance(event.currentTarget, true)}
-                        onMouseLeave={(event) => setCatalogActionAppearance(event.currentTarget, false)}
-                        onFocus={(event) => setCatalogActionAppearance(event.currentTarget, true)}
-                        onBlur={(event) => setCatalogActionAppearance(event.currentTarget, false)}
-                        style={catalogActionStyle}
-                      >
-                        Detaylar
-                        <ArrowUpRightIcon className="h-3.5 w-3.5 shrink-0" />
-                      </Link>
+                    <div className="grid grid-cols-1 gap-3">
                       <button
                         type="button"
                         onClick={() => {

@@ -1,9 +1,10 @@
+
 "use client";
 
 import Link from "next/link";
 import type { Product } from "@/lib/products";
 import { categoryLabels } from "@/lib/products";
-import { ArrowUpRightIcon, CheckIcon } from "@heroicons/react/24/outline";
+import { CheckIcon } from "@heroicons/react/24/outline";
 
 type PopularProductsSliderProps = {
   products: Product[];
@@ -59,7 +60,7 @@ export default function PopularProductsSlider({
           {products.map((product, index) => (
             <article
               key={product.id}
-              className="group"
+              className="group cursor-default"
             >
               {/* GÖRSEL */}
               <div className="relative aspect-[4/3] overflow-hidden bg-[#f5f4f1]">
@@ -92,15 +93,6 @@ export default function PopularProductsSlider({
                     {categoryLabels[product.category]}
                   </span>
                 </div>
-
-                {/* Sağ üst ok */}
-                <Link
-                  href={`/urunler/${product.id}`}
-                  aria-label={`${product.name} ürününü incele`}
-                  className="absolute right-5 top-5 flex h-10 w-10 items-center justify-center bg-white text-[#24211e] opacity-0 transition-all duration-300 group-hover:bg-[#edf3fa] group-hover:text-[#52749b] group-hover:opacity-100"
-                >
-                  <ArrowUpRightIcon className="h-4 w-4" />
-                </Link>
               </div>
 
               {/* ÜRÜN BİLGİSİ */}
@@ -118,7 +110,7 @@ export default function PopularProductsSlider({
                   </div>
 
                   {product.price > 0 && (
-                    <span className="pt-1 text-sm font-medium whitespace-nowrap text-[#4a4641]">
+                    <span className="whitespace-nowrap pt-1 text-sm font-medium text-[#4a4641]">
                       {formatPrice(product.price)}
                     </span>
                   )}
@@ -170,15 +162,8 @@ export default function PopularProductsSlider({
                   )}
                 </div>
 
-                {/* ÜRÜN DETAY */}
-                <Link
-                  href={`/urunler/${product.id}`}
-                  className="mt-8 inline-flex items-center gap-3 text-[9px] font-medium uppercase tracking-[0.22em] text-[#282522] transition-colors duration-300 hover:text-[#52749b]"
-                >
-                  Ürünü İncele
-
-                  <ArrowUpRightIcon className="h-3.5 w-3.5 transition-all duration-300 group-hover:-translate-y-1 group-hover:translate-x-1 group-hover:text-[#52749b]" />
-                </Link>
+                {/* ÜRÜN DETAY BUTONU YOK */}
+                <div className="mt-8 h-4" aria-hidden="true" />
               </div>
             </article>
           ))}
@@ -203,7 +188,19 @@ export default function PopularProductsSlider({
           >
             Tüm Kataloğu Gör
 
-            <ArrowUpRightIcon className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+            <svg
+              className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M7 17 17 7M8 7h9v9"
+              />
+            </svg>
           </Link>
         </div>
 
