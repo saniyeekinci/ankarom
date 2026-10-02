@@ -15,8 +15,10 @@ const whatsappHref =
   "https://wa.me/905079586868?text=İyi%20günler,%20hizmetleriniz%20hakkında%20detaylı%20bilgi%20alabilir%20miyim?";
 
 const menuLinks = [
+  { name: "Anasayfa", href: "/" },
   { name: "Katalog", href: "/urunler" },
   { name: "Hakkımızda", href: "/hakkimizda" },
+  { name: "İletişim", href: "/iletisim" },
 ];
 
 export default function Header() {
@@ -259,7 +261,7 @@ export default function Header() {
                 <div className="flex items-center gap-5">
 
                   <span className="text-[9px] font-medium tracking-[0.2em] text-[#aaa49f]">
-                    03
+                    05
                   </span>
 
                   <span className="text-[14px] font-medium uppercase tracking-[0.16em] text-[#3d3935]">
@@ -270,7 +272,7 @@ export default function Header() {
 
                 <div className="flex items-center gap-3">
 
-                  <span className="flex h-5 min-w-5 items-center justify-center bg-[#171717] px-1 text-[9px] text-white">
+                  <span className="flex h-5 min-w-5 items-center justify-center border border-[#d8d3ca] bg-white px-1 text-[9px] text-[#171717]">
                     {itemCount}
                   </span>
 
@@ -303,7 +305,7 @@ export default function Header() {
               target="_blank"
               rel="noopener noreferrer"
               onClick={closeMobileMenu}
-              className="group flex w-full items-center justify-between bg-[#24211e] px-5 py-4 text-white transition-colors duration-300 hover:bg-[#3a3631]"
+              className="group flex w-full items-center justify-between border border-[#d8d3ca] bg-white px-5 py-4 text-[#24211e] transition-colors duration-300 hover:bg-[#f3f2ef]"
             >
               <span className="text-[10px] font-medium uppercase tracking-[0.2em]">
                 Teklif Al

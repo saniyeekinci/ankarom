@@ -156,7 +156,6 @@ export default function ContactPage() {
                       </span>
                     </div>
                   </a>
-
                   <a
                     href="mailto:info@ankarom.com"
                     className="group block border-t border-[#d8d3ca] py-9"
@@ -177,18 +176,18 @@ export default function ContactPage() {
                       </span>
                     </div>
                   </a>
-
-                  <div className="border-y border-[#d8d3ca] py-9">
-                    <div className="flex items-center gap-5">
-                      <MapPinIcon className="h-5 w-5 shrink-0 stroke-[1.2] text-[#827d74]" />
+ <div className="border-t border-[#d8d3ca] py-9">
+                    <div className="flex items-start gap-5">
+                      <MapPinIcon className="mt-1 h-5 w-5 shrink-0 stroke-[1.2] text-[#827d74]" />
 
                       <div>
                         <p className="text-[8px] uppercase tracking-[0.3em] text-[#96918a]">
-                          MERKEZ
+                          ADRES
                         </p>
 
-                        <p className="mt-4 text-[15px] font-light text-[#55514b]">
-                          Ankara, Türkiye
+                        <p className="mt-4 max-w-[290px] text-[15px] font-light leading-7 text-[#55514b]">
+                          Hasköy Mahallesi Eczacılar sokak Emek Sokak 3/A
+                          Keçiören Ankara
                         </p>
                       </div>
                     </div>
