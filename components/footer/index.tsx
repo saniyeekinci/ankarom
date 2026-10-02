@@ -392,7 +392,7 @@ export default function Footer() {
                       href="mailto:info@ankarom.com"
                       className="text-[14px] text-[#b9c8db] transition-colors hover:text-white"
                     >
-                      info@ankarom.com
+                      ankarom06@gmail.com 
                     </a>
                   </div>
 

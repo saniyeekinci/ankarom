@@ -167,7 +167,7 @@ export default function ContactPage() {
                         </p>
 
                         <p className="mt-4 text-[18px] font-light tracking-[-0.01em] text-[#272522] sm:text-[20px]">
-                          info@ankarom.com
+                          ankarom06@gmail.com 
                         </p>
                       </div>
 
