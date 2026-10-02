@@ -404,7 +404,9 @@ export default function Footer() {
                     <p className="text-[14px] leading-6 text-[#9caec6]">
                       Türkiye / Ankara
                       <br />
-                      Hasköy Mahallesi Eczacılar sokak Emek Sokak 3/A Keçiören Ankara
+                      Hasköy Mahallesi  Emek Sokak  3/A 
+                      <br />
+                      Keçiören /ANKARA
                     </p>
                   </div>
 

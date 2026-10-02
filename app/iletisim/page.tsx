@@ -186,8 +186,9 @@ export default function ContactPage() {
                         </p>
 
                         <p className="mt-4 max-w-[290px] text-[15px] font-light leading-7 text-[#55514b]">
-                          Hasköy Mahallesi Eczacılar sokak Emek Sokak 3/A
-                          Keçiören Ankara
+                          Hasköy Mahallesi  Emek Sokak  3/A 
+                          <br />
+                          Keçiören /ANKARA
                         </p>
                       </div>
                     </div>
