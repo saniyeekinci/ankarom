@@ -8,9 +8,6 @@ import {
   ArrowUpRightIcon,
 } from "@heroicons/react/24/outline";
 
-const whatsappHref =
-  "https://wa.me/905079586868?text=İyi%20günler,%20hizmetleriniz%20hakkında%20detaylı%20bilgi%20alabilir%20miyim?";
-
 const advantages = [
   {
     icon: ShieldCheckIcon,
@@ -96,18 +93,6 @@ export default function HeroStatsCard() {
                 <ArrowUpRightIcon className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
               </Link>
 
-              <Link
-                href={whatsappHref}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group inline-flex items-center gap-4 border border-[#c5d3e4] bg-white px-7 py-4 text-[9px] font-medium uppercase tracking-[0.24em] text-[#252320] transition-all duration-300 hover:border-[#7896bb] hover:bg-[#f1f5fa] hover:text-[#52749b]"
-              >
-                Teklif Al
-
-                <span className="text-[#aaa49c] transition-transform duration-300 group-hover:translate-x-1">
-                  →
-                </span>
-              </Link>
             </div>
           </div>
 

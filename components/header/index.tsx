@@ -11,9 +11,6 @@ import {
 } from "@heroicons/react/24/outline";
 import { useCart } from "@/components/cart/CartProvider";
 
-const whatsappHref =
-  "https://wa.me/905079586868?text=İyi%20günler,%20hizmetleriniz%20hakkında%20detaylı%20bilgi%20alabilir%20miyim?";
-
 const menuLinks = [
   { name: "Anasayfa", href: "/" },
   { name: "Katalog", href: "/urunler" },
@@ -133,17 +130,6 @@ export default function Header() {
             </span>
           </Link>
 
-          {/* Teklif Al */}
-          <Link
-            href={whatsappHref}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group ml-5 inline-flex items-center gap-4 border border-[#d8d3ca] bg-white px-5 py-3 text-[10px] font-medium uppercase tracking-[0.18em] text-[#24211e] transition-all duration-300 hover:border-[#aaa49c] hover:bg-[#EFF6FF]"
-          >
-            <span>Teklif Al</span>
-
-            <ArrowUpRightIcon className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-          </Link>
         </nav>
 
         {/* =====================================================
@@ -297,28 +283,6 @@ export default function Header() {
             </div>
           </div>
 
-          {/* Mobile CTA */}
-          <div className="border-t border-[#e5e1da] p-6 sm:p-8">
-
-            <Link
-              href={whatsappHref}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={closeMobileMenu}
-              className="group flex w-full items-center justify-between border border-[#d8d3ca] bg-white px-5 py-4 text-[#24211e] transition-colors duration-300 hover:bg-[#f3f2ef]"
-            >
-              <span className="text-[10px] font-medium uppercase tracking-[0.2em]">
-                Teklif Al
-              </span>
-
-              <ArrowUpRightIcon className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-            </Link>
-
-            <p className="mt-4 text-center text-[9px] uppercase tracking-[0.15em] text-[#aaa49f]">
-              WhatsApp üzerinden iletişime geçin
-            </p>
-
-          </div>
         </div>
       </div>
     </header>

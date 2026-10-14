@@ -13,7 +13,7 @@ const sections = [
     title: "Taraflar",
     paragraphs: [
       "Bu sözleşme; sipariş sırasında bilgileri ve iletişim kanalları paylaşılan satıcı ile sipariş formunda bilgileri yer alan tüketici arasında, elektronik ortamda kurulur.",
-      "Satıcının tam ticari unvanı, MERSİS veya vergi numarası ve tebligat adresi, sipariş tamamlanmadan önce sunulan Ön Bilgilendirme Formu ve sipariş özetiyle birlikte değerlendirilmelidir. ANKAROM marka adıdır; hukuki satıcı bilgileri sipariş belgelerinde esas alınır.",
+      "Satıcının tam ticari unvanı ile MERSİS veya vergi numarası, sipariş tamamlanmadan önce sunulan Ön Bilgilendirme Formu ve sipariş özetinde belirtilmelidir. ANKAROM marka adıdır; hukuki satıcı bilgileri sipariş belgelerinde esas alınır. Satıcının iletişim ve adres bilgileri aşağıda yer almaktadır.",
     ],
   },
   {
@@ -168,7 +168,11 @@ export default function DistanceSalesAgreementPage() {
             <a className="mt-1 block hover:text-[#29483c]" href="tel:+905079586868">
               +90 (507) 958 68 68
             </a>
-            <p className="mt-1">Türkiye / Ankara</p>
+            <p className="mt-2">
+              Hasköy Mahallesi, Emek Sokak 3/A
+              <br />
+              Keçiören / ANKARA
+            </p>
           </div>
         </aside>
 
@@ -176,10 +180,9 @@ export default function DistanceSalesAgreementPage() {
           <div className="mb-10 border border-[#e3d8bd] bg-[#fbf8f0] px-5 py-4 text-[13px] leading-6 text-[#665d4e] sm:px-6">
             <p className="font-semibold text-[#4d463a]">Yayına almadan önce</p>
             <p className="mt-1">
-              Satıcının tam ticari unvanı, MERSİS veya vergi numarası ve açık
-              tebligat adresi henüz bu sayfada yer almıyor. Bu yasal bilgiler
-              sipariş kabul edilmeden önce sözleşme ve Ön Bilgilendirme
-              Formunda tamamlanmalıdır.
+              Satıcının tam ticari unvanı ile MERSİS veya vergi numarası bu
+              sayfada yer almıyor. Bu yasal bilgiler sipariş kabul edilmeden
+              önce sözleşme ve Ön Bilgilendirme Formunda tamamlanmalıdır.
             </p>
           </div>
 
